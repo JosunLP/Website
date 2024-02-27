@@ -1,13 +1,13 @@
 <script>
 	import { page } from '$app/stores';
-	import logo from '$lib/images/svelte-logo.svg';
+	import lintree from '$lib/images/linktree-seeklogo.svg';
 	import github from '$lib/images/github.svg';
 </script>
 
 <header>
 	<div class="corner">
-		<a href="https://kit.svelte.dev">
-			<img src={logo} alt="SvelteKit" />
+		<a href="https://linktr.ee/josunlp" target="_blank">
+			<img src={lintree} alt="LinkTree" />
 		</a>
 	</div>
 
@@ -22,8 +22,8 @@
 			<li aria-current={$page.url.pathname === '/about' ? 'page' : undefined}>
 				<a href="/about">About</a>
 			</li>
-			<li aria-current={$page.url.pathname.startsWith('/sverdle') ? 'page' : undefined}>
-				<a href="/sverdle">Sverdle</a>
+			<li aria-current={$page.url.pathname === '/contact' ? 'page' : undefined}>
+				<a href="/contact">Contact</a>
 			</li>
 		</ul>
 		<svg viewBox="0 0 2 3" aria-hidden="true">
@@ -32,8 +32,8 @@
 	</nav>
 
 	<div class="corner">
-		<a href="https://github.com/sveltejs/kit">
-			<img src={github} alt="GitHub" />
+		<a href="https://github.com/josunlp">
+			<img src={github} alt="GitHub" class="github" />
 		</a>
 	</div>
 </header>
@@ -66,7 +66,7 @@
 	nav {
 		display: flex;
 		justify-content: center;
-		--background: rgba(255, 255, 255, 0.7);
+		--background: rgba(238, 92, 92, 0.7);
 	}
 
 	svg {
@@ -125,5 +125,12 @@
 
 	a:hover {
 		color: var(--color-theme-1);
+	}
+
+	.github {
+		width: 2em;
+		height: 2em;
+		object-fit: contain;
+		filter: invert(1);
 	}
 </style>
