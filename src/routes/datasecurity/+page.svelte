@@ -1,8 +1,11 @@
 <svelte:head>
-	<title>Disclaimer</title>
-	<meta name="description" content="Disclaimer" />
+	<title>Datasecurity</title>
+	<meta name="description" content="datasecurity" />
 </svelte:head>
 
 <div class="text-column">
-	<h1>Disclaimer</h1>
+	<h1>Data protection at a glance</h1>
+	<p>
+		This page does not collect any data. It does not use cookies, does not track you, and does not store any data.
+	</p>
 </div>

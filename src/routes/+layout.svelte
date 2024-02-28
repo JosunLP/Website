@@ -14,17 +14,16 @@
 
 	<footer>
 		<div class="footerLinks">
-			<a href="./impressum" class="imprint">Imprint</a>
+			<a href="./imprint" class="imprint">Imprint</a>
 			|
-			<a href="./datenschutz" class="datasecurity">Datasecurity</a>
+			<a href="./datasecurity" class="datasecurity">Datasecurity</a>
 			|
-			<a href="./disclaimer" class="disclaimer">Disclaimer</a>
-			|
-			<a href="./kontakt" class="contact">Contact</a>
+			<a href="./contact" class="contact">Contact</a>
 			|
 			<a href="https://profile.josunlp.de/" target="_blank" class="projects">Projects</a>
 			|
-			<a href="https://forsaken-ashbirds.net/" target="_blank" class="forsaken">Forsaken Ashbirds</a>
+			<a href="https://forsaken-ashbirds.net/" target="_blank" class="forsaken">Forsaken Ashbirds</a
+			>
 		</div>
 		<p>©{year} Jonas Pfalzgraf</p>
 	</footer>
@@ -32,5 +31,9 @@
 
 <style lang="sass">
 
+	@import '../sass/mixins/_notouch.sass'
 
+	footer
+		p
+			@include noTouch
 </style>
