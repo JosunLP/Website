@@ -55,6 +55,8 @@
 
 <style lang="sass">
 
+	@import '../sass/mixins/_flickering.sass'
+
 	section
 		display: flex
 		flex-direction: column

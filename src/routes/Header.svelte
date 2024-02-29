@@ -1,37 +1,34 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import { browser } from '$app/environment';
-	import {replaceState, pushState} from '$app/navigation';
-  import lintree from '$lib/images/linktree-seeklogo.svg';
-  import github from '$lib/images/github.svg';
+	import { page } from '$app/stores';
+	import { browser } from '$app/environment';
+	import { goto, pushState, replaceState } from '$app/navigation';
+	import lintree from '$lib/images/linktree-seeklogo.svg';
+	import github from '$lib/images/github.svg';
 
-  let scrollToSection = (sectionId: string) => {};
+	let scrollToSection = (sectionId: string) => {};
+	let navigateToSection = (sectionId: string) => {};
 
-  if (browser) {
-    scrollToSection = (sectionId: string) => {
-      const section = document.getElementById(sectionId);
+	if (browser) {
+		scrollToSection = async (sectionId: string) => {
+			const section = document.getElementById(sectionId);
 
-      if ($page.url.pathname !== '/') {
-				// navigate to the home page
-				pushState('', '/');
+			if ($page.url.pathname !== '/') {
+				await goto(`/#${sectionId}`);
+				document.title = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+			}
 
-        // Smoothly scroll to the top of the page if not on the home page
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+			replaceState(new URL($page.url.href), `#${sectionId}`);
 
-      // Update the URL hash without triggering the scroll event
-      replaceState('', `#${sectionId}`);
+			if (section) {
+				section.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest'});
+				document.title = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+			}
+		};
 
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth' });
-      }
-    };
-
-    // Add an event listener to update the page.url when the hash changes
-    document.addEventListener('hashchange', () => {
-      $page.url = new URL(document.location.href);
-    });
-  }
+		navigateToSection = (sectionId: string) => {
+			goto(`/${sectionId}`);
+		};
+	}
 </script>
 
 <header>
@@ -46,17 +43,30 @@
 			<path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
 		</svg>
 		<ul>
-			<li aria-current={$page.url.hash === '' || $page.url.hash === '#home' ? 'page' : undefined}>
-				<a href="#home" on:click={() => scrollToSection('home')}>Home</a>
+			<li
+				aria-current={$page.url.pathname === '/' &&
+				($page.state === '' || $page.state === '#home')
+					? 'page'
+					: undefined}
+			>
+				<button on:click={() => scrollToSection('home')}>Home</button>
 			</li>
-			<li aria-current={$page.url.hash === '#about' ? 'page' : undefined}>
-				<a href="#about" on:click={() => scrollToSection('about')}>About</a>
+			<li
+				aria-current={$page.url.pathname === '/' && $page.state === '#about'
+					? 'page'
+					: undefined}
+			>
+				<button on:click={() => scrollToSection('about')}>About</button>
 			</li>
-			<li aria-current={$page.url.hash === '#contact' ? 'page' : undefined}>
-				<a href="#contact" on:click={() => scrollToSection('contact')}>Contact</a>
+			<li
+				aria-current={$page.url.pathname === '/' && $page.state === '#contact'
+					? 'page'
+					: undefined}
+			>
+				<button on:click={() => scrollToSection('contact')}>Contact</button>
 			</li>
 			<li aria-current={$page.url.pathname === '/imprint' ? 'page' : undefined}>
-				<a href="/imprint">Imprint</a>
+				<button on:click={() => navigateToSection('imprint')}>Imprint</button>
 			</li>
 		</ul>
 		<svg viewBox="0 0 2 3" aria-hidden="true">
@@ -72,6 +82,7 @@
 </header>
 
 <style lang="sass">
+
 	header
 		display: flex
 		justify-content: space-between
@@ -101,10 +112,8 @@
 		height: 3em
 		display: block
 
-
 	path
 		fill: var(--background)
-
 
 	ul
 		position: relative
@@ -139,7 +148,7 @@
 		display: flex
 		justify-content: center
 		--background: rgba(238, 92, 92, 0.7)
-		a
+		button
 			display: flex
 			height: 100%
 			align-items: center
@@ -151,9 +160,14 @@
 			letter-spacing: 0.1em
 			text-decoration: none
 			transition: color 0.2s linear
-
-		a:hover
-			color: var(--color-theme-1)
+			background-color: transparent
+			background-repeat: no-repeat
+			border: none
+			cursor: pointer
+			overflow: hidden
+			outline: none
+			&:hover
+				color: var(--color-theme-1)
 
 	.github
 		width: 2em

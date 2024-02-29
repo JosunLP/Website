@@ -1,7 +1,7 @@
-<section class="text-column greeting">
-	<h1>Moin</h1>
+<section class="text-column" id="greeting">
 
 	<div>
+		<h1>Moin</h1>
 		<p>
 			Welcome to my space, where I showcase my work and projects. If you have any inquiries about me
 			or the projects mentioned, feel free to reach out using the contact form. I'm also available
@@ -12,6 +12,7 @@
 </section>
 
 <style lang="sass">
+
 	.text-column
 		display: flex
 		flex-direction: column
@@ -22,7 +23,7 @@
 	h1
 		width: 100%
 
-	.greeting
+	#greeting
 		display: flex
 		flex-direction: column
 		justify-content: center
@@ -31,13 +32,21 @@
 		height: 60vh
 		padding: 10rem 0 calc(100% * 495 / 2048) 0
 		overflow: hidden
-		animation: wave 4s infinite linear
 
-		@keyframes wave
-			0%
-				transform: translate(0, 0)
-			50%
-				transform: translate(0, 1%)
-			100%
-				transform: translate(0, 0)
+		div
+			width: 100%
+			max-width: 40rem
+			text-align: center
+			margin-top: 2rem
+			font-size: 1.5rem
+			line-height: 1.5
+			color: var(--text)
+			font-weight: 300
+			letter-spacing: 0.1rem
+			opacity: 0.8
+			transition: opacity 0.3s ease-in-out
+
+			&:hover
+				opacity: 1
+				transition: opacity 0.3s ease-in-out
 </style>

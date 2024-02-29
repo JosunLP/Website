@@ -18,7 +18,7 @@
 			|
 			<a href="./datasecurity" class="datasecurity">Datasecurity</a>
 			|
-			<a href="./contact" class="contact">Contact</a>
+			<a href="./#contact" class="contact">Contact</a>
 			|
 			<a href="https://profile.josunlp.de/" target="_blank" class="projects">Projects</a>
 			|
@@ -30,7 +30,6 @@
 </div>
 
 <style lang="sass">
-
 	@import '../sass/mixins/_notouch.sass'
 
 	footer
