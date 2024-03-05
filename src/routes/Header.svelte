@@ -1,34 +1,32 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
-	import { goto, pushState, replaceState } from '$app/navigation';
 	import lintree from '$lib/images/linktree-seeklogo.svg';
 	import github from '$lib/images/github.svg';
+	import type { Page } from '@sveltejs/kit';
+	import PageNavigation from '../classes/pageNavigation';
+	import { onMount } from 'svelte';
 
-	let scrollToSection = (sectionId: string) => {};
+	let scrollToSection = (
+		sectionId: string,
+		$page: Page<Record<string, string>, string | null>
+	) => {};
 	let navigateToSection = (sectionId: string) => {};
 
 	if (browser) {
-		scrollToSection = async (sectionId: string) => {
-			const section = document.getElementById(sectionId);
+		scrollToSection = PageNavigation.scrollToSection;
 
-			if ($page.url.pathname !== '/') {
-				await goto(`/#${sectionId}`);
-				document.title = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-			}
-
-			replaceState(new URL($page.url.href), `#${sectionId}`);
-
-			if (section) {
-				section.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest'});
-				document.title = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-			}
-		};
-
-		navigateToSection = (sectionId: string) => {
-			goto(`/${sectionId}`);
-		};
+		navigateToSection = PageNavigation.navigateToSection;
 	}
+
+	onMount(() => {
+		const currentURL = new URL(window.location.href);
+		const hash = currentURL.hash;
+
+		if (hash) {
+			scrollToSection(hash.slice(1), $page);
+		}
+	});
 </script>
 
 <header>
@@ -44,26 +42,21 @@
 		</svg>
 		<ul>
 			<li
-				aria-current={$page.url.pathname === '/' &&
-				($page.state === '' || $page.state === '#home')
+				aria-current={$page.url.pathname === '/' && ($page.state === '' || $page.state === '#home')
 					? 'page'
 					: undefined}
 			>
-				<button on:click={() => scrollToSection('home')}>Home</button>
+				<button on:click={() => scrollToSection('home', $page)}>Home</button>
 			</li>
 			<li
-				aria-current={$page.url.pathname === '/' && $page.state === '#about'
-					? 'page'
-					: undefined}
+				aria-current={$page.url.pathname === '/' && $page.state === '#about' ? 'page' : undefined}
 			>
-				<button on:click={() => scrollToSection('about')}>About</button>
+				<button on:click={() => scrollToSection('about', $page)}>About</button>
 			</li>
 			<li
-				aria-current={$page.url.pathname === '/' && $page.state === '#contact'
-					? 'page'
-					: undefined}
+				aria-current={$page.url.pathname === '/' && $page.state === '#contact' ? 'page' : undefined}
 			>
-				<button on:click={() => scrollToSection('contact')}>Contact</button>
+				<button on:click={() => scrollToSection('contact', $page)}>Contact</button>
 			</li>
 			<li aria-current={$page.url.pathname === '/imprint' ? 'page' : undefined}>
 				<button on:click={() => navigateToSection('imprint')}>Imprint</button>

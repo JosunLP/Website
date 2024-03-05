@@ -6,6 +6,16 @@
 	import '../sass/mixins/_notouch.sass';
 	import '../sass/mixins/_shadow.sass';
 	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
+	import type { Page } from '@sveltejs/kit';
+	import PageNavigation from '../classes/pageNavigation';
+	import { page } from '$app/stores';
+
+	let scrollToSection = (sectionId: string, $page: Page<Record<string, string>, string | null>) => {};
+
+	if (browser) {
+		scrollToSection = PageNavigation.scrollToSection;
+	}
 
 	onMount(() => {
 		const home = document.getElementById('home') as HTMLTableSectionElement;
@@ -23,7 +33,9 @@
 	<h1>
 		<span class="welcome">
 			<img src={logo3d} alt="Logo" />
-			<svg
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<svg on:click={() => scrollToSection('greeting', $page)}
 					fill="#000000"
 					height="200px"
 					width="200px"
@@ -93,6 +105,7 @@
 			position: absolute
 			top: 35rem
 			animation: wave 4s infinite linear
+			cursor: pointer
 			@keyframes wave
 				0%
 					transform: translate(0, 0)
