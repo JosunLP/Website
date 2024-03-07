@@ -85,8 +85,8 @@
 		justify-content: center
 		align-items: center
 		width: 100%
-		height: 40vh
-		padding: 10rem 0 calc(100% * 495 / 2048) 0
+		height: 5vh
+		padding: 50vh 0 calc(100% * 495 / 2048) 0
 		overflow: hidden
 		animation: wave 4s infinite linear
 		@keyframes wave

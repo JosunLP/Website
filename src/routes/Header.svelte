@@ -26,6 +26,8 @@
 		if (hash) {
 			scrollToSection(hash.slice(1), $page);
 		}
+
+		PageNavigation.trackScrollSectionPosition($page);
 	});
 </script>
 
