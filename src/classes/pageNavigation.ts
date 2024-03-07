@@ -30,7 +30,6 @@ export default class PageNavigation {
 					$page.state = `/#${sectionId}`;
 					$page.route = { id: `/#${sectionId}` };
 					$page.url = new URL($page.url.origin + `/#${sectionId}` + $page.url.search);
-					console.log($page);
 				})
 				.catch((error) => {
 					console.error(error);
