@@ -22,7 +22,8 @@
 	onMount(() => {
 		const currentURL = new URL(window.location.href);
 		const hash = currentURL.hash;
-
+		console.info('%c If you read this and have a job for me, feel free to contact me at mailto://info@josunlp.de', 'background: #222; color: #bada55; font-size: 1.5em; padding: 0.5em;');
+		console.info('%c For Technical difficulties with the website or one of my projects, please contact me at mailto://support@josunlp.de', 'background: #222; color: #bada55; font-size: 1.5em; padding: 0.5em;');
 		if (hash) {
 			scrollToSection(hash.slice(1), $page);
 		}
