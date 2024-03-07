@@ -87,6 +87,7 @@
 		width: 100%
 		height: 5vh
 		padding: 50vh 0 calc(100% * 495 / 2048) 0
+		margin-top: 10vh
 		overflow: hidden
 		animation: wave 4s infinite linear
 		@keyframes wave

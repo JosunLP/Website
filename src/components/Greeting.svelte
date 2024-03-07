@@ -37,7 +37,8 @@
 			width: 100%
 			max-width: 40rem
 			text-align: center
-			margin-top: 2rem
+			margin-top: 10vh
+			margin-bottom: 5vh
 			font-size: 1.5rem
 			line-height: 1.5
 			color: var(--text)

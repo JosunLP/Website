@@ -44,19 +44,19 @@
 		</svg>
 		<ul>
 			<li
-				aria-current={$page.url.pathname === '/' && ($page.state === '' || $page.state === '#home')
+				aria-current={$page.url.pathname === '/' && ($page.state === '/' || $page.state === '/#home')
 					? 'page'
 					: undefined}
 			>
 				<button on:click={() => scrollToSection('home', $page)}>Home</button>
 			</li>
 			<li
-				aria-current={$page.url.pathname === '/' && $page.state === '#about' ? 'page' : undefined}
+				aria-current={$page.url.pathname === '/' && $page.state === '/#about' ? 'page' : undefined}
 			>
 				<button on:click={() => scrollToSection('about', $page)}>About</button>
 			</li>
 			<li
-				aria-current={$page.url.pathname === '/' && $page.state === '#contact' ? 'page' : undefined}
+				aria-current={$page.url.pathname === '/' && $page.state === '/#contact' ? 'page' : undefined}
 			>
 				<button on:click={() => scrollToSection('contact', $page)}>Contact</button>
 			</li>
