@@ -1,7 +1,23 @@
 import { goto, replaceState } from '$app/navigation';
 import type { Page } from '@sveltejs/kit';
+import { DeviceType } from '../enums/deviceType.enum';
 
 export default class PageNavigation {
+
+	public static getDeviceType(): DeviceType {
+		const userAgent = navigator.userAgent;
+		const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+		const isTablet = /iPad|Android|Touch/i.test(userAgent);
+
+		if (isMobile) {
+			return DeviceType.MOBILE;
+		} else if (isTablet) {
+			return DeviceType.TABLET;
+		} else {
+			return DeviceType.DESKTOP;
+		}
+	}
+
 	private constructor() {
 		console.log('PageNavigation constructor');
 	}
