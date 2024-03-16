@@ -89,7 +89,7 @@
 			</ul>
 		{/if}
 
-		{#if deviceType === DeviceType.DESKTOP}
+		{#if deviceType === DeviceType.DESKTOP || deviceType === DeviceType.TABLET}
 			<svg viewBox="0 0 2 3" aria-hidden="true">
 				<path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
 			</svg>
@@ -140,10 +140,10 @@
 	header
 		display: flex
 		justify-content: space-between
-		// make header sticky
 		position: sticky
 		top: 0
 		z-index: 100
+		background: var(--background)
 
 	.open
 		display: flex
@@ -180,7 +180,7 @@
 		--background: rgba(238, 92, 92, 0.7)
 
 		ul
-			@include respond-to(medium-screens)
+			@include respond-to(tablet)
 				position: relative
 				padding: 0
 				margin: 0
@@ -192,7 +192,7 @@
 				background: var(--background)
 				background-size: contain
 
-			@include respond-to(wide-screens)
+			@include respond-to(desktop)
 				position: relative
 				padding: 0
 				margin: 0
@@ -204,7 +204,7 @@
 				background: var(--background)
 				background-size: contain
 
-			@include respond-to(handhelds)
+			@include respond-to(smartphone)
 				position: absolute
 				top: 3em
 				left: 0
@@ -220,15 +220,15 @@
 				transition: opacity 0.3s ease-in-out
 
 			li
-				@include respond-to(medium-screens)
+				@include respond-to(tablet)
 					position: relative
 					height: 100%
 					width: 100%
-				@include respond-to(wide-screens)
+				@include respond-to(desktop)
 					position: relative
 					height: 100%
 					width: 100%
-				@include respond-to(handhelds)
+				@include respond-to(smartphone)
 					position: relative
 					height: 3em
 					width: 100%

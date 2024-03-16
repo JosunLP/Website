@@ -2,6 +2,7 @@
 	import AboutMe from './../components/AboutMe.svelte';
 	import Greeting from './../components/Greeting.svelte';
 	import logo3d from '../lib/images/Logo-Jonas_3d.svg';
+	import arrowDown from '../lib/images/arrow-down.svg';
 	import Contact from '../components/Contact.svelte';
 	import '../sass/mixins/_notouch.sass';
 	import '../sass/mixins/_shadow.sass';
@@ -32,31 +33,10 @@
 <section id="home">
 	<h1>
 		<span class="welcome">
-			<img src={logo3d} alt="Logo" />
+			<img class="logo" src={logo3d} alt="Logo" />
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<svg on:click={() => scrollToSection('greeting', $page)}
-					fill="#000000"
-					height="200px"
-					width="200px"
-					version="1.1"
-					id="Capa_1"
-					xmlns="http://www.w3.org/2000/svg"
-					xmlns:xlink="http://www.w3.org/1999/xlink"
-					viewBox="0 0 490 490"
-					xml:space="preserve"
-					data-darkreader-inline-fill=""
-					style="--darkreader-inline-fill: #0d0d0d;"
-					><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g
-						id="SVGRepo_tracerCarrier"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					></g><g id="SVGRepo_iconCarrier">
-						<path
-							d="M320.953,78.043L245,159.24l-75.953-81.197l-34.582,35.377L91.341,67.315L0,160.754l245,261.932l245-261.932l-91.341-93.439 l-43.124,46.105L320.953,78.043z M168.568,122.455L245,204.162l76.432-81.707l13.11,13.41L245,231.597l-89.542-95.732 L168.568,122.455z M399.138,111.727l48.398,49.506L245,377.764L42.464,161.233l48.398-49.506l32.458,34.701L245,276.533 l121.681-130.106L399.138,111.727z"
-						></path>
-					</g></svg
-				>
+			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+			<img class="arrowDown" src={arrowDown} alt="Arrow Down" on:click={() => scrollToSection('greeting', $page)}>
 		</span>
 	</h1>
 </section>
@@ -68,6 +48,7 @@
 <style lang="sass">
 
 	@import '../sass/mixins/_flickering.sass'
+	@import '../sass/mixins/_mediaQ.sass'
 
 	section
 		display: flex
@@ -98,28 +79,47 @@
 			100%
 				transform: translate(0, 0)
 
-		svg
-			width: 5rem
-			height: 5rem
-			fill: var(--background)
-			z-index: -1
-			position: absolute
-			top: 35rem
-			animation: wave 4s infinite linear
-			cursor: pointer
-			@keyframes wave
-				0%
-					transform: translate(0, 0)
-				50%
-					transform: translate(0, 1%)
-				100%
-					transform: translate(0, 0)
+		.logo
+			position: relative
+			@include respond-to(desktop)
+				margin-top: -30vh
+				width: 40%
+				height: auto
+				animation: wave 4s infinite linear
+				@keyframes wave
+					0%
+						transform: translate(0, 0)
+					50%
+						transform: translate(0, 1%)
+					100%
+						transform: translate(0, 0)
+			@include respond-to('tablet')
+				margin-top: -30vh
+				width: 50vw
+				height: auto
+				animation: wave 4s infinite linear
+				@keyframes wave
+					0%
+						transform: translate(0, 0)
+					50%
+						transform: translate(0, 1%)
+					100%
+						transform: translate(0, 0)
+			@include respond-to(smartphone)
+				margin-top: -50vh
+				width: 50vw
+				height: auto
+				animation: wave 4s infinite linear
+				@keyframes wave
+					0%
+						transform: translate(0, 0)
+					50%
+						transform: translate(0, 1%)
+					100%
+						transform: translate(0, 0)
 
-		img
-			position: absolute
-			top: 7rem
-			width: 40%
-			height: auto
+		.arrowDown
+			cursor: pointer
 			animation: wave 4s infinite linear
 			@keyframes wave
 				0%
@@ -128,5 +128,20 @@
 					transform: translate(0, 1%)
 				100%
 					transform: translate(0, 0)
+			@include respond-to(desktop)
+				bottom: 0
+				width: 20%
+				height: auto
+				top: 30rem
+			@include respond-to(tablet)
+				bottom: 0
+				width: 30vw
+				height: auto
+				top: 30rem
+			@include respond-to(smartphone)
+				bottom: 0
+				width: 40%
+				height: auto
+				top: 23rem
 
 </style>

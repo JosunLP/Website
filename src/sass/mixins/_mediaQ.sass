@@ -1,12 +1,15 @@
-@mixin respond-to($media)
-	@if $media == handhelds
-		@media only screen and (max-device-width: 40rem)
+@mixin respond-to($device)
+	@if $device == smartphone
+		@media only screen and (max-width: 480px)
 			@content
 
-	@else if $media == medium-screens
-		@media only screen and (min-device-width: 40rem)
+	@else if $device == tablet
+		@media only screen and (min-width: 481px) and (max-width: 1024px)
 			@content
 
-	@else if $media == wide-screens
-		@media only screen and (min-width: 1000px)
+	@else if $device == desktop
+		@media only screen and (min-width: 1025px)
 			@content
+
+	@else
+		@warn "Ungültiges Gerät '$device'. Verwende 'smartphone', 'tablet' oder 'desktop'."
