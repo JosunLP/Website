@@ -16,6 +16,9 @@
 </section>
 
 <style lang="sass">
+
+	@import '../sass/mixins/_mediaQ.sass'
+
 	.text-column
 		display: flex
 		flex-direction: column
@@ -35,6 +38,8 @@
 		height: 60vh
 		padding: 10rem 0 calc(100% * 495 / 2048) 0
 		overflow: hidden
+		@include respond-to(smartphone)
+			padding-bottom: 15rem
 
 		div
 			width: 100%

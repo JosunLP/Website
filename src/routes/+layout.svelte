@@ -15,13 +15,13 @@
 	<footer>
 		<div class="footerLinks">
 			<a href="./imprint" class="imprint">Imprint</a>
-			|
+			-
 			<a href="./datasecurity" class="datasecurity">Datasecurity</a>
-			|
+			-
 			<a href="./#contact" class="contact">Contact</a>
-			|
+			-
 			<a href="https://profile.josunlp.de/" target="_blank" class="projects">Projects</a>
-			|
+			-
 			<a href="https://forsaken-ashbirds.net/" target="_blank" class="forsaken">Forsaken Ashbirds</a
 			>
 		</div>
@@ -31,8 +31,17 @@
 
 <style lang="sass">
 	@import '../sass/mixins/_notouch.sass'
+	@import '../sass/mixins/_mediaQ.sass'
 
 	footer
 		p
 			@include noTouch
+		@include respond-to(smartphone)
+			.footerLinks
+				text-align: center
+
+				a
+					margin: 0 0.5rem
+					&:last-child
+						margin-right: 0
 </style>

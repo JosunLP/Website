@@ -3,10 +3,9 @@ import type { Page } from '@sveltejs/kit';
 import { DeviceType } from '../enums/deviceType.enum';
 
 export default class PageNavigation {
-
 	public static getDeviceType(): DeviceType {
 		const userAgent = navigator.userAgent;
-		const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+		const isMobile = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
 		const isTablet = /iPad|Android|Touch/i.test(userAgent);
 
 		if (isMobile) {
@@ -35,7 +34,8 @@ export default class PageNavigation {
 
 	public static async scrollToSection(
 		sectionId: string,
-		$page: Page<Record<string, string>, string | null>
+		$page: Page<Record<string, string>, string | null>,
+		callback?: () => void
 	) {
 		const section = document.getElementById(sectionId);
 
@@ -58,9 +58,13 @@ export default class PageNavigation {
 		}
 
 		await PageNavigation.trackScrollSectionPosition($page);
+
+		if (callback) {
+			callback();
+		}
 	}
 
-	public static async navigateToSection(sectionId: string) {
+	public static async navigateToSection(sectionId: string, callback?: () => void) {
 		const sections = document.querySelectorAll('section');
 		const sectionObserver = new IntersectionObserver(() => {}, { threshold: 0.5 });
 
@@ -68,6 +72,10 @@ export default class PageNavigation {
 			sectionObserver.unobserve(section);
 		});
 		goto(`/${sectionId}`);
+
+		if (callback) {
+			callback();
+		}
 	}
 
 	public static async trackScrollSectionPosition(

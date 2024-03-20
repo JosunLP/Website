@@ -1,17 +1,22 @@
 <section class="text-column" id="greeting">
-
 	<div>
 		<h1>Moin</h1>
 		<p>
-			Welcome to my space, where I showcase my work and projects. If you have any inquiries about me
-			or the projects mentioned, feel free to reach out using the contact form. I'm also available
-			on various social media platforms.
+			Welcome to my space, where I showcase my work and projects.
+			<br />
+			<br />
+			If you have any inquiries about me or the projects mentioned, feel free to reach out using the
+			contact form.
+			<br />
+			<br />
+			I'm also available on various social media platforms.
 		</p>
 	</div>
-
 </section>
 
 <style lang="sass">
+
+	@import '../sass/mixins/_mediaQ'
 
 	.text-column
 		display: flex
@@ -32,6 +37,8 @@
 		height: 60vh
 		padding: 10rem 0 calc(100% * 495 / 2048) 0
 		overflow: hidden
+		@include respond-to(smartphone)
+			padding: 5rem 0 calc(100% * 495 / 2048) 0
 
 		div
 			width: 100%

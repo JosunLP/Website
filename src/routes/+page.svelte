@@ -12,7 +12,10 @@
 	import PageNavigation from '../classes/pageNavigation';
 	import { page } from '$app/stores';
 
-	let scrollToSection = (sectionId: string, $page: Page<Record<string, string>, string | null>) => {};
+	let scrollToSection = (
+		_sectionId: string,
+		_$page: Page<Record<string, string>, string | null>
+	) => {};
 
 	if (browser) {
 		scrollToSection = PageNavigation.scrollToSection;
@@ -36,7 +39,12 @@
 			<img class="logo" src={logo3d} alt="Logo" />
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-			<img class="arrowDown" src={arrowDown} alt="Arrow Down" on:click={() => scrollToSection('greeting', $page)}>
+			<img
+				class="arrowDown"
+				src={arrowDown}
+				alt="Arrow Down"
+				on:click={() => scrollToSection('greeting', $page)}
+			/>
 		</span>
 	</h1>
 </section>

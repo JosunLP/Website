@@ -9,11 +9,16 @@
 	import { DeviceType } from '../enums/deviceType.enum';
 
 	let scrollToSection = (
-		sectionId: string,
-		$page: Page<Record<string, string>, string | null>
+		_sectionId: string,
+		_$page: Page<Record<string, string>, string | null>,
+		_callback?: () => void
 	) => {};
-	let navigateToSection = (sectionId: string) => {};
+	let navigateToSection = (_sectionId: string, _callback?: () => void) => {};
 	let deviceType: DeviceType = DeviceType.UNKNOWN;
+	let closeMenu = () => {
+		const nav = document.querySelector('nav ul');
+		nav?.classList.remove('open');
+	};
 
 	if (browser) {
 		scrollToSection = PageNavigation.scrollToSection;
@@ -51,7 +56,7 @@
 	<nav>
 		{#if deviceType === DeviceType.MOBILE}
 			<button
-			class="openButton"
+				class="openButton"
 				on:click={() => {
 					const nav = document.querySelector('nav ul');
 					nav?.classList.toggle('open');
@@ -81,22 +86,46 @@
 					? 'page'
 					: undefined}
 			>
-				<button class="menuSelectButton" on:click={() => scrollToSection('home', $page)}>Home</button>
+				<button
+					class="menuSelectButton"
+					on:click={() =>
+						scrollToSection('home', $page, () => {
+							closeMenu();
+						})}>Home</button
+				>
 			</li>
 			<li
 				aria-current={$page.url.pathname === '/' && $page.state === '/#about' ? 'page' : undefined}
 			>
-				<button class="menuSelectButton" on:click={() => scrollToSection('about', $page)}>About</button>
+				<button
+					class="menuSelectButton"
+					on:click={() =>
+						scrollToSection('about', $page, () => {
+							closeMenu();
+						})}>About</button
+				>
 			</li>
 			<li
 				aria-current={$page.url.pathname === '/' && $page.state === '/#contact'
 					? 'page'
 					: undefined}
 			>
-				<button class="menuSelectButton" on:click={() => scrollToSection('contact', $page)}>Contact</button>
+				<button
+					class="menuSelectButton"
+					on:click={() =>
+						scrollToSection('contact', $page, () => {
+							closeMenu();
+						})}>Contact</button
+				>
 			</li>
 			<li aria-current={$page.url.pathname === '/imprint' ? 'page' : undefined}>
-				<button class="menuSelectButton" on:click={() => navigateToSection('imprint')}>Imprint</button>
+				<button
+					class="menuSelectButton"
+					on:click={() =>
+						navigateToSection('imprint', () => {
+							closeMenu();
+						})}>Imprint</button
+				>
 			</li>
 		</ul>
 	</nav>
@@ -120,15 +149,10 @@
 		z-index: 100
 		background: var(--background)
 
-	@include respond-to(smartphone)
-		.open
-			display: flex
-			opacity: 1
-			pointer-events: all
-
 	.corner
 		width: 3em
 		height: 3em
+		z-index: 100
 
 		a
 			display: flex
@@ -157,7 +181,10 @@
 		@include respond-to(smartphone)
 			display: block
 			position: absolute
+			width: 100%
 			.openButton
+				left: 0
+				right: 0
 				display: flex
 				align-items: center
 				justify-content: center
@@ -169,6 +196,16 @@
 				color: var(--color-text)
 				font-weight: 700
 				font-size: 1rem
+				padding: 0.7em
+				padding-top: 0.8em
+				margin-left: 37vw
+
+			.open
+				display: block
+				opacity: 1
+				pointer-events: all
+				transition: opacity 0.2s linear
+
 		ul
 			@include respond-to(tablet)
 				position: relative
@@ -196,20 +233,17 @@
 
 			@include respond-to(smartphone)
 				position: absolute
-				top: 3em
+				display: none
+				text-decoration: none
+				overflow: hidden
+				top: 2em
 				left: 0
-				width: 100%
-				height: 100%
-				flex-direction: column
-				justify-content: flex-start
-				align-items: center
-				background: var(--background)
-				background-size: contain
-				opacity: 0
-				pointer-events: none
-				transition: opacity 0.3s ease-in-out
+				right: 0
+				padding: 0
 
 			li
+				list-style-type: none
+				text-align: center
 				@include respond-to(desktop)
 					position: relative
 					height: 100%
@@ -221,11 +255,17 @@
 					width: 100%
 				@include respond-to(smartphone)
 					position: relative
+					display: block
 					height: 3em
 					width: 100%
-					opacity: 0
-					pointer-events: none
-					transition: opacity 0.3s ease-in-out
+					margin: 0
+					border-top: 1px solid var(--color-text)
+					background: var(--background)
+					transition: background 0.2s linear
+
+					button
+						width: 100%
+						text-align: center
 
 			li[aria-current='page']::before
 				--size: 6px
