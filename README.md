@@ -1,18 +1,16 @@
-# create-svelte
+# JosunLP.de
+
+[![FTP Deploy](https://img.shields.io/badge/Deployed%20With-FTP%20DEPLOY%20ACTION-%3CCOLOR%3E?style=for-the-badge&color=green)](https://github.com/SamKirkland/FTP-Deploy-Action)
+[![GitHub issues](https://img.shields.io/github/issues/JosunLP/Website?style=for-the-badge)](https://github.com/JosunLP/Website/issues)
+[![GitHub forks](https://img.shields.io/github/forks/JosunLP/Website?style=for-the-badge)](https://github.com/JosunLP/Website/network)
+[![GitHub stars](https://img.shields.io/github/stars/JosunLP/Website?style=for-the-badge)](https://github.com/JosunLP/Website/stargazers)
+[![GitHub license](https://img.shields.io/github/license/JosunLP/Website?style=for-the-badge)](https://github.com/JosunLP/Website/blob/main/LICENSE)
+[![CodeFactor](https://www.codefactor.io/repository/github/JosunLP/Website/badge?style=for-the-badge)](https://www.codefactor.io/repository/github/JosunLP/Website)
+[![TypeScript](https://img.shields.io/badge/Developed%20in-SvelteKit-orange?logo=svelte&style=for-the-badge)](https://svelte.dev/)
+
+## create-svelte
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
 
 ## Developing
 

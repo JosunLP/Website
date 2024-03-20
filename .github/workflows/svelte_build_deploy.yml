@@ -1,4 +1,4 @@
-name: Svelte Build and Deploy
+name: Svelte Build and Deploy 🎉
 
 on:
   push:
@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+      - name: 🚚 Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Install Dependencies
         run: npm install
@@ -19,11 +19,11 @@ jobs:
       - name: Build Svelte Project
         run: npm run build
 
-      - name: Deploy to Webserver
+      - name: 📂 Deploy to Webserver
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: /build/
-          server-dir: /public_html/website/
+          local-dir: ./build/
+          server-dir: public_html/website/
