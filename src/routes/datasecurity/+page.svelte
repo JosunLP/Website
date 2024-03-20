@@ -1,6 +1,6 @@
 <svelte:head>
 	<title>Datasecurity</title>
-	<meta name="description" content="datasecurity" />
+	<meta name="description" content="JosunLP Datasecurity" />
 </svelte:head>
 
 <div class="text-column">

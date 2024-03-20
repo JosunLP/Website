@@ -6,7 +6,7 @@
 			<br />
 			<br />
 			If you have any inquiries about me or the projects mentioned, feel free to reach out using the
-			contact form.
+			contact emails.
 			<br />
 			<br />
 			I'm also available on various social media platforms.
