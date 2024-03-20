@@ -8,7 +8,8 @@
 		</p>
 		<p>
 			Outside of coding, I immerse myself in the gaming world. Join me on our Discord server at
-			discord.com/invite/sdrzgp8SAq or catch my streams on Twitch at twitch.tv/josunlp.
+			<a href="https://discord.com/invite/sdrzgp8SAq">discord.com/invite/sdrzgp8SAq</a> or catch my
+			streams on Twitch at <a href="https://twitch.tv/josunlp">twitch.tv/josunlp</a>.
 		</p>
 		<p>
 			All my social media links are available in the left upper corner of the page, there you can
