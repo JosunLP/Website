@@ -4,7 +4,6 @@
 	xmlns:news="https://www.google.com/schemas/sitemap-news/0.9"
 	xmlns:image="https://www.google.com/schemas/sitemap-image/1.1"
 	xmlns:video="https://www.google.com/schemas/sitemap-video/1.1">
-	<script />
 	<url>
 		<loc>https://josunlp.de/</loc>
 		<lastmod>2024-04-29</lastmod>
