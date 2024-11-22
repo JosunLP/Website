@@ -1,7 +1,7 @@
 <script lang="ts">
 	import AboutMe from './../components/AboutMe.svelte';
 	import Greeting from './../components/Greeting.svelte';
-	import logo3d from '../lib/images/Logo-Jonas_3d.svg';
+	import logo from '../lib/images/Logo-Jonas_1.svg';
 	import arrowDown from '../lib/images/arrow-down.svg';
 	import Contact from '../components/Contact.svelte';
 	import '../sass/mixins/_notouch.sass';
@@ -36,7 +36,7 @@
 <section id="home">
 	<h1>
 		<span class="welcome">
-			<img class="logo" src={logo3d} alt="Logo" />
+			<img class="logo" src={logo} alt="Logo" />
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 			<img

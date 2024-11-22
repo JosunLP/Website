@@ -16,8 +16,23 @@
 </section>
 
 <style lang="sass">
+	@use "sass:meta"
 
-	@import '../sass/mixins/_mediaQ.sass'
+	=respond-to($device)
+		@if $device == smartphone
+			@media only screen and (max-width: 480px)
+				@content
+
+		@else if $device == tablet
+			@media only screen and (min-width: 481px) and (max-width: 1024px)
+				@content
+
+		@else if $device == desktop
+			@media only screen and (min-width: 1025px)
+				@content
+
+		@else
+			@warn "Ungültiges Gerät '$device'. Verwende 'smartphone', 'tablet' oder 'desktop'."
 
 	.text-column
 		display: flex
@@ -38,7 +53,7 @@
 		height: 60vh
 		padding: 10rem 0 calc(100% * 495 / 2048) 0
 		overflow: hidden
-		@include respond-to(smartphone)
+		+respond-to(smartphone)
 			padding-bottom: 15rem
 
 		div
