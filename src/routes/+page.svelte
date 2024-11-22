@@ -55,79 +55,44 @@
 
 <style lang="sass">
 
-	@import '../sass/mixins/_flickering.sass'
-	@import '../sass/mixins/_mediaQ.sass'
+@use '../sass/mixins/_flickering' as *
+@use '../sass/mixins/_mediaQ' as *
 
-	section
-		display: flex
-		flex-direction: column
-		justify-content: center
-		align-items: center
-		flex: 0.6
+section
+	display: flex
+	flex-direction: column
+	justify-content: center
+	align-items: center
+	flex: 0.6
 
-	h1
-		width: 100%
+h1
+	width: 100%
 
-	.welcome
-		display: flex
-		flex-direction: column
-		justify-content: center
-		align-items: center
-		width: 100%
-		height: 5vh
-		padding: 50vh 0 calc(100% * 495 / 2048) 0
-		margin-top: 10vh
-		overflow: hidden
-		animation: wave 4s infinite linear
-		@keyframes wave
-			0%
-				transform: translate(0, 0)
-			50%
-				transform: translate(0, 1%)
-			100%
-				transform: translate(0, 0)
+.welcome
+	display: flex
+	flex-direction: column
+	justify-content: center
+	align-items: center
+	width: 100%
+	height: 5vh
+	padding: 50vh 0 calc(100% * 495 / 2048) 0
+	margin-top: 10vh
+	overflow: hidden
+	animation: wave 4s infinite linear
+	@keyframes wave
+		0%
+			transform: translate(0, 0)
+		50%
+			transform: translate(0, 1%)
+		100%
+			transform: translate(0, 0)
 
-		.logo
-			position: relative
-			@include respond-to(desktop)
-				margin-top: -30vh
-				width: 40%
-				height: auto
-				animation: wave 4s infinite linear
-				@keyframes wave
-					0%
-						transform: translate(0, 0)
-					50%
-						transform: translate(0, 1%)
-					100%
-						transform: translate(0, 0)
-			@include respond-to('tablet')
-				margin-top: -30vh
-				width: 50vw
-				height: auto
-				animation: wave 4s infinite linear
-				@keyframes wave
-					0%
-						transform: translate(0, 0)
-					50%
-						transform: translate(0, 1%)
-					100%
-						transform: translate(0, 0)
-			@include respond-to(smartphone)
-				margin-top: -50vh
-				width: 50vw
-				height: auto
-				animation: wave 4s infinite linear
-				@keyframes wave
-					0%
-						transform: translate(0, 0)
-					50%
-						transform: translate(0, 1%)
-					100%
-						transform: translate(0, 0)
-
-		.arrowDown
-			cursor: pointer
+	.logo
+		position: relative
+		@include respond-to(desktop)
+			margin-top: -30vh
+			width: 40%
+			height: auto
 			animation: wave 4s infinite linear
 			@keyframes wave
 				0%
@@ -136,20 +101,55 @@
 					transform: translate(0, 1%)
 				100%
 					transform: translate(0, 0)
-			@include respond-to(desktop)
-				bottom: 0
-				width: 20%
-				height: auto
-				top: 30rem
-			@include respond-to(tablet)
-				bottom: 0
-				width: 30vw
-				height: auto
-				top: 30rem
-			@include respond-to(smartphone)
-				bottom: 0
-				width: 40%
-				height: auto
-				top: 23rem
+		@include respond-to('tablet')
+			margin-top: -30vh
+			width: 50vw
+			height: auto
+			animation: wave 4s infinite linear
+			@keyframes wave
+				0%
+					transform: translate(0, 0)
+				50%
+					transform: translate(0, 1%)
+				100%
+					transform: translate(0, 0)
+		@include respond-to(smartphone)
+			margin-top: -50vh
+			width: 50vw
+			height: auto
+			animation: wave 4s infinite linear
+			@keyframes wave
+				0%
+					transform: translate(0, 0)
+				50%
+					transform: translate(0, 1%)
+				100%
+					transform: translate(0, 0)
+
+	.arrowDown
+		cursor: pointer
+		animation: wave 4s infinite linear
+		@keyframes wave
+			0%
+				transform: translate(0, 0)
+			50%
+				transform: translate(0, 1%)
+			100%
+				transform: translate(0, 0)
+		@include respond-to(desktop)
+			bottom: 0
+			width: 20%
+			height: auto
+			top: 30rem
+		@include respond-to(tablet)
+			bottom: 0
+			width: 30vw
+			height: auto
+			top: 30rem
+		@include respond-to(smartphone)
+			bottom: 0
+			width: 40%
+			height: auto
+			top: 23rem
 
 </style>

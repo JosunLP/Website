@@ -30,12 +30,12 @@
 </div>
 
 <style lang="sass">
-	@import '../sass/mixins/_notouch.sass'
-	@import '../sass/mixins/_mediaQ.sass'
+@use '../sass/mixins/_notouch' as *
+@use '../sass/mixins/_mediaQ' as *
 
-	footer
-		p
-			@include noTouch
+footer
+	p
+		@include noTouch()
 		@include respond-to(smartphone)
 			.footerLinks
 				text-align: center
