@@ -73,10 +73,9 @@ h1
 	flex-direction: column
 	justify-content: center
 	align-items: center
-	width: 100%
-	height: 5vh
+	width: auto
+	height: auto
 	padding: 50vh 0 calc(100% * 495 / 2048) 0
-	margin-top: 10vh
 	overflow: hidden
 	animation: wave 4s infinite linear
 	@keyframes wave
@@ -91,7 +90,7 @@ h1
 		position: relative
 		@include respond-to(desktop)
 			margin-top: -30vh
-			width: 40%
+			width: 20vw
 			height: auto
 			animation: wave 4s infinite linear
 			@keyframes wave
@@ -102,8 +101,8 @@ h1
 				100%
 					transform: translate(0, 0)
 		@include respond-to('tablet')
-			margin-top: -30vh
-			width: 50vw
+			margin-top: -40vh
+			width: 30vw
 			height: auto
 			animation: wave 4s infinite linear
 			@keyframes wave
@@ -114,7 +113,7 @@ h1
 				100%
 					transform: translate(0, 0)
 		@include respond-to(smartphone)
-			margin-top: -50vh
+			margin-top: -30vh
 			width: 50vw
 			height: auto
 			animation: wave 4s infinite linear
@@ -138,12 +137,12 @@ h1
 				transform: translate(0, 0)
 		@include respond-to(desktop)
 			bottom: 0
-			width: 20%
+			width: 10vw
 			height: auto
 			top: 30rem
 		@include respond-to(tablet)
 			bottom: 0
-			width: 30vw
+			width: 20vw
 			height: auto
 			top: 30rem
 		@include respond-to(smartphone)

@@ -178,10 +178,20 @@ nav
 	display: flex
 	justify-content: center
 	--background: rgba(238, 92, 92, 0.7)
+
+	@include respond-to(desktop)
+		.openButton
+			display: none
+
+	@include respond-to(tablet)
+		.openButton
+			display: none
+
 	@include respond-to(smartphone)
 		display: block
 		position: absolute
 		width: 100%
+
 		.openButton
 			left: 0
 			right: 0
@@ -205,6 +215,7 @@ nav
 			opacity: 1
 			pointer-events: all
 			transition: opacity 0.2s linear
+
 
 	ul
 		@include respond-to(tablet)
