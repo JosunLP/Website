@@ -9,8 +9,8 @@
 	<p><strong>Information according to § 5 TMG</strong></p>
 	<p>
 		Jonas Pfalzgraf<br />
-		Alter Heidberg 22<br />
-		22846 Norderstedt
+		Postfach 7222<br />
+		22831 Norderstedt
 	</p>
 
 	<p>
