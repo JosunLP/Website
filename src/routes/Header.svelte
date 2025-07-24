@@ -297,6 +297,7 @@ nav
 			border: 1px solid rgba(156, 39, 39, 0.4)
 			box-shadow: 0 8px 32px rgba(156, 39, 39, 0.3)
 
+		// .open class is dynamically added by JavaScript (see toggleMenu function)
 		&.open
 			@include respond-to(smartphone)
 				display: block
