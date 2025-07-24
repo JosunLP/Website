@@ -182,15 +182,6 @@ footer
 			flex-direction: column
 			gap: 0.75rem
 
-		span[aria-hidden="true"]
-			color: rgba(156, 39, 39, 0.6)
-			font-weight: 300
-			font-size: 1rem
-			margin: 0 0.25rem
-
-			@include respond-to(smartphone)
-				display: none
-
 		a
 			position: relative
 			text-decoration: none
