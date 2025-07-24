@@ -4,18 +4,94 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.ico" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta property="og:title" content="JosunLP.de | Design & Development" />
+
+		<!-- Primary Meta Tags -->
+		<title>JosunLP.de | Full-Stack Developer & Designer</title>
+		<meta name="title" content="JosunLP.de | Full-Stack Developer & Designer" />
+		<meta
+			name="description"
+			content="Welcome to my space, where I showcase my work and projects. If you have any inquiries about me or the projects mentioned, feel free to reach out using the contact emails."
+		/>
+		<meta
+			name="keywords"
+			content="Jonas Pfalzgraf, Full-Stack Developer, TypeScript, SvelteKit, Azure, Web Development"
+		/>
+		<meta name="author" content="Jonas Pfalzgraf" />
+		<meta name="robots" content="index, follow" />
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://JosunLP.de" />
+		<meta property="og:title" content="JosunLP.de | Full-Stack Developer & Designer" />
 		<meta
 			property="og:description"
 			content="Welcome to my space, where I showcase my work and projects. If you have any inquiries about me or the projects mentioned, feel free to reach out using the contact emails."
 		/>
 		<meta property="og:image" content="https://josunlp.de/images/lang.png" />
-		<meta property="og:url" content="https://JosunLP.de" />
-		<meta name="og:sitemap" content="https://JosunLP.de/sitemap.xml" />
+		<meta property="og:locale" content="en_US" />
+		<meta property="og:site_name" content="JosunLP.de" />
+
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content="https://JosunLP.de" />
+		<meta property="twitter:title" content="JosunLP.de | Full-Stack Developer & Designer" />
+		<meta
+			property="twitter:description"
+			content="Welcome to my space, where I showcase my work and projects. If you have any inquiries about me or the projects mentioned, feel free to reach out using the contact emails."
+		/>
+		<meta property="twitter:image" content="https://josunlp.de/images/lang.png" />
+
+		<!-- PWA -->
+		<link rel="manifest" href="%sveltekit.assets%/site.webmanifest" />
+		<meta name="theme-color" content="#1a1a1a" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<meta name="apple-mobile-web-app-title" content="JosunLP.de" />
+		<link rel="apple-touch-icon" href="%sveltekit.assets%/apple-touch-icon.png" />
+
+		<!-- Sitemap and canonical -->
+		<link rel="canonical" href="https://JosunLP.de" />
+		<link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+
+		<!-- Skip to content link for accessibility -->
+		<style>
+			.skip-link {
+				position: absolute;
+				top: -40px;
+				left: 6px;
+				background: #000;
+				color: #fff;
+				padding: 8px;
+				text-decoration: none;
+				z-index: 1000;
+				border-radius: 4px;
+			}
+			.skip-link:focus {
+				top: 6px;
+			}
+		</style>
+
 		%sveltekit.head%
 	</head>
 
 	<body data-sveltekit-preload-data="hover">
+		<a href="#main-content" class="skip-link">Skip to main content</a>
 		<div style="display: contents">%sveltekit.body%</div>
+
+		<!-- Service Worker Registration -->
+		<script>
+			if ('serviceWorker' in navigator) {
+				window.addEventListener('load', () => {
+					navigator.serviceWorker
+						.register('/service-worker.js')
+						.then((registration) => {
+							console.log('SW registered: ', registration);
+						})
+						.catch((registrationError) => {
+							console.log('SW registration failed: ', registrationError);
+						});
+				});
+			}
+		</script>
 	</body>
 </html>
