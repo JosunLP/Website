@@ -1,6 +1,16 @@
 import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
+	// Handle Chrome DevTools specific requests
+	if (event.url.pathname === '/.well-known/appspecific/com.chrome.devtools.json') {
+		return new Response('{}', {
+			status: 200,
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+	}
+
 	const response = await resolve(event);
 
 	// Only add security headers for HTML responses

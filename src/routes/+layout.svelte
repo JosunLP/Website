@@ -156,7 +156,7 @@ footer
 		padding: 1.5rem 1rem 1rem
 
 	p
-		@include noTouch()
+		+noTouch()
 		margin: 0
 		color: rgba(255, 255, 255, 0.8)
 		font-size: 0.9rem
@@ -179,9 +179,6 @@ footer
 				display: none
 
 		a
-			@include touch-target()
-			@include touch-feedback()
-			@include focus-visible()
 			text-decoration: none
 			padding: 0.5rem 0.75rem
 			border-radius: 6px
@@ -189,6 +186,9 @@ footer
 			font-weight: 500
 			color: var(--color-theme-1)
 			border: 1px solid transparent
+			@include touch-target()
+			@include touch-feedback()
+			@include focus-visible()
 
 			&:hover
 				background-color: rgba(255, 255, 255, 0.1)
@@ -215,8 +215,6 @@ footer
 	right: 2rem
 	width: 48px
 	height: 48px
-	@include touch-feedback()
-	@include focus-visible()
 	background: var(--color-bg-0)
 	color: var(--color-theme-1)
 	border: 2px solid rgba(255, 255, 255, 0.2)
@@ -230,6 +228,8 @@ footer
 	font-weight: bold
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3)
 	transition: all 0.3s ease
+	@include touch-feedback()
+	@include focus-visible()
 
 	@include respond-to(smartphone)
 		bottom: 1rem
