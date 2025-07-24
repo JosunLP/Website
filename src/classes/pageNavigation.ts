@@ -43,7 +43,7 @@ export default class PageNavigation {
 
 	public static updateTitle(sectionId: string, $page: Page<Record<string, string>, string | null>) {
 		try {
-			if ($page.url.pathname === '/') {
+			if ($page?.url?.pathname === '/') {
 				const formattedTitle = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
 				document.title = `${formattedTitle} | JosunLP.de`;
 			}
@@ -62,13 +62,15 @@ export default class PageNavigation {
 
 			const section = document.getElementById(sectionId);
 
-			if ($page.url.pathname !== '/') {
+			if ($page?.url?.pathname !== '/') {
 				await goto(`/#${sectionId}`)
 					.then(() => {
 						PageNavigation.trackScrollSectionPosition($page);
 						$page.state = `/#${sectionId}`;
 						$page.route = { id: `/#${sectionId}` };
-						$page.url = new URL($page.url.origin + `/#${sectionId}` + $page.url.search);
+						if ($page.url) {
+							$page.url = new URL($page.url.origin + `/#${sectionId}` + $page.url.search);
+						}
 					})
 					.catch((error) => {
 						ErrorHandler.handleNavError(error, sectionId);
@@ -133,7 +135,7 @@ export default class PageNavigation {
 		$page: Page<Record<string, string>, string | null>
 	) {
 		try {
-			const isBasePath = $page.url.pathname === '/';
+			const isBasePath = $page?.url?.pathname === '/';
 
 			if (isBasePath) {
 				const sections = document.querySelectorAll('section');

@@ -42,7 +42,9 @@
 
 		deviceType = PageNavigation.getDeviceType();
 
-		PageNavigation.trackScrollSectionPosition($page);
+		if ($page) {
+			PageNavigation.trackScrollSectionPosition($page);
+		}
 	});
 </script>
 
@@ -81,8 +83,8 @@
 
 		<ul>
 			<li
-				aria-current={$page.url.pathname === '/' &&
-				($page.state === '/' || $page.state === '/#home')
+				aria-current={$page?.url?.pathname === '/' &&
+				($page?.state === '/' || $page?.state === '/#home')
 					? 'page'
 					: undefined}
 			>
@@ -95,7 +97,9 @@
 				>
 			</li>
 			<li
-				aria-current={$page.url.pathname === '/' && $page.state === '/#about' ? 'page' : undefined}
+				aria-current={$page?.url?.pathname === '/' && $page?.state === '/#about'
+					? 'page'
+					: undefined}
 			>
 				<button
 					class="menuSelectButton"
@@ -106,7 +110,7 @@
 				>
 			</li>
 			<li
-				aria-current={$page.url.pathname === '/' && $page.state === '/#contact'
+				aria-current={$page?.url?.pathname === '/' && $page?.state === '/#contact'
 					? 'page'
 					: undefined}
 			>
@@ -118,7 +122,7 @@
 						})}>Contact</button
 				>
 			</li>
-			<li aria-current={$page.url.pathname === '/imprint' ? 'page' : undefined}>
+			<li aria-current={$page?.url?.pathname === '/imprint' ? 'page' : undefined}>
 				<button
 					class="menuSelectButton"
 					on:click={() =>
