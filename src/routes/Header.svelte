@@ -425,9 +425,9 @@ nav
 	width: 1.8em
 	height: 1.8em
 	object-fit: contain
-	filter: invert(1) brightness(1.1)
+	filter: brightness(1.1)
 	transition: filter 0.3s ease
 
 	&:hover
-		filter: invert(1) brightness(1.3) contrast(1.2)
+		filter: brightness(1.3) contrast(1.2)
 </style>
