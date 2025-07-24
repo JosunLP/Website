@@ -147,9 +147,19 @@ main
 
 footer
 	margin-top: auto
+	padding: 2rem 1rem 1rem
+	text-align: center
+	background: rgba(255, 255, 255, 0.05)
+	border-top: 1px solid rgba(255, 255, 255, 0.1)
+
+	@include respond-to(smartphone)
+		padding: 1.5rem 1rem 1rem
 
 	p
 		@include noTouch()
+		margin: 0
+		color: rgba(255, 255, 255, 0.8)
+		font-size: 0.9rem
 
 	.footerLinks
 		display: flex
@@ -161,50 +171,80 @@ footer
 
 		@include respond-to(smartphone)
 			flex-direction: column
-			gap: 0.25rem
+			gap: 0.75rem
+
+		span[aria-hidden="true"]
+			color: rgba(255, 255, 255, 0.4)
+			@include respond-to(smartphone)
+				display: none
 
 		a
 			@include touch-target()
 			@include touch-feedback()
 			@include focus-visible()
 			text-decoration: none
-			padding: 0.25rem 0.5rem
-			border-radius: 4px
-			transition: background-color 0.2s ease
+			padding: 0.5rem 0.75rem
+			border-radius: 6px
+			transition: all 0.2s ease
+			font-weight: 500
+			color: var(--color-theme-1)
+			border: 1px solid transparent
 
 			&:hover
 				background-color: rgba(255, 255, 255, 0.1)
+				border-color: rgba(255, 255, 255, 0.2)
+				text-decoration: underline
+
+			&:active
+				transform: translateY(1px)
 
 			&[rel*="noopener"]
 				&::after
 					content: " ↗"
 					font-size: 0.8em
 					opacity: 0.7
+					margin-left: 0.2em
 
 .sr-only
 	@include screen-reader-only()
 
-// Back to top button (will be added later)
+// Back to top button
 .back-to-top
 	position: fixed
 	bottom: 2rem
 	right: 2rem
-	@include touch-target(48px)
+	width: 48px
+	height: 48px
 	@include touch-feedback()
 	@include focus-visible()
-	background: rgba(0, 0, 0, 0.8)
-	color: white
-	border: none
+	background: var(--color-bg-0)
+	color: var(--color-theme-1)
+	border: 2px solid rgba(255, 255, 255, 0.2)
 	border-radius: 50%
 	cursor: pointer
 	z-index: 1000
+	display: flex
+	align-items: center
+	justify-content: center
+	font-size: 1.2rem
+	font-weight: bold
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3)
+	transition: all 0.3s ease
 
-	@include animate(opacity)
+	@include respond-to(smartphone)
+		bottom: 1rem
+		right: 1rem
+		width: 44px
+		height: 44px
 
 	&.hidden
 		opacity: 0
 		pointer-events: none
+		transform: translateY(10px)
 
 	&:hover
-		background: rgba(0, 0, 0, 0.9)
+		background: rgba(156, 39, 39, 0.9)
+		border-color: rgba(255, 255, 255, 0.4)
+		transform: translateY(-2px)
+		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4)
 </style>

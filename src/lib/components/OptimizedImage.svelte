@@ -7,7 +7,7 @@
 	export let width: number | undefined = undefined;
 	export let height: number | undefined = undefined;
 	export let loading: 'lazy' | 'eager' = 'lazy';
-	export let sizes: string = '100vw';
+	export let sizes: string = '(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 800px';
 	export let quality: number = 85;
 	export let priority: boolean = false;
 	export let className: string = '';
@@ -142,9 +142,24 @@
 </div>
 
 <style>
+	.optimized-image {
+		max-width: 100%;
+		height: auto;
+		transition: opacity 0.3s ease-in-out;
+		opacity: 0;
+		object-fit: cover;
+	}
+
+	.optimized-image.fade-in {
+		opacity: 1;
+	}
+
+	/* Responsive image sizing */
 	.image-container {
 		position: relative;
 		overflow: hidden;
+		max-width: 800px;
+		margin: 0 auto;
 	}
 
 	.image-container.loaded .placeholder {
@@ -153,17 +168,6 @@
 
 	.image-container.error .optimized-image {
 		display: none;
-	}
-
-	.optimized-image {
-		width: 100%;
-		height: auto;
-		transition: opacity 0.3s ease-in-out;
-		opacity: 0;
-	}
-
-	.optimized-image.fade-in {
-		opacity: 1;
 	}
 
 	.placeholder {
