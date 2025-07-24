@@ -1,0 +1,133 @@
+// Touch-optimized mixins
+@mixin touch-target($size: 44px)
+	min-height: $size
+	min-width: $size
+	position: relative
+
+	// Ensure touch targets are big enough on touch devices
+	@media (hover: none) and (pointer: coarse)
+		padding: 8px
+
+		&::before
+			content: ''
+			position: absolute
+			top: 50%
+			left: 50%
+			transform: translate(-50%, -50%)
+			min-width: $size
+			min-height: $size
+			z-index: -1
+
+@mixin touch-feedback
+	@media (hover: none) and (pointer: coarse)
+		&:active
+			transform: scale(0.98)
+			transition: transform 0.1s ease
+
+		&:focus-visible
+			outline: 2px solid #007acc
+			outline-offset: 2px
+
+@mixin no-select
+	-webkit-user-select: none
+	-moz-user-select: none
+	-ms-user-select: none
+	user-select: none
+
+// Performance mixins
+@mixin will-change($property)
+	will-change: $property
+
+	// Remove will-change after animation/transition
+	&:hover, &:focus, &:active
+		will-change: auto
+
+@mixin gpu-accelerated
+	transform: translateZ(0)
+	-webkit-transform: translateZ(0)
+	-webkit-backface-visibility: hidden
+	backface-visibility: hidden
+	-webkit-perspective: 1000
+	perspective: 1000
+
+// Accessibility mixins
+@mixin screen-reader-only
+	position: absolute !important
+	width: 1px !important
+	height: 1px !important
+	padding: 0 !important
+	margin: -1px !important
+	overflow: hidden !important
+	clip: rect(0, 0, 0, 0) !important
+	white-space: nowrap !important
+	border: 0 !important
+
+@mixin focus-visible
+	&:focus-visible
+		outline: 2px solid #007acc
+		outline-offset: 2px
+
+	// Remove focus for mouse users
+	&:focus:not(:focus-visible)
+		outline: none
+
+// Animation mixins with reduced motion support
+@mixin animate($property, $duration: 0.3s, $easing: ease)
+	transition: $property $duration $easing
+
+	@media (prefers-reduced-motion: reduce)
+		transition: none
+
+@mixin fade-in($duration: 0.3s)
+	opacity: 0
+	animation: fade-in $duration ease forwards
+
+	@media (prefers-reduced-motion: reduce)
+		animation: none
+		opacity: 1
+
+@keyframes fade-in
+	to
+		opacity: 1
+
+// Loading states
+@mixin skeleton-loading
+	background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)
+	background-size: 200% 100%
+	animation: skeleton-pulse 2s infinite
+
+	@media (prefers-reduced-motion: reduce)
+		animation: none
+		background: #f0f0f0
+
+@keyframes skeleton-pulse
+	0%
+		background-position: 200% 0
+	100%
+		background-position: -200% 0
+
+// Modern scroll behavior
+@mixin smooth-scroll
+	scroll-behavior: smooth
+
+	@media (prefers-reduced-motion: reduce)
+		scroll-behavior: auto
+
+// High contrast mode support
+@mixin high-contrast
+	@media (prefers-contrast: high)
+		@content
+
+// Dark mode mixins
+@mixin dark-mode
+	@media (prefers-color-scheme: dark)
+		@content
+
+@mixin light-mode
+	@media (prefers-color-scheme: light)
+		@content
+
+// Container queries (when supported)
+@mixin container-query($size)
+	@container (min-width: $size)
+		@content

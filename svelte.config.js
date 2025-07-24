@@ -1,7 +1,7 @@
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -36,7 +36,28 @@ const config = {
 			fallback: '404.html',
 			precompress: false,
 			strict: true
-		})
+		}),
+		prerender: {
+			handleHttpError: ({ path, referrer, message }) => {
+				// Ignore font files and other static assets that might not exist during prerendering
+				if (
+					path.includes('/fonts/') ||
+					path.includes('.woff') ||
+					path.includes('.woff2') ||
+					path.includes('.ttf')
+				) {
+					return;
+				}
+				throw new Error(message);
+			},
+			handleMissingId: ({ path, id, referrers }) => {
+				// Ignore missing IDs that are related to anchor links, especially for fonts directory
+				if (path.includes('/fonts/') || id === 'contact') {
+					return;
+				}
+				throw new Error(`Missing element with id="${id}" on page "${path}"`);
+			}
+		}
 	}
 };
 
