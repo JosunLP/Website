@@ -89,11 +89,8 @@
 		<nav aria-label="Footer navigation">
 			<div class="footerLinks">
 				<a href="./imprint" class="imprint">Imprint</a>
-				<span aria-hidden="true">-</span>
 				<a href="./datasecurity" class="datasecurity">Data Security</a>
-				<span aria-hidden="true">-</span>
 				<a href="./#contact" class="contact">Contact</a>
-				<span aria-hidden="true">-</span>
 				<a
 					href="https://profile.josunlp.de/"
 					target="_blank"
@@ -103,7 +100,6 @@
 					Projects
 					<span class="sr-only">(opens in new tab)</span>
 				</a>
-				<span aria-hidden="true">-</span>
 				<a
 					href="https://forsaken-ashbirds.net/"
 					target="_blank"
@@ -147,19 +143,32 @@ main
 
 footer
 	margin-top: auto
-	padding: 2rem 1rem 1rem
+	padding: 3rem 1rem 2rem
 	text-align: center
-	background: rgba(255, 255, 255, 0.05)
-	border-top: 1px solid rgba(255, 255, 255, 0.1)
+	background: linear-gradient(135deg, rgba(156, 39, 39, 0.1) 0%, rgba(0, 0, 0, 0.3) 100%)
+	border-top: 2px solid rgba(156, 39, 39, 0.3)
+	backdrop-filter: blur(10px)
+	position: relative
+
+	&::before
+		content: ''
+		position: absolute
+		top: 0
+		left: 0
+		right: 0
+		height: 1px
+		background: linear-gradient(90deg, transparent 0%, rgba(156, 39, 39, 0.6) 50%, transparent 100%)
 
 	@include respond-to(smartphone)
-		padding: 1.5rem 1rem 1rem
+		padding: 2rem 1rem 1.5rem
 
 	p
 		+noTouch()
-		margin: 0
-		color: rgba(255, 255, 255, 0.8)
-		font-size: 0.9rem
+		margin: 1.5rem 0 0
+		color: rgba(255, 255, 255, 0.7)
+		font-size: 0.85rem
+		font-weight: 300
+		letter-spacing: 0.5px
 
 	.footerLinks
 		display: flex
@@ -167,43 +176,51 @@ footer
 		justify-content: center
 		align-items: center
 		gap: 0.5rem
-		margin-bottom: 1rem
+		margin-bottom: 0
 
 		@include respond-to(smartphone)
 			flex-direction: column
 			gap: 0.75rem
 
 		span[aria-hidden="true"]
-			color: rgba(255, 255, 255, 0.4)
+			color: rgba(156, 39, 39, 0.6)
+			font-weight: 300
+			font-size: 1rem
+			margin: 0 0.25rem
+
 			@include respond-to(smartphone)
 				display: none
 
 		a
+			position: relative
 			text-decoration: none
 			padding: 0.5rem 0.75rem
-			border-radius: 6px
-			transition: all 0.2s ease
+			transition: all 0.3s ease
 			font-weight: 500
-			color: var(--color-theme-1)
-			border: 1px solid transparent
+			font-size: 0.9rem
+			color: rgba(255, 255, 255, 0.85)
+			letter-spacing: 0.3px
+			border-radius: 4px
 			@include touch-target()
 			@include touch-feedback()
 			@include focus-visible()
 
 			&:hover
-				background-color: rgba(255, 255, 255, 0.1)
-				border-color: rgba(255, 255, 255, 0.2)
+				color: #ffffff
 				text-decoration: underline
+				text-decoration-color: rgba(156, 39, 39, 0.8)
+				text-underline-offset: 4px
 
 			&:active
-				transform: translateY(1px)
+				color: rgba(156, 39, 39, 1)
 
 			&[rel*="noopener"]
 				&::after
 					content: " ↗"
-					font-size: 0.8em
-					opacity: 0.7
-					margin-left: 0.2em
+					font-size: 0.75em
+					opacity: 0.8
+					margin-left: 0.3em
+					color: rgba(156, 39, 39, 0.8)
 
 .sr-only
 	@include screen-reader-only()
@@ -213,38 +230,39 @@ footer
 	position: fixed
 	bottom: 2rem
 	right: 2rem
-	width: 48px
-	height: 48px
-	background: var(--color-bg-0)
-	color: var(--color-theme-1)
-	border: 2px solid rgba(255, 255, 255, 0.2)
+	width: 52px
+	height: 52px
+	background: linear-gradient(135deg, rgba(156, 39, 39, 0.9) 0%, rgba(156, 39, 39, 0.7) 100%)
+	color: #ffffff
+	border: 2px solid rgba(156, 39, 39, 0.5)
 	border-radius: 50%
 	cursor: pointer
 	z-index: 1000
 	display: flex
 	align-items: center
 	justify-content: center
-	font-size: 1.2rem
+	font-size: 1.3rem
 	font-weight: bold
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3)
-	transition: all 0.3s ease
+	box-shadow: 0 6px 20px rgba(156, 39, 39, 0.4)
+	backdrop-filter: blur(10px)
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
 	@include touch-feedback()
 	@include focus-visible()
 
 	@include respond-to(smartphone)
-		bottom: 1rem
-		right: 1rem
-		width: 44px
-		height: 44px
+		bottom: 1.5rem
+		right: 1.5rem
+		width: 48px
+		height: 48px
 
 	&.hidden
 		opacity: 0
 		pointer-events: none
-		transform: translateY(10px)
+		transform: translateY(15px) scale(0.9)
 
 	&:hover
-		background: rgba(156, 39, 39, 0.9)
-		border-color: rgba(255, 255, 255, 0.4)
-		transform: translateY(-2px)
-		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4)
+		background: linear-gradient(135deg, rgba(156, 39, 39, 1) 0%, rgba(156, 39, 39, 0.9) 100%)
+		border-color: rgba(156, 39, 39, 0.8)
+		transform: translateY(-3px) scale(1.05)
+		box-shadow: 0 8px 25px rgba(156, 39, 39, 0.6)
 </style>

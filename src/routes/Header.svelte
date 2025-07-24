@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
-	import lintree from '$lib/images/linktree-seeklogo.svg';
+	import { page } from '$app/stores';
 	import github from '$lib/images/github.svg';
+	import lintree from '$lib/images/linktree-seeklogo.svg';
 	import type { Page } from '@sveltejs/kit';
-	import PageNavigation from '../classes/pageNavigation';
 	import { onMount } from 'svelte';
+	import PageNavigation from '../classes/pageNavigation';
 	import { DeviceType } from '../enums/deviceType.enum';
 
 	let scrollToSection = (
@@ -144,14 +144,28 @@
 header
 	display: flex
 	justify-content: space-between
+	align-items: center
 	position: sticky
 	top: 0
 	z-index: 100
-	background: var(--background)
+	background: linear-gradient(135deg, rgba(156, 39, 39, 0.15) 0%, rgba(0, 0, 0, 0.4) 100%)
+	backdrop-filter: blur(15px)
+	border-bottom: 2px solid rgba(156, 39, 39, 0.2)
+	padding: 0.5rem 1rem
+	transition: all 0.3s ease
+
+	&::before
+		content: ''
+		position: absolute
+		bottom: 0
+		left: 0
+		right: 0
+		height: 1px
+		background: linear-gradient(90deg, transparent 0%, rgba(156, 39, 39, 0.4) 50%, transparent 100%)
 
 .corner
-	width: 3em
-	height: 3em
+	width: 3.5em
+	height: 3.5em
 	z-index: 100
 
 	a
@@ -160,11 +174,22 @@ header
 		justify-content: center
 		width: 100%
 		height: 100%
+		border-radius: 50%
+		background: rgba(156, 39, 39, 0.1)
+		border: 1px solid rgba(156, 39, 39, 0.3)
+		transition: all 0.3s ease
+		backdrop-filter: blur(5px)
+
+		&:hover
+			background: rgba(156, 39, 39, 0.2)
+			border-color: rgba(156, 39, 39, 0.5)
+			transform: scale(1.05)
 
 	img
-		width: 2em
-		height: 2em
+		width: 1.8em
+		height: 1.8em
 		object-fit: contain
+		filter: brightness(1.1)
 
 svg
 	width: 2em
@@ -177,7 +202,7 @@ path
 nav
 	display: flex
 	justify-content: center
-	--background: rgba(238, 92, 92, 0.7)
+	--background: linear-gradient(135deg, rgba(156, 39, 39, 0.2) 0%, rgba(0, 0, 0, 0.5) 100%)
 
 	@include respond-to(desktop)
 		.openButton
@@ -200,21 +225,27 @@ nav
 			justify-content: center
 			height: 3em
 			margin: 0
-			padding: 0
-			background: transparent
-			border: none
-			color: var(--color-text)
-			font-weight: 700
-			font-size: 1rem
 			padding: 0.7em
-			padding-top: 0.8em
+			background: rgba(156, 39, 39, 0.15)
+			border: 1px solid rgba(156, 39, 39, 0.3)
+			border-radius: 8px
+			color: rgba(255, 255, 255, 0.9)
+			font-weight: 600
+			font-size: 0.9rem
 			margin-left: 37vw
+			transition: all 0.3s ease
+			backdrop-filter: blur(5px)
+
+			&:hover
+				background: rgba(156, 39, 39, 0.25)
+				border-color: rgba(156, 39, 39, 0.5)
+				color: #ffffff
 
 		.open
 			display: block
 			opacity: 1
 			pointer-events: all
-			transition: opacity 0.2s linear
+			transition: opacity 0.3s ease
 
 
 	ul
@@ -222,97 +253,181 @@ nav
 			position: relative
 			padding: 0
 			margin: 0
-			height: 3em
+			height: 3.5em
 			display: flex
 			justify-content: center
 			align-items: center
 			list-style: none
 			background: var(--background)
-			background-size: contain
+			backdrop-filter: blur(10px)
+			border-radius: 25px
+			border: 1px solid rgba(156, 39, 39, 0.3)
 
 		@include respond-to(desktop)
 			position: relative
 			padding: 0
 			margin: 0
-			height: 3em
+			height: 3.5em
 			display: flex
 			justify-content: center
 			align-items: center
 			list-style: none
 			background: var(--background)
-			background-size: contain
+			backdrop-filter: blur(10px)
+			border-radius: 25px
+			border: 1px solid rgba(156, 39, 39, 0.3)
 
 		@include respond-to(smartphone)
 			position: absolute
 			display: none
 			text-decoration: none
 			overflow: hidden
-			top: 2em
-			left: 0
-			right: 0
+			top: 3em
+			left: 10%
+			right: 10%
 			padding: 0
+			background: var(--background)
+			backdrop-filter: blur(15px)
+			border-radius: 15px
+			border: 1px solid rgba(156, 39, 39, 0.4)
+			box-shadow: 0 8px 32px rgba(156, 39, 39, 0.3)
 
-		li
-			list-style-type: none
-			text-align: center
-			@include respond-to(desktop)
-				position: relative
-				height: 100%
-				width: 100%
-				margin: 0 1em
-			@include respond-to(tablet)
-				position: relative
-				height: 100%
-				width: 100%
+		&.open
 			@include respond-to(smartphone)
-				position: relative
 				display: block
-				height: 3em
+				animation: slideDown 0.3s ease-out
+
+	@keyframes slideDown
+		from
+			opacity: 0
+			transform: translateY(-10px)
+		to
+			opacity: 1
+			transform: translateY(0)
+
+	li
+		list-style-type: none
+		text-align: center
+		@include respond-to(desktop)
+			position: relative
+			height: 100%
+			margin: 0 0.5rem
+
+		@include respond-to(tablet)
+			position: relative
+			height: 100%
+			margin: 0 0.5rem
+
+			@include respond-to(smartphone)
+			position: relative
+			display: block
+			height: 3.5em
+			width: 100%
+			margin: 0
+			border-top: 1px solid rgba(156, 39, 39, 0.3)
+			transition: background 0.3s ease
+
+			&:first-child
+				border-top: none
+
+			&:hover
+				background: rgba(156, 39, 39, 0.1)
+
+			button
 				width: 100%
-				margin: 0
-				border-top: 1px solid var(--color-text)
-				background: var(--background)
-				transition: background 0.2s linear
+				text-align: center
 
-				button
-					width: 100%
-					text-align: center
+	li[aria-current='page']
+		@include respond-to(desktop)
+			&::before
+				--size: 4px
+				content: ''
+				width: 0
+				height: 0
+				position: absolute
+				top: -2px
+				left: calc(50% - var(--size))
+				border: var(--size) solid transparent
+				border-top: var(--size) solid rgba(156, 39, 39, 0.8)
 
-		li[aria-current='page']::before
-			--size: 6px
-			content: ''
-			width: 0
-			height: 0
-			position: absolute
+		@include respond-to(tablet)
+			&::before
+				--size: 4px
+				content: ''
+				width: 0
+				height: 0
+				position: absolute
+				top: -2px
+				left: calc(50% - var(--size))
+				border: var(--size) solid transparent
+				border-top: var(--size) solid rgba(156, 39, 39, 0.8)
+
+		@include respond-to(smartphone)
+			background: rgba(156, 39, 39, 0.2)
+
+			&::before
+				content: ''
+				position: absolute
+			left: 0
 			top: 0
-			left: calc(50% - var(--size))
-			border: var(--size) solid transparent
-			border-top: var(--size) solid var(--color-theme-1)
-
+			bottom: 0
+			width: 3px
+			background: rgba(156, 39, 39, 0.8)
 	.menuSelectButton
 		display: flex
 		height: 100%
 		align-items: center
-		padding: 0 0.4rem
-		color: var(--color-text)
-		font-weight: 700
-		font-size: 0.8rem
+		justify-content: center
+		padding: 0 1.5rem
+		color: rgba(255, 255, 255, 0.85)
+		font-weight: 600
+		font-size: 0.85rem
 		text-transform: uppercase
-		letter-spacing: 0.1em
+		letter-spacing: 0.5px
 		text-decoration: none
-		transition: color 0.2s linear
+		transition: all 0.3s ease
 		background-color: transparent
 		background-repeat: no-repeat
 		border: none
 		cursor: pointer
 		overflow: hidden
 		outline: none
+		border-radius: 20px
+		position: relative
+
+		@include respond-to(smartphone)
+			padding: 1rem 1.5rem
+			border-radius: 0
+
+		&::before
+			content: ''
+			position: absolute
+			top: 0
+			left: 0
+			right: 0
+			bottom: 0
+			background: rgba(156, 39, 39, 0.2)
+			opacity: 0
+			transition: opacity 0.3s ease
+			border-radius: 20px
+
 		&:hover
-			color: var(--color-theme-1)
+			color: #ffffff
+			transform: translateY(-1px)
+
+			&::before
+				opacity: 1
+
+		&:active
+			transform: translateY(0px)
 
 .github
-	width: 2em
-	height: 2em
+	width: 1.8em
+	height: 1.8em
 	object-fit: contain
-	filter: invert(1)
+	filter: invert(1) brightness(1.1)
+	transition: filter 0.3s ease
+
+	&:hover
+		filter: invert(1) brightness(1.3) contrast(1.2)
 </style>
