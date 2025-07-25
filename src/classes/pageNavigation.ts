@@ -28,7 +28,7 @@ export default class PageNavigation {
 	}
 
 	private constructor() {
-		console.log('PageNavigation constructor');
+		// console.log('PageNavigation constructor');
 	}
 
 	public static updateUrl(sectionId: string) {

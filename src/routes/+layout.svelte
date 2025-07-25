@@ -55,7 +55,7 @@
 				scriptElement.textContent = JSON.stringify([personSchema, websiteSchema]);
 				document.head.appendChild(scriptElement);
 
-				console.log('Layout initialized successfully');
+				// console.log('Layout initialized successfully');
 			} catch (error) {
 				ErrorHandler.handleComponentError(error as Error, 'Layout');
 			}

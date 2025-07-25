@@ -122,5 +122,5 @@ sw.addEventListener('sync', (event) => {
 
 async function backgroundSync() {
 	// Implement background sync logic here
-	console.log('Background sync triggered');
+	// console.log('Background sync triggered');
 }
