@@ -5,7 +5,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const data = await request.json();
 
 		// Log web vitals data
-		console.log('Web Vitals:', data);
+		// console.log('Web Vitals:', data);
 
 		// In production, you might want to send this to your analytics service
 		// await sendToAnalytics(data);

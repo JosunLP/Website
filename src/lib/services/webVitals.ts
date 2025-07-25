@@ -24,17 +24,17 @@ export class WebVitalsService {
 		onLCP(this.sendToAnalytics);
 		onTTFB(this.sendToAnalytics);
 
-		console.log('Web Vitals tracking initialized');
+		// console.log('Web Vitals tracking initialized');
 	}
 
 	private static sendToAnalytics(metric: WebVitalMetric) {
 		// Log to console in development
 		if (!import.meta.env.PROD) {
-			console.log('Web Vital:', {
-				name: metric.name,
-				value: Math.round(metric.value),
-				rating: WebVitalsService.getRating(metric.name, metric.value)
-			});
+			// console.log('Web Vital:', {
+			// 	name: metric.name,
+			// 	value: Math.round(metric.value),
+			// 	rating: WebVitalsService.getRating(metric.name, metric.value)
+			// });
 		}
 
 		// Send to Google Analytics if available
