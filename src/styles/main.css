@@ -1,0 +1,154 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. The visual identity is calm and editorial: a warm paper /
+ * deep ink base, one restrained accent, generous spacing, and a geometric
+ * "modular systems" motif used sparingly as decoration.
+ */
+@theme {
+	--font-sans:
+		ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+		'Helvetica Neue', Arial, sans-serif;
+	--font-mono:
+		ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
+
+	/* Color system (WCAG AA checked against their background pairings) */
+	--color-paper: oklch(0.985 0.004 95);
+	--color-paper-raised: oklch(1 0 0);
+	--color-ink: oklch(0.24 0.02 270);
+	--color-ink-muted: oklch(0.42 0.02 270);
+	--color-line: oklch(0.88 0.008 95);
+
+	--color-night: oklch(0.19 0.02 270);
+	--color-night-raised: oklch(0.24 0.02 270);
+	--color-snow: oklch(0.93 0.005 95);
+	--color-snow-muted: oklch(0.75 0.01 270);
+	--color-night-line: oklch(0.34 0.02 270);
+
+	--color-accent: oklch(0.5 0.13 250);
+	--color-accent-strong: oklch(0.42 0.13 250);
+	--color-accent-soft: oklch(0.93 0.03 250);
+	--color-accent-dark: oklch(0.78 0.1 250);
+	--color-accent-dark-soft: oklch(0.3 0.05 250);
+
+	--radius-card: 0.75rem;
+	--radius-tag: 0.375rem;
+
+	--shadow-card: 0 1px 3px oklch(0 0 0 / 0.08);
+
+	--duration-swift: 150ms;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Base layer: semantic defaults so pre-rendered content is readable even
+ * before/without any component styling.
+ */
+@layer base {
+	:root {
+		color-scheme: light;
+	}
+	:root.dark {
+		color-scheme: dark;
+	}
+
+	html {
+		scroll-behavior: smooth;
+	}
+
+	body {
+		@apply bg-paper font-sans text-ink antialiased dark:bg-night dark:text-snow;
+	}
+
+	::selection {
+		@apply bg-accent-soft text-ink dark:bg-accent-dark-soft dark:text-snow;
+	}
+
+	:focus-visible {
+		@apply outline-accent outline-2 outline-offset-2 dark:outline-accent-dark;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.01ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.01ms !important;
+		}
+	}
+}
+
+/*
+ * Prose styling for sanitized Markdown output (blog articles) and legal
+ * pages. Kept as a component class because the HTML is generated.
+ */
+@layer components {
+	.jp-prose {
+		@apply text-ink dark:text-snow;
+		max-width: 70ch;
+	}
+	.jp-prose > * + * {
+		margin-top: 1em;
+	}
+	.jp-prose h2 {
+		@apply mt-12 text-2xl font-semibold tracking-tight;
+	}
+	.jp-prose h3 {
+		@apply mt-8 text-xl font-semibold tracking-tight;
+	}
+	.jp-prose h4 {
+		@apply mt-6 text-lg font-semibold;
+	}
+	.jp-prose p,
+	.jp-prose li {
+		@apply text-ink-muted dark:text-snow-muted leading-relaxed;
+	}
+	.jp-prose a {
+		@apply text-accent dark:text-accent-dark underline underline-offset-2 hover:no-underline;
+	}
+	.jp-prose ul {
+		@apply list-disc pl-6;
+	}
+	.jp-prose ol {
+		@apply list-decimal pl-6;
+	}
+	.jp-prose ul.jp-task-list {
+		@apply list-none pl-1;
+	}
+	.jp-prose blockquote {
+		@apply border-accent dark:border-accent-dark border-l-4 pl-4 italic;
+	}
+	.jp-prose code {
+		@apply bg-accent-soft/60 dark:bg-night-raised rounded px-1.5 py-0.5 font-mono text-[0.9em];
+	}
+	.jp-prose pre {
+		@apply bg-night dark:bg-night-raised overflow-x-auto rounded-lg p-4;
+	}
+	.jp-prose pre code {
+		@apply text-snow bg-transparent p-0;
+	}
+	.jp-prose img {
+		@apply h-auto max-w-full rounded-lg;
+	}
+	.jp-prose hr {
+		@apply border-line dark:border-night-line my-10;
+	}
+	.jp-prose .jp-table-wrap {
+		@apply overflow-x-auto;
+	}
+	.jp-prose table {
+		@apply w-full border-collapse text-left text-sm;
+	}
+	.jp-prose th,
+	.jp-prose td {
+		@apply border-line dark:border-night-line border-b px-3 py-2 align-top;
+	}
+	.jp-prose th {
+		@apply font-semibold;
+	}
+}

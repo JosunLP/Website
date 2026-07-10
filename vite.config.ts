@@ -1,31 +1,35 @@
-import { sveltekit } from '@sveltejs/kit/vite';
+import tailwindcss from '@tailwindcss/vite';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
+/**
+ * Vite builds the client-side assets (interactive islands + styles) with
+ * hashed file names and a manifest. Static HTML pages are generated
+ * afterwards by `scripts/prerender.ts`, which reads the manifest to
+ * reference the hashed assets.
+ */
 export default defineConfig({
-	plugins: [sveltekit()],
-	css: {
-		preprocessorOptions: {
-			sass: {
-				api: 'modern'
-			}
-		}
+	resolve: {
+		alias: {
+			'@': fileURLToPath(new URL('./src', import.meta.url)),
+		},
+	},
+	plugins: [tailwindcss()],
+	publicDir: 'public',
+	build: {
+		outDir: 'dist',
+		manifest: true,
+		rollupOptions: {
+			input: {
+				bootstrap: 'src/app/bootstrap.ts',
+				article: 'src/app/article.ts',
+				'locale-redirect': 'src/app/locale-redirect.ts',
+				styles: 'src/styles/main.css',
+			},
+		},
 	},
 	test: {
-		include: ['src/**/*.{test,spec}.{js,ts}'],
-		environment: 'jsdom',
-		setupFiles: ['src/tests/setup.ts']
+		environment: 'happy-dom',
+		include: ['tests/**/*.test.ts'],
 	},
-	build: {
-		rollupOptions: {
-			output: {
-				manualChunks: {
-					vendor: ['svelte']
-				}
-			}
-		},
-		sourcemap: process.env.NODE_ENV === 'development'
-	},
-	define: {
-		'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-	}
 });
