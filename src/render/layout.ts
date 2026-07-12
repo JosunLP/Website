@@ -10,6 +10,8 @@ import { LOCALES, type Locale } from '@/domain/models/locale';
 import { renderHeadMeta, type PageMeta } from '@/domain/services/seo';
 import { messagesFor } from '@/features/i18n';
 import type { AppMessages } from '@/features/i18n/messages';
+import { SPECULATION_RULES_SNIPPET } from '@/features/navigation/speculation-rules';
+import { VIEW_TRANSITION_TYPES_SNIPPET } from '@/features/navigation/view-transition-types';
 import { THEME_INIT_SNIPPET } from '@/features/theme/theme-init';
 import { escape, html, raw, type SafeHtml } from '@/utils/html';
 import { externalLink } from './ui';
@@ -311,6 +313,15 @@ export function renderDocument(
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<script>${THEME_INIT_SNIPPET}</script>
+		<script>${VIEW_TRANSITION_TYPES_SNIPPET}</script>
+		<script type="speculationrules">${SPECULATION_RULES_SNIPPET}</script>${
+			options.bare
+				? ''
+				: // Hold the first paint until the main content exists in the
+					// DOM, so cross-document view transitions animate straight to
+					// the finished page instead of flashing a partial render.
+					'\n\t\t<link rel="expect" blocking="render" href="#main-content">'
+		}
 		${renderHeadMeta(meta).value}
 		<link rel="icon" href="/favicon.ico" sizes="32x32">
 		<link rel="icon" href="/favicon-32x32.png" type="image/png">

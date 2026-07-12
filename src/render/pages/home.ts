@@ -25,7 +25,7 @@ import type { RenderedPage } from './types';
 function heroArt(): ReturnType<typeof motif> {
 	return motif(
 		7,
-		'pointer-events-none absolute -top-6 right-0 hidden h-40 w-80 text-accent/50 dark:text-accent-dark/40 lg:block',
+		'jp-hero-art pointer-events-none absolute -top-6 right-0 hidden h-40 w-80 text-accent/50 dark:text-accent-dark/40 lg:block',
 	);
 }
 
@@ -82,7 +82,7 @@ export function renderHomePage(
 				${
 					flagship !== undefined
 						? html`<div
-								class="rounded-card border-accent/40 bg-accent-soft/40 dark:border-accent-dark/40 dark:bg-accent-dark-soft/40 mb-8 border p-6 sm:p-8"
+								class="jp-card jp-card--feature rounded-card border-accent/40 bg-accent-soft/40 dark:border-accent-dark/40 dark:bg-accent-dark-soft/40 mb-8 border p-6 sm:p-8"
 							>
 								<p
 									class="text-accent dark:text-accent-dark mb-3 text-sm font-semibold tracking-widest uppercase"
@@ -170,7 +170,7 @@ export function renderHomePage(
 					${FOCUS_AREAS.map(
 						(area) =>
 							html`<div
-								class="rounded-card border-line dark:border-night-line border p-6"
+								class="jp-card jp-card--feature rounded-card border-line dark:border-night-line border p-6"
 							>
 								<h3 class="text-lg font-semibold">${area.heading[locale]}</h3>
 								<p

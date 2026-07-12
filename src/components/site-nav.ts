@@ -19,6 +19,8 @@ const CLOSED_MOBILE_CLASSES = ['hidden', 'md:flex'];
 // against the header's inner container (`relative`), so it spans the whole
 // width instead of the narrow controls cluster it lives in.
 const OPEN_CLASSES = [
+	// Entry animation (fade + slide) via @starting-style; see main.css.
+	'jp-nav-panel',
 	'absolute',
 	'left-0',
 	'right-0',

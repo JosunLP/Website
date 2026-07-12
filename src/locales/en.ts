@@ -68,7 +68,7 @@ export const en: AppMessages = {
 			'Background, areas of expertise, and engineering values of Jonas Pfalzgraf (JosunLP), full-stack developer and open-source maintainer.',
 		heading: 'About me',
 		intro: [
-			'I am Jonas Pfalzgraf, a full-stack developer working under the handle JosunLP. My daily work spans TypeScript and C#/.NET applications, modern web front ends, APIs, and the tooling in between.',
+			'I am Jonas Pfalzgraf, a full-stack developer working under the handle JosunLP. My daily work spans TypeScript, php, and C#/.NET applications, modern web front ends, APIs, and the tooling in between.',
 			'In recent years my focus has been the web platform: typed component architectures, build tooling, accessibility, and performance. I care about software that other people can read, extend, and trust — which shapes how I design APIs, write documentation, and review code.',
 			'I maintain a range of open-source projects, from the bQuery.js framework to project templates and developer tools. Most of them started as a concrete need in a real project and grew into something reusable.',
 		],

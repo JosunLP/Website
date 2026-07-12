@@ -41,7 +41,7 @@ beforeAll(() => {
 });
 
 describe('jp-theme-toggle', () => {
-	it('renders a labelled button and cycles modes on click', async () => {
+	it('renders a labelled button and flips the resolved theme on click', async () => {
 		document.documentElement.classList.remove('dark');
 		localStorage.clear();
 		document.body.innerHTML = `<jp-theme-toggle data-label="Color scheme" data-light="Light" data-dark="Dark" data-system="System"></jp-theme-toggle>`;
@@ -50,18 +50,13 @@ describe('jp-theme-toggle', () => {
 		expect(button).not.toBeNull();
 		expect(button?.textContent).toContain('Color scheme');
 		expect(button?.textContent).toContain('System');
+		// The icon is a CSS-masked span; inline <svg> would be stripped by
+		// bQuery's render sanitizer, so guard that the icon element survives.
+		expect(button?.querySelector('.jp-theme-icon--system')).not.toBeNull();
 
 		(button as HTMLButtonElement).click();
 		await tick();
-		// system → light: stored explicitly.
-		expect(localStorage.getItem('jp:theme')).toBe('light');
-		expect(document.documentElement.classList.contains('dark')).toBe(false);
-
-		document
-			.querySelector<HTMLButtonElement>('jp-theme-toggle button')!
-			.click();
-		await tick();
-		// light → dark.
+		// system (resolves light in the test env) → dark: stored explicitly.
 		expect(localStorage.getItem('jp:theme')).toBe('dark');
 		expect(document.documentElement.classList.contains('dark')).toBe(true);
 
@@ -69,8 +64,17 @@ describe('jp-theme-toggle', () => {
 			.querySelector<HTMLButtonElement>('jp-theme-toggle button')!
 			.click();
 		await tick();
-		// dark → system: stored value cleared.
-		expect(localStorage.getItem('jp:theme')).toBeNull();
+		// dark → light.
+		expect(localStorage.getItem('jp:theme')).toBe('light');
+		expect(document.documentElement.classList.contains('dark')).toBe(false);
+
+		document
+			.querySelector<HTMLButtonElement>('jp-theme-toggle button')!
+			.click();
+		await tick();
+		// light → dark again: every click visibly flips the theme.
+		expect(localStorage.getItem('jp:theme')).toBe('dark');
+		expect(document.documentElement.classList.contains('dark')).toBe(true);
 	});
 });
 

@@ -8,7 +8,7 @@ and [`examples/hosting/nginx.conf`](../examples/hosting/nginx.conf).
 
 ```
 default-src 'none';
-script-src 'self' 'sha256-nTPhegqmvrjZuRuiDtWRYUA0nsamNqLzG7buGcTJGsk=';
+script-src 'self' 'sha256-nTPhegqmvrjZuRuiDtWRYUA0nsamNqLzG7buGcTJGsk=' 'sha256-Cg72eV8ns/6Pzyj/3F54zd4u7PgJMW20RqQ2y8pRR1Y=' 'sha256-+AXE/MttZEXsreUSecYA2V2pvWAOimYV8hZuNKsbvWA=';
 style-src 'self';
 img-src 'self' data:;
 font-src 'self';
@@ -22,11 +22,16 @@ frame-ancestors 'none'
 Rationale:
 
 - **No `unsafe-inline`, no `unsafe-eval`.** All scripts and styles are
-  self-hosted files. The single exception is the tiny inline theme
-  bootstrap in the document head (prevents a wrong-theme flash); it is
-  byte-stable and allowed via its SHA-256 hash.
-- The hash is derived from `src/features/theme/theme-init.ts`. After any
-  change to that snippet, recompute and update host config + this file:
+  self-hosted files. The only exceptions are three tiny inline snippets
+  in the document head — the theme bootstrap (prevents a wrong-theme
+  flash), the view-transition direction tagging (directional page
+  transitions), and the speculation rules JSON (prefetch/prerender for
+  near-instant navigation); all are byte-stable and allowed via their
+  SHA-256 hashes.
+- The hashes are derived from `src/features/theme/theme-init.ts`,
+  `src/features/navigation/view-transition-types.ts`, and
+  `src/features/navigation/speculation-rules.ts`. After any change to one
+  of the snippets, recompute and update host config + this file:
 
   ```bash
   bun run generate:csp-hash

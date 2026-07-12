@@ -32,9 +32,9 @@ export type ButtonVariant = 'primary' | 'secondary';
 
 const BUTTON_CLASSES: Record<ButtonVariant, string> = {
 	primary:
-		'inline-flex min-h-11 items-center justify-center rounded-full bg-accent px-6 py-2.5 font-medium text-white transition-colors duration-swift hover:bg-accent-strong dark:bg-accent-dark dark:text-night dark:hover:bg-accent-soft',
+		'jp-btn inline-flex min-h-11 items-center justify-center rounded-full bg-accent px-6 py-2.5 font-medium text-white transition-colors duration-swift hover:bg-accent-strong dark:bg-accent-dark dark:text-night dark:hover:bg-accent-soft',
 	secondary:
-		'inline-flex min-h-11 items-center justify-center rounded-full border border-line px-6 py-2.5 font-medium text-ink transition-colors duration-swift hover:border-accent hover:text-accent dark:border-night-line dark:text-snow dark:hover:border-accent-dark dark:hover:text-accent-dark',
+		'jp-btn inline-flex min-h-11 items-center justify-center rounded-full border border-line px-6 py-2.5 font-medium text-ink transition-colors duration-swift hover:border-accent hover:text-accent dark:border-night-line dark:text-snow dark:hover:border-accent-dark dark:hover:text-accent-dark',
 };
 
 export function buttonLink(
@@ -144,10 +144,10 @@ export function projectCard(
 		.split('')
 		.reduce((sum, char) => sum + char.charCodeAt(0), 0);
 	return html`<article
-		class="rounded-card border-line bg-paper-raised shadow-card dark:border-night-line dark:bg-night-raised flex h-full flex-col gap-4 border p-6"
+		class="jp-card rounded-card border-line bg-paper-raised shadow-card dark:border-night-line dark:bg-night-raised flex h-full flex-col gap-4 border p-6"
 	>
 		<div class="flex items-start justify-between gap-4">
-			${motif(seed, 'h-8 w-16 text-accent dark:text-accent-dark shrink-0')}
+			${motif(seed, 'jp-card-motif h-8 w-16 text-accent dark:text-accent-dark shrink-0')}
 			${statusBadge(project.status, messages)}
 		</div>
 		<${raw(heading)} class="text-xl font-semibold tracking-tight">
@@ -197,7 +197,7 @@ export function blogCard(
 	const heading = options.headingLevel ?? 'h3';
 	const path = blogPostPath(locale, post.slug);
 	return html`<article
-		class="rounded-card border-line bg-paper-raised shadow-card dark:border-night-line dark:bg-night-raised flex h-full flex-col gap-3 border p-6"
+		class="jp-card rounded-card border-line bg-paper-raised shadow-card dark:border-night-line dark:bg-night-raised flex h-full flex-col gap-3 border p-6"
 	>
 		<p class="text-ink-muted dark:text-snow-muted text-sm">
 			<time datetime="${post.publishedAt}"

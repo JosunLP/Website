@@ -42,6 +42,102 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
+ * Cross-document view transitions: full page navigations animate instead
+ * of hard-cutting. Header and footer are pinned as their own transition
+ * groups so they stay visually stable while the main content performs a
+ * quick fade-and-rise. Browsers without support simply navigate normally,
+ * and reduced-motion users keep instant swaps.
+ */
+@view-transition {
+	navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	@view-transition {
+		navigation: none;
+	}
+}
+
+@keyframes jp-vt-fade-out {
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes jp-vt-rise-in {
+	from {
+		opacity: 0;
+		transform: translateY(0.5rem);
+	}
+}
+
+::view-transition-old(main-content) {
+	animation: jp-vt-fade-out 120ms ease-in both;
+}
+
+::view-transition-new(main-content) {
+	animation: jp-vt-rise-in 240ms 60ms ease-out both;
+}
+
+/* Keep the root cross-fade snappy so navigation never feels delayed. */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 200ms;
+}
+
+/*
+ * Directional navigation: the inline head snippet (see
+ * src/features/navigation/view-transition-types.ts) tags each transition
+ * as "forwards" or "backwards" based on the header-nav page order, so
+ * content slides in the direction the user is moving through the site.
+ */
+@keyframes jp-vt-slide-out-left {
+	to {
+		opacity: 0;
+		transform: translateX(-2rem);
+	}
+}
+
+@keyframes jp-vt-slide-in-right {
+	from {
+		opacity: 0;
+		transform: translateX(2rem);
+	}
+}
+
+@keyframes jp-vt-slide-out-right {
+	to {
+		opacity: 0;
+		transform: translateX(2rem);
+	}
+}
+
+@keyframes jp-vt-slide-in-left {
+	from {
+		opacity: 0;
+		transform: translateX(-2rem);
+	}
+}
+
+html:active-view-transition-type(forwards) {
+	&::view-transition-old(main-content) {
+		animation: jp-vt-slide-out-left 140ms ease-in both;
+	}
+	&::view-transition-new(main-content) {
+		animation: jp-vt-slide-in-right 260ms 50ms cubic-bezier(0.2, 0, 0, 1) both;
+	}
+}
+
+html:active-view-transition-type(backwards) {
+	&::view-transition-old(main-content) {
+		animation: jp-vt-slide-out-right 140ms ease-in both;
+	}
+	&::view-transition-new(main-content) {
+		animation: jp-vt-slide-in-left 260ms 50ms cubic-bezier(0.2, 0, 0, 1) both;
+	}
+}
+
+/*
  * Base layer: semantic defaults so pre-rendered content is readable even
  * before/without any component styling.
  */
@@ -89,6 +185,21 @@
 
 	:focus-visible {
 		@apply outline-accent outline-2 outline-offset-2 dark:outline-accent-dark;
+	}
+
+	/*
+	 * Dedicated view-transition groups: the sticky header and the footer
+	 * persist visually across page navigations while only the main content
+	 * animates (see the @view-transition block above).
+	 */
+	body > header {
+		view-transition-name: site-header;
+	}
+	body > footer {
+		view-transition-name: site-footer;
+	}
+	main#main-content {
+		view-transition-name: main-content;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
@@ -172,5 +283,264 @@
 	}
 	.jp-prose th {
 		@apply font-semibold;
+	}
+}
+
+/*
+ * Theme toggle icon. The glyphs are CSS mask images colored via
+ * currentColor: bQuery's component sanitizer strips inline <svg> from
+ * render output, so the icon cannot live in the component's markup.
+ * The swap animation makes the sun/moon/system change read as a
+ * deliberate transition rather than a hard cut; motion is neutralised by
+ * the global reduced-motion guard.
+ */
+@keyframes jp-theme-swap {
+	from {
+		transform: rotate(-120deg) scale(0.5);
+		opacity: 0;
+	}
+	to {
+		transform: rotate(0) scale(1);
+		opacity: 1;
+	}
+}
+
+@layer components {
+	.jp-theme-icon {
+		width: 1.25rem;
+		height: 1.25rem;
+		background-color: currentColor;
+		-webkit-mask: var(--jp-theme-icon-mask) center / contain no-repeat;
+		mask: var(--jp-theme-icon-mask) center / contain no-repeat;
+		transform-origin: center;
+		animation: jp-theme-swap var(--duration-swift) ease-out;
+	}
+	.jp-theme-icon--system {
+		--jp-theme-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Crect x='4' y='5' width='16' height='11' rx='2'/%3E%3Cpath d='M9 20h6M12 16v4'/%3E%3C/svg%3E");
+	}
+	.jp-theme-icon--light {
+		--jp-theme-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4'/%3E%3C/svg%3E");
+	}
+	.jp-theme-icon--dark {
+		--jp-theme-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z'/%3E%3C/svg%3E");
+	}
+}
+
+/*
+ * Mobile navigation panel: fades and slides in when it first renders.
+ * `@starting-style` provides the pre-render state, so the transition runs
+ * on the display:none → visible switch without any JavaScript timing
+ * tricks. Motion is neutralised by the global reduced-motion guard.
+ */
+@layer components {
+	.jp-nav-panel {
+		transition:
+			opacity var(--duration-swift) ease-out,
+			translate var(--duration-swift) ease-out;
+
+		@starting-style {
+			opacity: 0;
+			translate: 0 -0.5rem;
+		}
+	}
+}
+
+/*
+ * ---------------------------------------------------------------------------
+ * Ambient & element motion
+ * ---------------------------------------------------------------------------
+ * A restrained motion layer that reinforces the "modular systems" identity
+ * without ever competing with the content:
+ *   - a fixed, slowly drifting accent glow plus a faint static grid behind
+ *     everything;
+ *   - scroll-driven section reveals (progressive enhancement — content is
+ *     never hidden on browsers without `animation-timeline`);
+ *   - a gentle staggered hero entrance and a floating hero motif;
+ *   - hover lift on cards and buttons.
+ *
+ * All durations/transforms are neutralised by the global reduced-motion
+ * guard in the base layer, and every transform-based effect is additionally
+ * gated behind `prefers-reduced-motion: no-preference` so nothing moves for
+ * users who opt out. These rules sit outside @layer on purpose: they must win
+ * over Tailwind utilities such as `shadow-card` and `transition-colors`.
+ */
+
+/* Background: drifting accent glow + faint modular grid. */
+:root {
+	--jp-glow-a: oklch(0.5 0.13 250 / 0.07);
+	--jp-glow-b: oklch(0.62 0.11 200 / 0.05);
+	--jp-grid-line: oklch(0.24 0.02 270 / 0.025);
+}
+:root.dark {
+	--jp-glow-a: oklch(0.78 0.1 250 / 0.09);
+	--jp-glow-b: oklch(0.7 0.09 210 / 0.06);
+	--jp-grid-line: oklch(0.93 0.005 95 / 0.022);
+}
+
+body::before,
+body::after {
+	content: '';
+	position: fixed;
+	inset: -25%;
+	z-index: -1;
+	pointer-events: none;
+}
+
+/* Layer 1: two soft accent blooms that slowly drift and breathe. */
+body::before {
+	background-image:
+		radial-gradient(
+			38rem 38rem at 18% 12%,
+			var(--jp-glow-a),
+			transparent 60%
+		),
+		radial-gradient(
+			34rem 34rem at 84% 30%,
+			var(--jp-glow-b),
+			transparent 58%
+		);
+	animation: jp-ambient-drift 34s ease-in-out infinite alternate;
+}
+
+/* Layer 2: a faint 40px grid, static, tying back to the module motif. */
+body::after {
+	background-image:
+		linear-gradient(var(--jp-grid-line) 1px, transparent 1px),
+		linear-gradient(90deg, var(--jp-grid-line) 1px, transparent 1px);
+	background-size: 2.5rem 2.5rem;
+	/* Fade the grid out toward the edges so it reads as texture, not a table. */
+	-webkit-mask-image: radial-gradient(
+		120% 90% at 50% 0%,
+		black,
+		transparent 78%
+	);
+	mask-image: radial-gradient(120% 90% at 50% 0%, black, transparent 78%);
+}
+
+@keyframes jp-ambient-drift {
+	from {
+		transform: translate3d(-1.5%, -1%, 0) scale(1.02);
+	}
+	to {
+		transform: translate3d(1.5%, 1%, 0) scale(1.08);
+	}
+}
+
+/* Card hover: a small lift, deeper shadow, and accent border. */
+.jp-card {
+	transition:
+		transform var(--duration-swift) ease-out,
+		box-shadow var(--duration-swift) ease-out,
+		border-color var(--duration-swift) ease-out;
+}
+.jp-card:hover {
+	border-color: var(--color-accent);
+}
+.dark .jp-card:hover {
+	border-color: var(--color-accent-dark);
+}
+
+/* Button hover: subtle lift + shadow, layered on the existing colour swap. */
+.jp-btn {
+	transition:
+		background-color var(--duration-swift) ease-out,
+		border-color var(--duration-swift) ease-out,
+		color var(--duration-swift) ease-out,
+		transform var(--duration-swift) ease-out,
+		box-shadow var(--duration-swift) ease-out;
+}
+
+@keyframes jp-reveal-in {
+	from {
+		opacity: 0;
+		transform: translateY(1.75rem);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes jp-hero-in {
+	from {
+		opacity: 0;
+		transform: translateY(1.25rem);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes jp-hero-float {
+	from {
+		transform: translateY(-0.4rem);
+		opacity: 0.8;
+	}
+	to {
+		transform: translateY(0.4rem);
+		opacity: 1;
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.jp-card:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 14px 30px -10px oklch(0 0 0 / 0.18);
+	}
+	.dark .jp-card:hover {
+		box-shadow: 0 14px 30px -10px oklch(0 0 0 / 0.55);
+	}
+	/* The card's motif nudges to life with the hover. */
+	.jp-card-motif {
+		transition: transform var(--duration-swift) ease-out;
+	}
+	.jp-card:hover .jp-card-motif {
+		transform: scale(1.1);
+	}
+
+	.jp-btn:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 18px -8px oklch(0.5 0.13 250 / 0.5);
+	}
+	.jp-btn:active {
+		transform: translateY(0);
+	}
+
+	/* Staggered hero entrance (the decorative motif is handled separately). */
+	section[aria-labelledby='hero-heading'] > *:not(.jp-hero-art) {
+		animation: jp-hero-in 700ms cubic-bezier(0.2, 0, 0, 1) both;
+	}
+	section[aria-labelledby='hero-heading'] > h1 {
+		animation-delay: 80ms;
+	}
+	section[aria-labelledby='hero-heading'] > p:nth-of-type(1) {
+		animation-delay: 200ms;
+	}
+	section[aria-labelledby='hero-heading'] > p:nth-of-type(2) {
+		animation-delay: 320ms;
+	}
+
+	/* The hero motif fades in, then floats indefinitely. */
+	.jp-hero-art {
+		animation:
+			jp-hero-in 900ms ease-out both,
+			jp-hero-float 9s ease-in-out 900ms infinite alternate;
+	}
+}
+
+/*
+ * Scroll-driven section reveals. Guarded by @supports so browsers without
+ * scroll-linked animations render the content in its final, visible state —
+ * the initial opacity:0 only exists inside this block. The hero animates on
+ * load (above), so it is excluded here.
+ */
+@supports (animation-timeline: view()) {
+	@media (prefers-reduced-motion: no-preference) {
+		main#main-content section:not([aria-labelledby='hero-heading']) {
+			animation: jp-reveal-in linear both;
+			animation-timeline: view();
+			animation-range: entry 0% entry 45%;
+		}
 	}
 }

@@ -69,7 +69,7 @@ export const de: AppMessages = {
 			'Werdegang, Schwerpunkte und Arbeitsweise von Jonas Pfalzgraf (JosunLP), Full-Stack-Entwickler und Open-Source-Maintainer.',
 		heading: 'Über mich',
 		intro: [
-			'Ich bin Jonas Pfalzgraf, Full-Stack-Entwickler, im Netz unterwegs als JosunLP. Mein Arbeitsalltag umfasst TypeScript- und C#/.NET-Anwendungen, moderne Web-Frontends, APIs und das Tooling dazwischen.',
+			'Ich bin Jonas Pfalzgraf, Full-Stack-Entwickler, im Netz unterwegs als JosunLP. Mein Arbeitsalltag umfasst TypeScript-, PHP- und C#/.NET-Anwendungen, moderne Web-Frontends, APIs und das Tooling dazwischen.',
 			'In den letzten Jahren liegt mein Schwerpunkt auf der Webplattform: typisierte Komponenten-Architekturen, Build-Tooling, Barrierefreiheit und Performance. Mir ist wichtig, dass Software für andere lesbar, erweiterbar und vertrauenswürdig ist — das prägt, wie ich APIs entwerfe, dokumentiere und Code reviewe.',
 			'Ich pflege eine Reihe von Open-Source-Projekten, vom Framework bQuery.js über Projekt-Templates bis zu Entwickler-Werkzeugen. Die meisten sind aus einem konkreten Bedarf in echten Projekten entstanden und zu etwas Wiederverwendbarem gewachsen.',
 		],
