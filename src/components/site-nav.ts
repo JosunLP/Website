@@ -15,7 +15,30 @@ import type { FocusTrapHandle } from '@bquery/bquery/a11y';
  */
 
 const CLOSED_MOBILE_CLASSES = ['hidden', 'md:flex'];
-const OPEN_CLASSES = ['flex', 'w-full', 'flex-col', 'items-stretch', 'pt-3'];
+// Open state: a full-width panel dropping below the header. Positioned
+// against the header's inner container (`relative`), so it spans the whole
+// width instead of the narrow controls cluster it lives in.
+const OPEN_CLASSES = [
+	'absolute',
+	'left-0',
+	'right-0',
+	'top-full',
+	'z-40',
+	'mt-px',
+	'flex',
+	'w-full',
+	'flex-col',
+	'items-stretch',
+	'border-line',
+	'dark:border-night-line',
+	'border-t',
+	'bg-paper',
+	'dark:bg-night',
+	'p-4',
+	'shadow-card',
+	'max-h-[calc(100vh_-_4rem)]',
+	'overflow-y-auto',
+];
 
 export function registerSiteNav(): void {
 	if (customElements.get('jp-site-nav') != null) {

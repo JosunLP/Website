@@ -49,7 +49,7 @@ ESLint 10 with typescript-eslint, Prettier 3 (print width 80), and tsx
 
 Edit `src/content/projects.ts` — typed `Project` records with de/en
 descriptions, technologies, category, status, license, links, and
-`featured`/`flagship` flags. `npm run test` and the build validate the
+`featured`/`flagship` flags. `bun run test` and the build validate the
 data (slugs, https URLs, non-empty localized copy). Cards, the flagship
 section, and JSON-LD update automatically.
 
@@ -57,7 +57,7 @@ section, and JSON-LD update automatically.
 
 Short version (details in `docs/blog-content-workflow.md`): write
 `content/blog/{locale}/<slug>.md` with the documented front matter, run
-`npm run generate:blog-manifest && npm run generate:blog-sitemap`, then
+`bun run generate:blog-manifest && bun run generate:blog-sitemap`, then
 upload the `.md` file, `content/blog/index.json`, `blog-sitemap.xml`, and
 any referenced assets. For maximum SEO, prefer committing the post and
 rebuilding instead.
@@ -67,7 +67,7 @@ rebuilding instead.
 - Rewrite unknown `/{de|en}/blog/{slug}/` → `/{locale}/blog/_article/index.html`
 - 404 → `/404.html`; `.md` served as `text/markdown`
 - Security headers incl. CSP with the theme-init hash
-  (`npm run generate:csp-hash`)
+  (`bun run generate:csp-hash`)
 - Immutable caching for `/assets/`, `no-cache` for HTML/content
 - Examples: `examples/hosting/.htaccess`, `examples/hosting/nginx.conf`
 
@@ -83,13 +83,13 @@ placeholders. No personal/legal data was invented.
 
 | Check                  | Result                             |
 | ---------------------- | ---------------------------------- |
-| `npm run typecheck`    | ✅ clean (strict)                  |
-| `npm run lint`         | ✅ 0 problems                      |
-| `npm run format:check` | ✅ clean                           |
-| `npm run test`         | ✅ 86/86 (9 files)                 |
-| `npm run test:a11y`    | ✅ 13 pages, 0 axe violations      |
-| `npm run build`        | ✅ 23 pages + hashed assets        |
-| `npm run validate`     | ✅ 24 HTML files, sitemaps, robots |
+| `bun run typecheck`    | ✅ clean (strict)                  |
+| `bun run lint`         | ✅ 0 problems                      |
+| `bun run format:check` | ✅ clean                           |
+| `bun run test`         | ✅ 86/86 (9 files)                 |
+| `bun run test:a11y`    | ✅ 13 pages, 0 axe violations      |
+| `bun run build`        | ✅ 23 pages + hashed assets        |
+| `bun run validate`     | ✅ 24 HTML files, sitemaps, robots |
 
 Bundle: bootstrap ~8.7 kB (3.4 kB gzip), styles ~26 kB (5.5 kB gzip);
 blog chunk ~114 kB (36 kB gzip) loaded on blog routes only. No remote

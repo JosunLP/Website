@@ -29,7 +29,7 @@ Rationale:
   change to that snippet, recompute and update host config + this file:
 
   ```bash
-  npm run generate:csp-hash
+  bun run generate:csp-hash
   ```
 
 - `connect-src 'self'` covers the blog's manifest/Markdown fetches.

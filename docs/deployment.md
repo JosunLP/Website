@@ -6,8 +6,8 @@ public content — deployable to any web server or shared hosting.
 ## 1. Build
 
 ```bash
-npm ci
-npm run check   # typecheck, lint, format, tests, build, validate
+bun install --frozen-lockfile
+bun run check   # typecheck, lint, format, tests, build, validate
 ```
 
 Upload the **contents of `dist/`** to the web root.

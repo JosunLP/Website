@@ -42,7 +42,7 @@ export function renderHomePage(
 	const main = html`
 		<div class="mx-auto max-w-6xl px-4 sm:px-6">
 			<!-- Hero -->
-			<section class="relative py-20 sm:py-28" aria-labelledby="hero-heading">
+			<section class="relative py-14 sm:py-28" aria-labelledby="hero-heading">
 				${heroArt()}
 				<h1
 					id="hero-heading"

@@ -60,7 +60,7 @@ maintainer, with bQuery.js as the flagship project.
 | Planning Poker              | Nuxt 4/TS/Tailwind estimation tool         | MIT      | Active, live demo |
 | Retro Rumble                | Nuxt 4/TS/Tailwind retro tool              | MIT      | Active            |
 
-### Tooling versions (npm, 2026-07-10)
+### Tooling versions (Bun, 2026-07-10)
 
 - `@bquery/bquery` 1.15.1, `tailwindcss` + `@tailwindcss/vite` 4.3.2,
   `vite` 8.1.4, `vitest` 4.x, `typescript` latest 7.0.2 (fallback pin
@@ -70,7 +70,8 @@ maintainer, with bQuery.js as the flagship project.
   all output passes through `@bquery/bquery/security` sanitization.
   `highlight.js/lib/core` with a small language subset, loaded only on
   article pages, for code highlighting.
-- Package manager: npm (already used by the repository).
+- Package manager & runtime: Bun (install, script running, and native
+  TypeScript execution for the build/prerender scripts).
 
 ## 3. Architecture decisions
 

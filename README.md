@@ -31,19 +31,19 @@ for the full picture.
 
 ## Prerequisites
 
-- Node.js ≥ 24
-- npm (lockfile committed)
+- [Bun](https://bun.sh/) ≥ 1.2 (runtime, package manager, and TypeScript
+  runner — `bun.lock` committed)
 
 ## Setup
 
 ```bash
-npm install
+bun install
 ```
 
 ## Development
 
 ```bash
-npm run dev          # dev server at http://localhost:5173/
+bun run dev          # dev server at http://localhost:5173/
 ```
 
 Pages are rendered on the fly through Vite's SSR pipeline; client islands
@@ -52,8 +52,8 @@ and styles are served by the regular Vite dev server.
 ## Build
 
 ```bash
-npm run build        # manifest + sitemaps + assets + prerendered HTML → dist/
-npm run preview      # serve dist/ locally
+bun run build        # manifest + sitemaps + assets + prerendered HTML → dist/
+bun run preview      # serve dist/ locally
 ```
 
 The build fails on invalid project data or broken blog content — by
@@ -62,13 +62,13 @@ design.
 ## Quality checks
 
 ```bash
-npm run typecheck        # strict TypeScript
-npm run lint             # ESLint (typed rules)
-npm run format:check     # Prettier (print width 80)
-npm run test             # unit + component tests (Vitest)
-npm run test:a11y        # axe-core checks on rendered pages
-npm run validate         # dist/ link, metadata, sitemap, robots checks
-npm run check            # all of the above + build
+bun run typecheck        # strict TypeScript
+bun run lint             # ESLint (typed rules)
+bun run format:check     # Prettier (print width 80)
+bun run test             # unit + component tests (Vitest)
+bun run test:a11y        # axe-core checks on rendered pages
+bun run validate         # dist/ link, metadata, sitemap, robots checks
+bun run check            # all of the above + build
 ```
 
 ## Blog workflow
@@ -78,8 +78,8 @@ Posts are Markdown files with YAML front matter under
 changes:
 
 ```bash
-npm run generate:blog-manifest
-npm run generate:blog-sitemap
+bun run generate:blog-manifest
+bun run generate:blog-sitemap
 ```
 
 Posts can be published **without a rebuild** by uploading the Markdown

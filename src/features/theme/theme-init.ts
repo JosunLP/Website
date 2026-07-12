@@ -3,7 +3,7 @@
  * flash of the wrong color scheme. It must stay byte-stable: the strict
  * Content Security Policy allows exactly this script via its SHA-256
  * hash (see docs/security-headers.md; recompute with
- * `npm run generate:csp-hash` after any change).
+ * `bun run generate:csp-hash` after any change).
  *
  * Behavior: an explicitly stored user preference wins; otherwise the
  * system preference applies and nothing is stored.

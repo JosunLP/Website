@@ -66,5 +66,5 @@ Ko-fi (`ko-fi.com/josunlp`).
       purpose, live announcements on the blog index/article shell.
 - [ ] Zoom 200% and 400% reflow check.
 - [ ] `prefers-reduced-motion` and dark/light contrast spot checks.
-- [ ] Re-run `npm run test:a11y` and `npm run validate` after content or
+- [ ] Re-run `bun run test:a11y` and `bun run validate` after content or
       design changes.

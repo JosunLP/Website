@@ -55,10 +55,32 @@
 
 	html {
 		scroll-behavior: smooth;
+		/* Keep anchor targets clear of the sticky header. */
+		scroll-padding-top: 5rem;
+		/* Prevent iOS from auto-inflating text in landscape. */
+		-webkit-text-size-adjust: 100%;
+		text-size-adjust: 100%;
 	}
 
 	body {
 		@apply bg-paper font-sans text-ink antialiased dark:bg-night dark:text-snow;
+		/* Guard against accidental horizontal scrolling on small screens. */
+		overflow-x: hidden;
+	}
+
+	/* Respect notch / rounded-corner safe areas on modern phones. */
+	@supports (padding: max(0px)) {
+		body {
+			padding-left: env(safe-area-inset-left);
+			padding-right: env(safe-area-inset-right);
+		}
+	}
+
+	/* Media should never force the layout wider than the viewport. */
+	img,
+	svg,
+	video {
+		max-width: 100%;
 	}
 
 	::selection {

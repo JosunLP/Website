@@ -64,11 +64,11 @@ removed by the sanitizer.
 3. Regenerate artifacts and verify:
 
    ```bash
-   npm run generate:blog-manifest
-   npm run generate:blog-sitemap
-   npm run test
-   npm run build && npm run validate
-   npm run preview
+   bun run generate:blog-manifest
+   bun run generate:blog-sitemap
+   bun run test
+   bun run build && bun run validate
+   bun run preview
    ```
 
 4. Commit and deploy `dist/` as usual. The post is fully pre-rendered
@@ -82,8 +82,8 @@ shell. Uploading a post requires **all** of these steps:
 1. Run the generators locally (they validate your front matter):
 
    ```bash
-   npm run generate:blog-manifest
-   npm run generate:blog-sitemap
+   bun run generate:blog-manifest
+   bun run generate:blog-sitemap
    ```
 
 2. Upload the Markdown file to

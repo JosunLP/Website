@@ -155,7 +155,7 @@ accessibility statement documents remaining limitations honestly.
   styles). Component render output is sanitized again by bQuery itself.
 - Strict CSP (no `unsafe-inline` for scripts): the only inline script is
   the byte-stable theme bootstrap, allowed via SHA-256 hash
-  (`npm run generate:csp-hash`). See
+  (`bun run generate:csp-hash`). See
   [../security-headers.md](../security-headers.md).
 - External links: `rel="noopener noreferrer"` (build-validated).
 - No analytics, no cookies, no consent-requiring tech, no third-party

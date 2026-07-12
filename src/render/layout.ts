@@ -121,37 +121,39 @@ function themeToggle(messages: AppMessages): SafeHtml {
 
 function siteHeader(ctx: RenderContext): SafeHtml {
 	const { messages, locale } = ctx;
-	return html`<header class="border-line dark:border-night-line border-b">
+	return html`<header
+		class="border-line dark:border-night-line bg-paper/85 dark:bg-night/85 sticky top-0 z-40 border-b backdrop-blur-md"
+	>
 		<div
-			class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-4 sm:px-6"
+			class="relative mx-auto flex max-w-6xl items-center justify-between gap-x-4 gap-y-3 px-4 py-3 sm:px-6 sm:py-4"
 		>
 			<a
 				href="${pagePath(locale, 'home')}"
-				class="flex items-center gap-3 text-lg font-semibold tracking-tight"
+				class="flex min-w-0 items-center gap-2.5 text-lg font-semibold tracking-tight sm:gap-3"
 			>
 				<img
 					src="/images/logo-jonas-light.svg"
 					alt=""
 					width="40"
 					height="40"
-					class="h-10 w-10 dark:hidden"
+					class="h-9 w-9 shrink-0 dark:hidden sm:h-10 sm:w-10"
 				/>
 				<img
 					src="/images/logo-jonas-dark.svg"
 					alt=""
 					width="40"
 					height="40"
-					class="hidden h-10 w-10 dark:block"
+					class="hidden h-9 w-9 shrink-0 dark:block sm:h-10 sm:w-10"
 				/>
-				<span>
+				<span class="min-w-0 truncate">
 					${messages.siteName}
 					<span
-						class="text-ink-muted dark:text-snow-muted block text-xs font-normal"
+						class="text-ink-muted dark:text-snow-muted block truncate text-xs font-normal"
 						>${messages.siteTagline}</span
 					>
 				</span>
 			</a>
-			<div class="flex items-center gap-2 sm:gap-4">
+			<div class="flex shrink-0 items-center gap-1 sm:gap-4">
 				${languageSwitcher(ctx, 'header')} ${themeToggle(messages)}
 				<jp-site-nav>
 					<button
@@ -189,14 +191,18 @@ function siteHeader(ctx: RenderContext): SafeHtml {
 						>
 							${HEADER_NAV.map((page) => {
 								const current = isCurrentPage(ctx, page);
-								return html`<li>
+								// Full-width, 44px tap targets inside the mobile panel;
+								// plain inline links from `md` up.
+								const base =
+									'flex min-h-11 w-full items-center rounded-lg px-3 md:min-h-9 md:w-auto md:rounded-none md:px-0';
+								return html`<li class="w-full md:w-auto">
 									<a
 										href="${pagePath(locale, page)}"
 										${current ? raw('aria-current="page"') : null}
 										class="${
 											current
-												? 'text-accent dark:text-accent-dark inline-flex min-h-9 items-center'
-												: 'hover:text-accent dark:hover:text-accent-dark inline-flex min-h-9 items-center'
+												? `${base} text-accent dark:text-accent-dark bg-accent-soft/50 dark:bg-accent-dark-soft/40 md:bg-transparent md:dark:bg-transparent`
+												: `${base} hover:text-accent dark:hover:text-accent-dark hover:bg-line/40 dark:hover:bg-night-line/30 md:hover:bg-transparent md:dark:hover:bg-transparent`
 										}"
 										>${navLabel(messages, page)}</a
 									>

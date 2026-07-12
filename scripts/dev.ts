@@ -11,6 +11,36 @@ import type * as I18nModule from '@/features/i18n';
 installDomGlobals();
 
 /**
+ * Minimal extension → MIME map for static public assets. Without an
+ * explicit `Content-Type`, browsers refuse to render SVGs inside `<img>`
+ * (the logos) and may mis-sniff other assets. Production web servers set
+ * this by extension; the dev server must do the same.
+ */
+const MIME_TYPES: Record<string, string> = {
+	'.svg': 'image/svg+xml',
+	'.png': 'image/png',
+	'.jpg': 'image/jpeg',
+	'.jpeg': 'image/jpeg',
+	'.webp': 'image/webp',
+	'.gif': 'image/gif',
+	'.ico': 'image/x-icon',
+	'.json': 'application/json',
+	'.webmanifest': 'application/manifest+json',
+	'.xml': 'application/xml',
+	'.txt': 'text/plain; charset=utf-8',
+	'.woff2': 'font/woff2',
+	'.css': 'text/css; charset=utf-8',
+};
+
+function contentTypeFor(path: string): string | undefined {
+	const dot = path.lastIndexOf('.');
+	if (dot === -1) {
+		return undefined;
+	}
+	return MIME_TYPES[path.slice(dot).toLowerCase()];
+}
+
+/**
  * Development server: renders pages on the fly through Vite's SSR module
  * graph (so edits to render code apply on reload) and serves client
  * assets through the regular Vite dev pipeline.
@@ -86,6 +116,10 @@ const server = createHttpServer((req, res) => {
 	// Static public assets.
 	const publicFile = join(process.cwd(), 'public', url.slice(1));
 	if (url !== '/' && !url.endsWith('/') && existsSync(publicFile)) {
+		const type = contentTypeFor(url);
+		if (type !== undefined) {
+			res.setHeader('content-type', type);
+		}
 		res.end(readFileSync(publicFile));
 		return;
 	}
