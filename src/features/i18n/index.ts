@@ -1,10 +1,19 @@
-import { createI18n, negotiateLocale } from '@bquery/bquery/i18n';
+import { createI18n } from '@bquery/bquery/i18n';
 import type { I18nInstance, Messages } from '@bquery/bquery/i18n';
-import { DEFAULT_LOCALE, LOCALES, type Locale } from '@/domain/models/locale';
-import { STORAGE_KEYS } from '@/app/configuration';
+import { DEFAULT_LOCALE, type Locale } from '@/domain/models/locale';
 import { de } from '@/locales/de';
 import { en } from '@/locales/en';
 import type { AppMessages } from './messages';
+
+// Client-safe preference helpers live in their own dictionary-free module
+// so the global bootstrap chunk never pulls in the message dictionaries.
+// Re-exported here for build-time and test callers that expect the full
+// i18n surface at this path.
+export {
+	decideLocale,
+	readStoredLocale,
+	storeLocale,
+} from './locale-preference';
 
 /** All dictionaries, keyed by locale. */
 export const DICTIONARIES: Readonly<Record<Locale, AppMessages>> = { de, en };
@@ -48,46 +57,6 @@ export function formatMessage(
 		const value = params[key];
 		return value === undefined ? match : String(value);
 	});
-}
-
-/**
- * Client-side locale decision for the root route:
- * 1. explicitly stored preference (set only on user action),
- * 2. browser language negotiation,
- * 3. default locale (German).
- */
-export function decideLocale(
-	storedValue: string | null,
-	navigatorLanguages: readonly string[],
-): Locale {
-	if (
-		storedValue !== null &&
-		(LOCALES as readonly string[]).includes(storedValue)
-	) {
-		return storedValue as Locale;
-	}
-	return negotiateLocale(navigatorLanguages, LOCALES, {
-		fallback: DEFAULT_LOCALE,
-	}) as Locale;
-}
-
-/** Reads the stored locale preference, tolerating unavailable storage. */
-export function readStoredLocale(): string | null {
-	try {
-		return localStorage.getItem(STORAGE_KEYS.locale);
-	} catch {
-		return null;
-	}
-}
-
-/** Persists an explicitly chosen locale (user action only). */
-export function storeLocale(locale: Locale): void {
-	try {
-		localStorage.setItem(STORAGE_KEYS.locale, locale);
-	} catch {
-		// Storage unavailable (private mode, disabled) — preference simply
-		// does not persist; the site keeps working.
-	}
 }
 
 /** Formats an ISO date for display in the given locale. */

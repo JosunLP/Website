@@ -158,11 +158,9 @@ export const en: AppMessages = {
 			'E-mails are used solely to answer your inquiry. Details are described in the privacy policy.',
 	},
 	notFound: {
-		title: 'Page not found — Jonas Pfalzgraf',
+		title: 'Page not found — JosunLP.de',
 		heading: 'Page not found',
 		text: 'The requested page does not exist or has been moved.',
 		backHome: 'Back to the home page',
 	},
-	legalDraftNotice:
-		'Draft template: this page is pending review by the site owner and, where appropriate, qualified legal counsel. It is not legal advice.',
 };

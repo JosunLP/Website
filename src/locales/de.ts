@@ -162,11 +162,9 @@ export const de: AppMessages = {
 			'E-Mails werden ausschließlich zur Beantwortung Ihrer Anfrage verwendet. Details beschreibt die Datenschutzerklärung.',
 	},
 	notFound: {
-		title: 'Seite nicht gefunden — Jonas Pfalzgraf',
+		title: 'Seite nicht gefunden — JosunLP.de',
 		heading: 'Seite nicht gefunden',
 		text: 'Die angeforderte Seite existiert nicht oder wurde verschoben.',
 		backHome: 'Zur Startseite',
 	},
-	legalDraftNotice:
-		'Entwurfsvorlage: Diese Seite muss noch durch den Seitenbetreiber und ggf. durch qualifizierte Rechtsberatung geprüft werden. Sie stellt keine Rechtsberatung dar.',
 };

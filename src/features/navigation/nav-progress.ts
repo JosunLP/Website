@@ -1,10 +1,10 @@
 /**
- * Cross-document navigation feedback. The next page is render-blocked
- * (`<link rel="expect">`) so the cross-document view transition can
- * capture a complete snapshot — but until that page is ready the old
- * page just sits there. Without feedback a slow navigation feels like
- * the click was swallowed, and a second click cancels and restarts the
- * in-flight navigation, making everything worse.
+ * Cross-document navigation feedback. Navigation is deliberately not
+ * render-blocked or speculated (see the comment in src/render/layout.ts),
+ * so between the click and the next page's first paint the old page just
+ * sits there. Without feedback a slow navigation feels like the click was
+ * swallowed, and a second click cancels and restarts the in-flight
+ * navigation, making everything worse.
  *
  * This module tags `<html>` with `jp-navigating` while a same-origin
  * navigation is in flight; main.css renders a thin indeterminate

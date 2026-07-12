@@ -1,5 +1,5 @@
 import { isLocale } from '@/domain/models/locale';
-import { storeLocale } from '@/features/i18n';
+import { storeLocale } from '@/features/i18n/locale-preference';
 
 /**
  * jp-language-switcher — progressive enhancer around the server-rendered

@@ -3,7 +3,6 @@ import type { LegalPageContent } from '@/content/pages/legal';
 import { breadcrumbJsonLd, webPageJsonLd } from '@/domain/services/seo';
 import { formatIsoDate } from '@/features/i18n';
 import type { RenderContext } from '@/render/layout';
-import { callout } from '@/render/ui';
 import { html } from '@/utils/html';
 import type { RenderedPage } from './types';
 
@@ -29,7 +28,6 @@ export function renderLegalPage(
 			<h1 class="text-4xl font-semibold tracking-tight">
 				${content.heading[locale]}
 			</h1>
-			<div class="mt-6">${callout(messages.legalDraftNotice, 'warning')}</div>
 			${content.sections.map((section, index) => {
 				// The privacy page's local-preferences section is the target of
 				// the footer "Privacy preferences" link.

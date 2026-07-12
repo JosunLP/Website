@@ -134,5 +134,4 @@ export interface AppMessages {
 		readonly text: string;
 		readonly backHome: string;
 	};
-	readonly legalDraftNotice: string;
 }

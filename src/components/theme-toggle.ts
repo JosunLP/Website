@@ -1,7 +1,4 @@
-import { component } from '@bquery/bquery/component';
-import { usePreferredColorScheme } from '@bquery/bquery/media';
 import { STORAGE_KEYS } from '@/app/configuration';
-import { escape } from '@/utils/html';
 
 /**
  * jp-theme-toggle — flips the *resolved* color scheme: light ⇄ dark.
@@ -10,18 +7,22 @@ import { escape } from '@/utils/html';
  * showing (including the system-derived one) and persists the explicit
  * choice. "system" only exists as the initial, unstored state.
  *
- * Rendered as an empty island (theme switching needs JavaScript). Renders
- * into the light DOM so the design system's Tailwind classes apply.
+ * Rendered as an empty island (theme switching needs JavaScript) and built
+ * with plain DOM APIs rather than a bQuery `component()`. The two other
+ * islands are already plain custom elements, and this button is the sole
+ * reason the `component` runtime plus its `sanitize` dependency would load
+ * on every page — keeping it dependency-free trims ~5 KB gzip from the
+ * global bootstrap chunk and speeds up the interactive-ready state. Labels
+ * come from data attributes so the element stays locale-agnostic.
+ *
+ * The icon lives in CSS (`.jp-theme-icon--*` mask images): a masked
+ * `<span>` colored via `currentColor` inherits the button's hover colors.
  */
 
 type ThemeMode = 'system' | 'light' | 'dark';
 
-interface ThemeToggleProps extends Record<string, unknown> {
-	readonly 'data-label': string;
-	readonly 'data-light': string;
-	readonly 'data-dark': string;
-	readonly 'data-system': string;
-}
+const BUTTON_CLASS =
+	'text-ink-muted hover:bg-accent-soft/60 hover:text-accent dark:text-snow-muted dark:hover:bg-accent-dark-soft/40 dark:hover:text-accent-dark duration-swift inline-flex min-h-11 min-w-11 items-center justify-center rounded-full transition-[color,background-color,transform] active:scale-95';
 
 function readStoredTheme(): ThemeMode {
 	try {
@@ -44,79 +45,96 @@ function persistTheme(mode: ThemeMode): void {
 	}
 }
 
-// The icon itself lives in CSS (.jp-theme-icon--* mask images): bQuery's
-// component sanitizer hard-blocks <svg> in render output, so inline SVG
-// would be stripped. A masked <span> colored via currentColor survives
-// sanitization and inherits the button's hover colors.
+function systemPrefersDark(): boolean {
+	try {
+		return matchMedia('(prefers-color-scheme: dark)').matches;
+	} catch {
+		return false;
+	}
+}
+
+function isDark(mode: ThemeMode): boolean {
+	return mode === 'dark' || (mode === 'system' && systemPrefersDark());
+}
 
 export function registerThemeToggle(): void {
-	const systemScheme = usePreferredColorScheme();
-
-	// bQuery 1.15 runs the connected() hook twice when upgrading an element
-	// that already sits in server markup with attributes (once via
-	// attributeChangedCallback→mount, once via connectedCallback's
-	// reconnect branch). Guard so the click listener is only bound once —
-	// a doubled listener toggles the theme twice per click, i.e. never
-	// visibly switches.
-	const clickBound = new WeakSet<object>();
-
-	const applyTheme = (mode: ThemeMode): void => {
-		const dark =
-			mode === 'dark' || (mode === 'system' && systemScheme.value === 'dark');
-		document.documentElement.classList.toggle('dark', dark);
-	};
-
-	component<
-		ThemeToggleProps,
-		{ mode: ThemeMode },
-		{ scheme: typeof systemScheme }
-	>('jp-theme-toggle', {
-		shadow: false,
-		props: {
-			'data-label': { type: String, default: 'Theme' },
-			'data-light': { type: String, default: 'light' },
-			'data-dark': { type: String, default: 'dark' },
-			'data-system': { type: String, default: 'system' },
-		},
-		state: { mode: readStoredTheme() },
-		signals: { scheme: systemScheme },
-		connected() {
-			applyTheme(this.getState('mode'));
-			if (clickBound.has(this)) {
-				return;
-			}
-			clickBound.add(this);
-			this.addEventListener('click', (event: Event) => {
-				const target = event.target as HTMLElement | null;
-				if (target?.closest('button') === null || target === null) {
-					return;
+	if (customElements.get('jp-theme-toggle') != null) {
+		return;
+	}
+	customElements.define(
+		'jp-theme-toggle',
+		class extends HTMLElement {
+			private mode: ThemeMode = readStoredTheme();
+			private icon: HTMLSpanElement | null = null;
+			private srLabel: HTMLSpanElement | null = null;
+			// connectedCallback re-runs whenever the element is reconnected
+			// (view transitions, DOM moves); build the button only once.
+			private built = false;
+			private readonly scheme = matchMedia('(prefers-color-scheme: dark)');
+			private readonly onSchemeChange = (): void => {
+				// Only the resolved theme changes in system mode; the icon still
+				// reads "system", so just re-apply the class.
+				if (this.mode === 'system') {
+					this.applyTheme();
 				}
-				const current = this.getState('mode');
-				// Invert the theme the user is actually seeing, so a click
-				// never appears to do nothing (the old system→light→dark
-				// cycle had a visually inert step).
-				const currentlyDark =
-					current === 'dark' ||
-					(current === 'system' && systemScheme.value === 'dark');
-				const next: ThemeMode = currentlyDark ? 'light' : 'dark';
-				persistTheme(next);
-				applyTheme(next);
-				this.setState('mode', next);
-			});
+			};
+
+			connectedCallback(): void {
+				this.applyTheme();
+				if (!this.built) {
+					this.build();
+					this.built = true;
+				}
+				this.scheme.addEventListener('change', this.onSchemeChange);
+			}
+
+			disconnectedCallback(): void {
+				this.scheme.removeEventListener('change', this.onSchemeChange);
+			}
+
+			private applyTheme(): void {
+				document.documentElement.classList.toggle('dark', isDark(this.mode));
+			}
+
+			private label(mode: ThemeMode): string {
+				const base = this.dataset.label ?? 'Theme';
+				const modeLabel = this.dataset[mode] ?? mode;
+				return `${base}: ${modeLabel}`;
+			}
+
+			private build(): void {
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.className = BUTTON_CLASS;
+
+				const icon = document.createElement('span');
+				icon.className = `jp-theme-icon jp-theme-icon--${this.mode}`;
+				icon.setAttribute('aria-hidden', 'true');
+
+				const srLabel = document.createElement('span');
+				srLabel.className = 'sr-only';
+				srLabel.textContent = this.label(this.mode);
+
+				button.append(icon, srLabel);
+				this.icon = icon;
+				this.srLabel = srLabel;
+				this.replaceChildren(button);
+
+				button.addEventListener('click', () => {
+					// Invert the theme the user is actually seeing, so a click
+					// never appears to do nothing.
+					const next: ThemeMode = isDark(this.mode) ? 'light' : 'dark';
+					this.mode = next;
+					persistTheme(next);
+					this.applyTheme();
+					if (this.icon !== null) {
+						this.icon.className = `jp-theme-icon jp-theme-icon--${next}`;
+					}
+					if (this.srLabel !== null) {
+						this.srLabel.textContent = this.label(next);
+					}
+				});
+			}
 		},
-		updated() {
-			// Re-applies when the system scheme signal flips in system mode.
-			applyTheme(this.getState('mode'));
-		},
-		render({ props, state }) {
-			const modeLabelKey = `data-${state.mode}` as keyof ThemeToggleProps;
-			return `<button
-				type="button"
-				class="text-ink-muted hover:bg-accent-soft/60 hover:text-accent dark:text-snow-muted dark:hover:bg-accent-dark-soft/40 dark:hover:text-accent-dark duration-swift inline-flex min-h-11 min-w-11 items-center justify-center rounded-full transition-[color,background-color,transform] active:scale-95"
-			>
-				<span class="jp-theme-icon jp-theme-icon--${state.mode}" aria-hidden="true"></span>
-				<span class="sr-only">${escape(props['data-label'])}: ${escape(String(props[modeLabelKey]))}</span>
-			</button>`;
-		},
-	});
+	);
 }

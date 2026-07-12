@@ -43,27 +43,15 @@ export const IMPRINT: LegalPageContent = {
 				en: 'Information pursuant to § 5 DDG (German Digital Services Act)',
 			},
 			paragraphs: {
-				de: [
-					'Jonas Pfalzgraf\nPostfach 7222\n22831 Norderstedt\nDeutschland',
-					'[[OWNER: Prüfen, ob ein Postfach als ladungsfähige Anschrift ausreicht; ggf. vollständige Anschrift ergänzen.]]',
-				],
-				en: [
-					'Jonas Pfalzgraf\nPostfach 7222\n22831 Norderstedt\nGermany',
-					'[[OWNER: Verify whether a PO box is sufficient as a serviceable address; add a full street address if required.]]',
-				],
+				de: ['Jonas Pfalzgraf\nPostfach 7222\n22831 Norderstedt\nDeutschland'],
+				en: ['Jonas Pfalzgraf\nPostfach 7222\n22831 Norderstedt\nGermany'],
 			},
 		},
 		{
 			heading: { de: 'Kontakt', en: 'Contact' },
 			paragraphs: {
-				de: [
-					'E-Mail: info@josunlp.de',
-					'Telefon: [[OWNER: Telefonnummer ergänzen oder Abschnitt entfernen, falls nicht erforderlich.]]',
-				],
-				en: [
-					'E-mail: info@josunlp.de',
-					'Telephone: [[OWNER: Add a telephone number or remove this line if not required.]]',
-				],
+				de: ['E-Mail: info@josunlp.de'],
+				en: ['E-mail: info@josunlp.de'],
 			},
 		},
 		{
@@ -72,12 +60,8 @@ export const IMPRINT: LegalPageContent = {
 				en: 'Responsible for editorial content',
 			},
 			paragraphs: {
-				de: [
-					'Jonas Pfalzgraf (Anschrift wie oben). [[OWNER: Bestätigen oder anpassen.]]',
-				],
-				en: [
-					'Jonas Pfalzgraf (address as above). [[OWNER: Confirm or adjust.]]',
-				],
+				de: ['Jonas Pfalzgraf (Anschrift wie oben).'],
+				en: ['Jonas Pfalzgraf (address as above).'],
 			},
 		},
 		{
@@ -86,12 +70,8 @@ export const IMPRINT: LegalPageContent = {
 				en: 'VAT / register entries',
 			},
 			paragraphs: {
-				de: [
-					'[[OWNER: Falls vorhanden: USt-IdNr., Registergericht und Registernummer ergänzen; andernfalls diesen Abschnitt entfernen.]]',
-				],
-				en: [
-					'[[OWNER: If applicable: add VAT ID, register court, and register number; otherwise remove this section.]]',
-				],
+				de: [''],
+				en: [''],
 			},
 		},
 		{
@@ -161,10 +141,10 @@ export const PRIVACY: LegalPageContent = {
 			heading: { de: 'Verantwortlicher', en: 'Controller' },
 			paragraphs: {
 				de: [
-					'Jonas Pfalzgraf, Postfach 7222, 22831 Norderstedt, E-Mail: info@josunlp.de. [[OWNER: Anschrift prüfen/ergänzen.]]',
+					'Jonas Pfalzgraf, Postfach 7222, 22831 Norderstedt, E-Mail: info@josunlp.de.',
 				],
 				en: [
-					'Jonas Pfalzgraf, Postfach 7222, 22831 Norderstedt, Germany, e-mail: info@josunlp.de. [[OWNER: Verify/complete the address.]]',
+					'Jonas Pfalzgraf, Postfach 7222, 22831 Norderstedt, Germany, e-mail: info@josunlp.de.',
 				],
 			},
 		},
@@ -176,11 +156,11 @@ export const PRIVACY: LegalPageContent = {
 			paragraphs: {
 				de: [
 					'Beim Aufruf dieser Website verarbeitet der Hosting-Anbieter technisch notwendige Daten (z. B. IP-Adresse, Datum und Uhrzeit des Zugriffs, aufgerufene Datei, User-Agent), soweit dies für Auslieferung und Sicherheit des Dienstes erforderlich ist (Art. 6 Abs. 1 lit. f DSGVO).',
-					'[[OWNER: Hosting-Anbieter benennen, Speicherdauer der Logs erfragen und ggf. Vertrag zur Auftragsverarbeitung dokumentieren.]]',
+					'',
 				],
 				en: [
 					'When this website is accessed, the hosting provider processes technically necessary data (e.g. IP address, date and time of access, requested file, user agent) to the extent required for delivering and securing the service (Art. 6(1)(f) GDPR).',
-					'[[OWNER: Name the hosting provider, determine log retention, and document a data-processing agreement where applicable.]]',
+					'',
 				],
 			},
 		},
@@ -199,10 +179,10 @@ export const PRIVACY: LegalPageContent = {
 			heading: { de: 'Kontakt per E-Mail', en: 'Contact by e-mail' },
 			paragraphs: {
 				de: [
-					'Wenn Sie mir per E-Mail schreiben, werden Ihre Angaben zur Bearbeitung der Anfrage und für Anschlussfragen gespeichert (Art. 6 Abs. 1 lit. b bzw. f DSGVO). Diese Daten gebe ich nicht ohne Ihre Einwilligung weiter. [[OWNER: E-Mail-Provider und Aufbewahrungsdauer dokumentieren.]]',
+					'Wenn Sie mir per E-Mail schreiben, werden Ihre Angaben zur Bearbeitung der Anfrage und für Anschlussfragen gespeichert (Art. 6 Abs. 1 lit. b bzw. f DSGVO). Diese Daten gebe ich nicht ohne Ihre Einwilligung weiter.',
 				],
 				en: [
-					'If you contact me by e-mail, your details are stored to process the inquiry and handle follow-up questions (Art. 6(1)(b) or (f) GDPR). I do not pass this data on without your consent. [[OWNER: Document the e-mail provider and retention period.]]',
+					'If you contact me by e-mail, your details are stored to process the inquiry and handle follow-up questions (Art. 6(1)(b) or (f) GDPR). I do not pass this data on without your consent.',
 				],
 			},
 		},
@@ -221,10 +201,10 @@ export const PRIVACY: LegalPageContent = {
 			heading: { de: 'Ihre Rechte', en: 'Your rights' },
 			paragraphs: {
 				de: [
-					'Sie haben im Rahmen der DSGVO das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch sowie das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. [[OWNER: Zuständige Aufsichtsbehörde benennen, z. B. die des Bundeslandes des Wohnsitzes.]]',
+					'Sie haben im Rahmen der DSGVO das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch sowie das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren.',
 				],
 				en: [
-					'Under the GDPR you have the right to access, rectification, erasure, restriction of processing, data portability, and objection, as well as the right to lodge a complaint with a data protection supervisory authority. [[OWNER: Name the competent supervisory authority, e.g. that of your federal state of residence.]]',
+					'Under the GDPR you have the right to access, rectification, erasure, restriction of processing, data portability, and objection, as well as the right to lodge a complaint with a data protection supervisory authority.',
 				],
 			},
 		},
@@ -277,11 +257,11 @@ export const ACCESSIBILITY: LegalPageContent = {
 			paragraphs: {
 				de: [
 					'Blogartikel, die nach der Veröffentlichung der Website manuell hochgeladen werden, werden clientseitig gerendert; ohne JavaScript ist für diese Artikel nur die Artikelübersicht verfügbar. Ältere Inhalte Dritter, auf die verlinkt wird, liegen außerhalb meiner Kontrolle.',
-					'Ein vollständiger Test mit allen Screenreader-/Browser-Kombinationen steht noch aus. [[OWNER: Nach manuellen Tests konkrete Ergebnisse und ggf. weitere Einschränkungen dokumentieren.]]',
+					'Ein vollständiger Test mit allen Screenreader-/Browser-Kombinationen steht noch aus.',
 				],
 				en: [
 					'Blog articles uploaded manually after the site was published are rendered client-side; without JavaScript, only the article overview is available for those posts. Third-party content that is linked to is outside my control.',
-					'A complete test with all screen reader/browser combinations is still pending. [[OWNER: After manual testing, document concrete results and any additional limitations.]]',
+					'A complete test with all screen reader/browser combinations is still pending.',
 				],
 			},
 		},
@@ -289,10 +269,10 @@ export const ACCESSIBILITY: LegalPageContent = {
 			heading: { de: 'Barrieren melden', en: 'Report a barrier' },
 			paragraphs: {
 				de: [
-					'Wenn Sie auf eine Barriere stoßen, freue ich mich über eine Nachricht an info@josunlp.de. Bitte beschreiben Sie das Problem und die verwendete Technik (Browser, Hilfstechnologie). [[OWNER: Bestätigen, dass diese Adresse der gewünschte Meldeweg ist.]]',
+					'Wenn Sie auf eine Barriere stoßen, freue ich mich über eine Nachricht an info@josunlp.de. Bitte beschreiben Sie das Problem und die verwendete Technik (Browser, Hilfstechnologie).',
 				],
 				en: [
-					'If you encounter a barrier, please write to info@josunlp.de. Describe the problem and the technology you use (browser, assistive technology). [[OWNER: Confirm that this address is the intended reporting channel.]]',
+					'If you encounter a barrier, please write to info@josunlp.de. Describe the problem and the technology you use (browser, assistive technology).',
 				],
 			},
 		},

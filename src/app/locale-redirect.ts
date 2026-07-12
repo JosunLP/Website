@@ -1,4 +1,7 @@
-import { decideLocale, readStoredLocale } from '@/features/i18n';
+import {
+	decideLocale,
+	readStoredLocale,
+} from '@/features/i18n/locale-preference';
 
 /**
  * Root route (`/`) locale decision: stored explicit preference →
