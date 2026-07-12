@@ -1,6 +1,7 @@
 import { registerLanguageSwitcher } from '@/components/language-switcher';
 import { registerSiteNav } from '@/components/site-nav';
 import { registerThemeToggle } from '@/components/theme-toggle';
+import { initNavProgress } from '@/features/navigation/nav-progress';
 
 /**
  * Global client entry: registers the interactive islands that enhance
@@ -9,3 +10,4 @@ import { registerThemeToggle } from '@/components/theme-toggle';
 registerThemeToggle();
 registerLanguageSwitcher();
 registerSiteNav();
+initNavProgress();

@@ -15,7 +15,7 @@ ErrorDocument 404 /404.html
 # --- Security headers ----------------------------------------------------
 # See docs/security-headers.md for the rationale and the CSP hash source.
 <IfModule mod_headers.c>
-	Header always set Content-Security-Policy "default-src 'none'; script-src 'self' 'sha256-nTPhegqmvrjZuRuiDtWRYUA0nsamNqLzG7buGcTJGsk=' 'sha256-Cg72eV8ns/6Pzyj/3F54zd4u7PgJMW20RqQ2y8pRR1Y=' 'sha256-+AXE/MttZEXsreUSecYA2V2pvWAOimYV8hZuNKsbvWA='; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+	Header always set Content-Security-Policy "default-src 'none'; script-src 'self' 'sha256-nTPhegqmvrjZuRuiDtWRYUA0nsamNqLzG7buGcTJGsk=' 'sha256-jFAMy6fbnPHqoB7GwIyJYurX5GRwXsN1/lmkdRoQ/VE='; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
 	Header always set X-Content-Type-Options "nosniff"
 	Header always set Referrer-Policy "strict-origin-when-cross-origin"
 	Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"

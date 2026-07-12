@@ -50,6 +50,10 @@ export function registerSiteNav(): void {
 		'jp-site-nav',
 		class extends HTMLElement {
 			private trap: FocusTrapHandle | null = null;
+			// connectedCallback re-runs whenever the element is reconnected;
+			// duplicated toggle listeners would open and immediately re-close
+			// the menu on a single click.
+			private initialized = false;
 
 			private get toggle(): HTMLButtonElement | null {
 				return this.querySelector('button[data-nav-toggle]');
@@ -68,11 +72,15 @@ export function registerSiteNav(): void {
 			}
 
 			private init(): void {
+				if (this.initialized) {
+					return;
+				}
 				const toggle = this.toggle;
 				const list = this.list;
 				if (toggle === null || list === null) {
 					return;
 				}
+				this.initialized = true;
 				toggle.hidden = false;
 				// `hidden` must win over the server-rendered `flex` on mobile.
 				list.classList.remove('flex');

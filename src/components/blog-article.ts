@@ -6,15 +6,10 @@ import {
 	BlogManifestService,
 	type FetchLike,
 } from '@/domain/services/blog-manifest-service';
-import { MarkdownArticleService } from '@/domain/services/markdown-article-service';
-import {
-	renderMarkdown,
-	type RenderedMarkdown,
-} from '@/domain/services/markdown';
+import type { RenderedMarkdown } from '@/domain/services/markdown';
 import { messagesFor } from '@/features/i18n';
 import { createRenderContext, type AssetResolver } from '@/render/layout';
 import { articleBody } from '@/render/pages/blog';
-import { highlightCode } from '@/features/blog/highlight';
 
 /**
  * jp-blog-article — client-side renderer for blog posts that were
@@ -58,6 +53,15 @@ async function loadArticle(
 	if (entry === undefined) {
 		return null;
 	}
+	// The Markdown pipeline (marked + highlight.js) dominates this entry's
+	// bundle but is only needed on this rare path — a post uploaded after
+	// the build. Loading it on demand keeps the eager blog chunk small.
+	const [{ MarkdownArticleService }, { renderMarkdown }, { highlightCode }] =
+		await Promise.all([
+			import('@/domain/services/markdown-article-service'),
+			import('@/domain/services/markdown'),
+			import('@/features/blog/highlight'),
+		]);
 	const post = await new MarkdownArticleService(fetchFn).load(entry.path);
 	if (post.meta.draft) {
 		return null;

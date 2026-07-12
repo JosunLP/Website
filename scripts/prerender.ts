@@ -22,6 +22,7 @@ const VITE_MANIFEST = join(DIST, '.vite', 'manifest.json');
 interface ViteManifestChunk {
 	file: string;
 	css?: string[];
+	imports?: string[];
 }
 
 /** Resolves hashed asset URLs from Vite's build manifest. */
@@ -49,10 +50,30 @@ function createAssetResolver(): AssetResolver {
 			styles.add(`/${css}`);
 		}
 	}
+	// Shared chunks a page's entries import, collected transitively. Emitted
+	// as <link rel="modulepreload"> so the browser does not discover them a
+	// network round trip after the entry module.
+	const modulePreloads = (entries: readonly string[]): readonly string[] => {
+		const files = new Set<string>();
+		const visit = (key: string): void => {
+			for (const imported of manifest[key]?.imports ?? []) {
+				const file = manifest[imported]?.file;
+				if (file !== undefined && !files.has(file)) {
+					files.add(file);
+					visit(imported);
+				}
+			}
+		};
+		for (const entry of entries) {
+			visit(`src/app/${entry}.ts`);
+		}
+		return [...files].map((file) => `/${file}`);
+	};
 	return {
 		script: (entry: string): string => `/${chunk(`src/app/${entry}.ts`).file}`,
 		styles: (): readonly string[] => [...styles],
 		extraHead: (): string => '',
+		modulePreloads,
 	};
 }
 

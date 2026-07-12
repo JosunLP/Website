@@ -1,11 +1,10 @@
 import { createHash } from 'node:crypto';
-import { SPECULATION_RULES_SNIPPET } from '@/features/navigation/speculation-rules';
 import { VIEW_TRANSITION_TYPES_SNIPPET } from '@/features/navigation/view-transition-types';
 import { THEME_INIT_SNIPPET } from '@/features/theme/theme-init';
 
 /**
- * Prints the CSP hashes for the inline head snippets (theme bootstrap,
- * view-transition direction tagging, and speculation rules). Update
+ * Prints the CSP hashes for the inline head snippets (theme bootstrap
+ * and view-transition direction tagging). Update
  * docs/security-headers.md and the host configuration whenever one of
  * the snippets changes.
  */
@@ -16,4 +15,3 @@ function cspHash(source: string): string {
 
 console.log(`theme-init:            ${cspHash(THEME_INIT_SNIPPET)}`);
 console.log(`view-transition-types: ${cspHash(VIEW_TRANSITION_TYPES_SNIPPET)}`);
-console.log(`speculation-rules:     ${cspHash(SPECULATION_RULES_SNIPPET)}`);

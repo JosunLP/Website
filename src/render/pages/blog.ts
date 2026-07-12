@@ -207,6 +207,9 @@ export function renderBlogArticlePage(
 			...(post.meta.canonicalUrl !== undefined
 				? { canonicalUrl: post.meta.canonicalUrl }
 				: {}),
+			...(post.meta.coverImage !== undefined
+				? { ogImage: post.meta.coverImage }
+				: {}),
 			jsonLd: [
 				blogPostingJsonLd(jsonLdPost),
 				breadcrumbJsonLd([

@@ -10,7 +10,6 @@ import { LOCALES, type Locale } from '@/domain/models/locale';
 import { renderHeadMeta, type PageMeta } from '@/domain/services/seo';
 import { messagesFor } from '@/features/i18n';
 import type { AppMessages } from '@/features/i18n/messages';
-import { SPECULATION_RULES_SNIPPET } from '@/features/navigation/speculation-rules';
 import { VIEW_TRANSITION_TYPES_SNIPPET } from '@/features/navigation/view-transition-types';
 import { THEME_INIT_SNIPPET } from '@/features/theme/theme-init';
 import { escape, html, raw, type SafeHtml } from '@/utils/html';
@@ -28,6 +27,13 @@ export interface AssetResolver {
 	styles(): readonly string[];
 	/** Extra head markup (e.g. Vite dev client). */
 	extraHead(): string;
+	/**
+	 * Shared chunk URLs imported by the given entries. Emitted as
+	 * `<link rel="modulepreload">` so the browser fetches them together
+	 * with the entry instead of discovering them one network round trip
+	 * later. Only meaningful for production builds.
+	 */
+	modulePreloads?(entries: readonly string[]): readonly string[];
 }
 
 export interface RenderContext {
@@ -291,6 +297,9 @@ export function renderDocument(
 		.styles()
 		.map((href) => `<link rel="stylesheet" href="${escape(href)}">`)
 		.join('\n\t\t');
+	const preloadLinks = (assets.modulePreloads?.(scripts) ?? [])
+		.map((href) => `<link rel="modulepreload" href="${escape(href)}">`)
+		.join('\n\t\t');
 	const scriptTags = scripts
 		.map(
 			(entry) =>
@@ -314,20 +323,28 @@ export function renderDocument(
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<script>${THEME_INIT_SNIPPET}</script>
 		<script>${VIEW_TRANSITION_TYPES_SNIPPET}</script>
-		<script type="speculationrules">${SPECULATION_RULES_SNIPPET}</script>${
-			options.bare
-				? ''
-				: // Hold the first paint until the main content exists in the
-					// DOM, so cross-document view transitions animate straight to
-					// the finished page instead of flashing a partial render.
-					'\n\t\t<link rel="expect" blocking="render" href="#main-content">'
-		}
-		${renderHeadMeta(meta).value}
+		${
+			// Two deliberate omissions, both reproduced with a rapid
+			// click-chain against a throttled server (Edge, headless):
+			//  - NO <link rel="expect" blocking="render">: it held the first
+			//    paint until the whole <main> was parsed, freezing the old
+			//    page for the entire fetch+parse of every navigation.
+			//  - NO <script type="speculationrules">: clicking a link whose
+			//    hover-triggered prefetch/prerender was still in flight
+			//    intermittently swallowed the click (prerender even wedged
+			//    the navigation for seconds). These pages are tiny static
+			//    files — navigation without speculation measured 60-190ms,
+			//    so speculation only added risk.
+			''
+		}${renderHeadMeta(meta).value}
+		<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbfaf7">
+		<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#20242f">
 		<link rel="icon" href="/favicon.ico" sizes="32x32">
 		<link rel="icon" href="/favicon-32x32.png" type="image/png">
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 		<link rel="manifest" href="/site.webmanifest">
 		${styleLinks}
+		${preloadLinks}
 		${assets.extraHead()}
 		${scriptTags}
 	</head>

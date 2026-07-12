@@ -17,7 +17,12 @@ export interface PageMeta {
 	readonly noindex?: boolean;
 	/** Overrides the default canonical URL (used for syndicated posts). */
 	readonly canonicalUrl?: string;
+	/** Site-absolute path of the social preview image (og/twitter). */
+	readonly ogImage?: string;
 }
+
+/** Fallback social preview image (site logo). */
+const DEFAULT_OG_IMAGE = '/android-chrome-512x512.png';
 
 export function absoluteUrl(path: string): string {
 	return `${SITE_ORIGIN}${path}`;
@@ -154,6 +159,7 @@ export function renderHeadMeta(meta: PageMeta): SafeHtml {
 			`<link rel="alternate" hreflang="${locale}" href="${escape(absoluteUrl(path))}">`,
 		);
 	}
+	const ogImage = absoluteUrl(meta.ogImage ?? DEFAULT_OG_IMAGE);
 	lines.push(
 		`<link rel="alternate" hreflang="x-default" href="${escape(
 			absoluteUrl(alternates.de),
@@ -164,10 +170,18 @@ export function renderHeadMeta(meta: PageMeta): SafeHtml {
 		`<meta property="og:url" content="${escape(canonical)}">`,
 		`<meta property="og:site_name" content="${escape(OWNER.name)}">`,
 		`<meta property="og:locale" content="${meta.locale}">`,
+		`<meta property="og:image" content="${escape(ogImage)}">`,
+		`<meta property="og:image:alt" content="${escape(meta.title)}">`,
 		`<meta name="twitter:card" content="summary">`,
 		`<meta name="twitter:title" content="${escape(meta.title)}">`,
 		`<meta name="twitter:description" content="${escape(meta.description)}">`,
+		`<meta name="twitter:image" content="${escape(ogImage)}">`,
 	);
+	for (const locale of Object.keys(alternates)) {
+		if (locale !== meta.locale) {
+			lines.push(`<meta property="og:locale:alternate" content="${locale}">`);
+		}
+	}
 	for (const data of meta.jsonLd ?? []) {
 		// JSON-LD scripts are data, not executable code; escape "<" to keep
 		// "</script>" sequences inert inside the script element.
