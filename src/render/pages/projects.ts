@@ -7,7 +7,7 @@ import {
 } from '@/domain/services/seo';
 import { formatMessage } from '@/features/i18n';
 import type { RenderContext } from '@/render/layout';
-import { externalLink, projectCard, techTags } from '@/render/ui';
+import { breadcrumbs, externalLink, projectCard, techTags } from '@/render/ui';
 import { html } from '@/utils/html';
 import type { RenderedPage } from './types';
 
@@ -22,8 +22,14 @@ export function renderProjectsPage(ctx: RenderContext): RenderedPage {
 		description: messages.projects.description,
 	};
 
+	const trail = [
+		{ name: messages.nav.home, path: pagePath(locale, 'home') },
+		{ name: messages.nav.projects, path: ctx.path },
+	];
+
 	const main = html`
 		<div class="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+			${breadcrumbs(trail, messages)}
 			<h1 class="text-4xl font-semibold tracking-tight">
 				${messages.projects.heading}
 			</h1>
@@ -40,7 +46,7 @@ export function renderProjectsPage(ctx: RenderContext): RenderedPage {
 							aria-labelledby="flagship-heading"
 						>
 							<p
-								class="text-accent dark:text-accent-dark mb-3 text-sm font-semibold tracking-widest uppercase"
+								class="jp-kicker text-accent dark:text-accent-dark mb-3 text-sm font-semibold tracking-widest uppercase"
 								aria-hidden="true"
 							>
 								${messages.projects.flagshipHeading}
@@ -104,10 +110,7 @@ export function renderProjectsPage(ctx: RenderContext): RenderedPage {
 			...meta,
 			jsonLd: [
 				webPageJsonLd(meta),
-				breadcrumbJsonLd([
-					{ name: messages.nav.home, path: pagePath(locale, 'home') },
-					{ name: messages.nav.projects, path: ctx.path },
-				]),
+				breadcrumbJsonLd(trail),
 				...PROJECTS.map((project) =>
 					projectJsonLd({
 						name: project.name,

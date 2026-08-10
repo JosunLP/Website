@@ -23,6 +23,7 @@ export default defineConfig({
 			input: {
 				bootstrap: 'src/app/bootstrap.ts',
 				article: 'src/app/article.ts',
+				'article-tools': 'src/app/article-tools.ts',
 				'locale-redirect': 'src/app/locale-redirect.ts',
 				styles: 'src/styles/main.css',
 			},

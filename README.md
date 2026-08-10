@@ -74,18 +74,19 @@ bun run check            # all of the above + build
 ## Blog workflow
 
 Posts are Markdown files with YAML front matter under
-`content/blog/{de,en}/`. Regenerate the manifest and blog sitemap after
-changes:
+`content/blog/{de,en}/`. Regenerate the manifest, the blog sitemap, and
+the per-locale Atom feeds after changes:
 
 ```bash
 bun run generate:blog-manifest
 bun run generate:blog-sitemap
+bun run generate:blog-feeds
 ```
 
 Posts can be published **without a rebuild** by uploading the Markdown
-file, the regenerated `index.json`, and `blog-sitemap.xml` to the server —
-the full procedure is documented in
-[docs/blog-content-workflow.md](docs/blog-content-workflow.md).
+file and the regenerated `index.json`, `blog-sitemap.xml`, and
+`{locale}/blog/feed.xml` to the server — the full procedure is documented
+in [docs/blog-content-workflow.md](docs/blog-content-workflow.md).
 
 ## Deployment
 

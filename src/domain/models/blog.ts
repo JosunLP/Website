@@ -40,6 +40,12 @@ export interface BlogManifestEntry {
 	readonly coverImageAlt?: string;
 	/** Path of the Markdown file relative to the site origin. */
 	readonly path: string;
+	/**
+	 * Estimated reading time in minutes, computed from the Markdown body
+	 * at manifest-generation time. Optional so manifests written before
+	 * this field existed still validate.
+	 */
+	readonly readingMinutes?: number;
 }
 
 /** The public blog manifest. `version` guards the client against drift. */
@@ -199,6 +205,16 @@ export function validateManifest(value: unknown): string[] {
 		}
 		if (entry.tags !== undefined && !isStringArray(entry.tags)) {
 			errors.push(`post ${String(index)}: "tags" must be a list of strings`);
+		}
+		if (
+			entry.readingMinutes !== undefined &&
+			(typeof entry.readingMinutes !== 'number' ||
+				!Number.isInteger(entry.readingMinutes) ||
+				entry.readingMinutes < 1)
+		) {
+			errors.push(
+				`post ${String(index)}: "readingMinutes" must be a positive integer`,
+			);
 		}
 		if (
 			typeof entry.path === 'string' &&

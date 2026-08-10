@@ -40,13 +40,21 @@ export interface AppMessages {
 		readonly privacyPreferences: string;
 		readonly sourceNote: string;
 		readonly socialLabel: string;
+		readonly exploreLabel: string;
+		readonly feed: string;
+		readonly backToTop: string;
 	};
+	readonly breadcrumbLabel: string;
 	readonly externalLink: string;
 	readonly home: {
 		readonly title: string;
 		readonly description: string;
 		readonly heroHeading: string;
 		readonly heroIntro: string;
+		readonly flagshipChip: string;
+		readonly statsProjects: string;
+		readonly statsTech: string;
+		readonly statsPosts: string;
 		readonly ctaProjects: string;
 		readonly ctaContact: string;
 		readonly selectedWorkHeading: string;
@@ -116,6 +124,14 @@ export interface AppMessages {
 		readonly backToBlog: string;
 		readonly postCount: string;
 		readonly availableIn: string;
+		readonly readingTime: string;
+		readonly feedTitle: string;
+		readonly feedLink: string;
+		readonly copyCode: string;
+		readonly copiedCode: string;
+		readonly copyCodeFailed: string;
+		readonly headingLink: string;
+		readonly readingProgress: string;
 	};
 	readonly contact: {
 		readonly title: string;

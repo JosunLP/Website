@@ -7,6 +7,7 @@ import {
 } from '@/app/configuration';
 import { equivalentPath } from '@/app/routes';
 import { LOCALES, type Locale } from '@/domain/models/locale';
+import { feedPath } from '@/domain/services/feed';
 import { renderHeadMeta, type PageMeta } from '@/domain/services/seo';
 import { messagesFor } from '@/features/i18n';
 import type { AppMessages } from '@/features/i18n/messages';
@@ -224,30 +225,78 @@ function siteHeader(ctx: RenderContext): SafeHtml {
 	</header>`;
 }
 
+const FOOTER_LINK_CLASS =
+	'hover:text-accent dark:hover:text-accent-dark inline-flex min-h-9 items-center';
+
+/**
+ * Footer column heading. Each one names its group through
+ * `aria-labelledby` rather than a second `aria-label`, so the footer's
+ * landmarks stay uniquely named against the header's navigation.
+ */
+function footerColumnHeading(id: string, label: string): SafeHtml {
+	return html`<h2
+		id="${id}"
+		class="text-ink dark:text-snow mb-2 text-xs font-semibold tracking-widest uppercase"
+	>
+		${label}
+	</h2>`;
+}
+
 function siteFooter(ctx: RenderContext): SafeHtml {
 	const { messages, locale } = ctx;
-	return html`<footer class="border-line dark:border-night-line mt-20 border-t">
+	return html`<footer class="border-line dark:border-night-line mt-24 border-t">
 		<div
-			class="text-ink-muted dark:text-snow-muted mx-auto flex max-w-6xl flex-col gap-8 px-4 py-10 text-sm sm:px-6 md:flex-row md:justify-between"
+			class="text-ink-muted dark:text-snow-muted mx-auto grid max-w-6xl gap-10 px-4 py-14 text-sm sm:px-6 md:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,1fr))]"
 		>
 			<div class="space-y-3">
-				<p class="text-ink dark:text-snow font-semibold">
-					${messages.siteName}
-				</p>
-				<p>${messages.siteTagline}</p>
-				<p aria-label="${messages.footer.socialLabel}">
-					${externalLink(OWNER.gitHubUrl, 'GitHub', messages)} ·
-					${externalLink(OWNER.koFiUrl, 'Ko-fi', messages)}
-				</p>
+				<div class="flex items-center gap-2.5">
+					<img
+						src="/images/logo-jonas-light.svg"
+						alt=""
+						width="32"
+						height="32"
+						class="h-8 w-8 dark:hidden"
+					/>
+					<img
+						src="/images/logo-jonas-dark.svg"
+						alt=""
+						width="32"
+						height="32"
+						class="hidden h-8 w-8 dark:block"
+					/>
+					<p class="text-ink dark:text-snow font-semibold">
+						${messages.siteName}
+					</p>
+				</div>
+				<p class="max-w-xs leading-relaxed">${messages.siteTagline}</p>
 			</div>
-			<nav aria-label="${messages.nav.legalNavLabel}">
-				<ul class="space-y-2">
+
+			<nav aria-labelledby="footer-explore">
+				${footerColumnHeading('footer-explore', messages.footer.exploreLabel)}
+				<ul>
+					${HEADER_NAV.filter((page) => page !== 'home').map(
+						(page) =>
+							html`<li>
+								<a href="${pagePath(locale, page)}" class="${FOOTER_LINK_CLASS}"
+									>${navLabel(messages, page)}</a
+								>
+							</li>`,
+					)}
+					<li>
+						<a href="${feedPath(locale)}" class="${FOOTER_LINK_CLASS}"
+							>${messages.footer.feed}</a
+						>
+					</li>
+				</ul>
+			</nav>
+
+			<nav aria-labelledby="footer-legal">
+				${footerColumnHeading('footer-legal', messages.nav.legalNavLabel)}
+				<ul>
 					${FOOTER_LEGAL_NAV.map(
 						(page) =>
 							html`<li>
-								<a
-									href="${pagePath(locale, page)}"
-									class="hover:text-accent dark:hover:text-accent-dark inline-flex min-h-9 items-center"
+								<a href="${pagePath(locale, page)}" class="${FOOTER_LINK_CLASS}"
 									>${navLabel(messages, page)}</a
 								>
 							</li>`,
@@ -255,22 +304,36 @@ function siteFooter(ctx: RenderContext): SafeHtml {
 					<li>
 						<a
 							href="${pagePath(locale, 'privacy')}#local-preferences"
-							class="hover:text-accent dark:hover:text-accent-dark inline-flex min-h-9 items-center"
+							class="${FOOTER_LINK_CLASS}"
 							>${messages.footer.privacyPreferences}</a
 						>
 					</li>
 				</ul>
 			</nav>
-			<div class="space-y-2">
-				${languageSwitcher(ctx, 'footer')}
-				<p>
-					${externalLink(
-						'https://github.com/JosunLP/Website',
-						messages.footer.sourceNote,
-						messages,
-					)}
-				</p>
+
+			<div>
+				${footerColumnHeading('footer-social', messages.footer.socialLabel)}
+				<ul aria-labelledby="footer-social">
+					<li>${externalLink(OWNER.gitHubUrl, 'GitHub', messages)}</li>
+					<li>${externalLink(OWNER.koFiUrl, 'Ko-fi', messages)}</li>
+					<li>
+						${externalLink(
+							'https://github.com/JosunLP/Website',
+							messages.footer.sourceNote,
+							messages,
+						)}
+					</li>
+				</ul>
 			</div>
+		</div>
+
+		<div
+			class="border-line dark:border-night-line text-ink-muted dark:text-snow-muted mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 border-t px-4 py-6 text-sm sm:px-6"
+		>
+			${languageSwitcher(ctx, 'footer')}
+			<a href="#main-content" class="${FOOTER_LINK_CLASS}"
+				>${messages.footer.backToTop}<span aria-hidden="true"> ↑</span></a
+			>
 		</div>
 	</footer>`;
 }
@@ -343,6 +406,7 @@ export function renderDocument(
 		<link rel="icon" href="/favicon-32x32.png" type="image/png">
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 		<link rel="manifest" href="/site.webmanifest">
+		<link rel="alternate" type="application/atom+xml" title="${escape(messages.blog.feedTitle)}" href="${escape(feedPath(ctx.locale))}">
 		${styleLinks}
 		${preloadLinks}
 		${assets.extraHead()}

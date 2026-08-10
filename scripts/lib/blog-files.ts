@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import type { BlogManifestEntry, BlogPost } from '@/domain/models/blog';
 import { LOCALES, type Locale } from '@/domain/models/locale';
 import { MarkdownArticleService } from '@/domain/services/markdown-article-service';
+import { estimateReadingMinutes } from '@/domain/services/reading-time';
 
 export const CONTENT_BLOG_DIR = join(process.cwd(), 'content', 'blog');
 
@@ -85,6 +86,7 @@ export function toManifestEntries(posts: LoadedPost[]): BlogManifestEntry[] {
 				? { coverImageAlt: post.meta.coverImageAlt }
 				: {}),
 			path: publicPath,
+			readingMinutes: estimateReadingMinutes(post.markdown),
 		}))
 		.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 }

@@ -14,6 +14,13 @@ import type { FocusTrapHandle } from '@bquery/bquery/a11y';
  * and must never re-render it.
  */
 
+/**
+ * Tailwind's `md` breakpoint — the width at which the toggle button is
+ * hidden and the list renders inline again. Must stay in sync with the
+ * `md:` variants in the server markup and in {@link OPEN_CLASSES}.
+ */
+const DESKTOP_QUERY = '(min-width: 48rem)';
+
 const CLOSED_MOBILE_CLASSES = ['hidden', 'md:flex'];
 // Open state: a full-width panel dropping below the header. Positioned
 // against the header's inner container (`relative`), so it spans the whole
@@ -54,6 +61,15 @@ export function registerSiteNav(): void {
 			// duplicated toggle listeners would open and immediately re-close
 			// the menu on a single click.
 			private initialized = false;
+			private readonly desktop = matchMedia(DESKTOP_QUERY);
+			// Growing past `md` hides the toggle button, so an open panel
+			// could no longer be closed — and its focus trap would keep
+			// swallowing Tab across a nav that is visually inline again.
+			private readonly onDesktopChange = (): void => {
+				if (this.desktop.matches && this.isOpen()) {
+					this.setOpen(false);
+				}
+			};
 
 			private get toggle(): HTMLButtonElement | null {
 				return this.querySelector('button[data-nav-toggle]');
@@ -64,6 +80,9 @@ export function registerSiteNav(): void {
 			}
 
 			connectedCallback(): void {
+				// Re-registered on every reconnect, unlike the listeners in
+				// init(), which sit on child elements that move with the DOM.
+				this.desktop.addEventListener('change', this.onDesktopChange);
 				// Children may not be attached yet when the element upgrades
 				// (parser-driven upgrades, happy-dom); defer setup one tick.
 				queueMicrotask(() => {
@@ -103,6 +122,7 @@ export function registerSiteNav(): void {
 			}
 
 			disconnectedCallback(): void {
+				this.desktop.removeEventListener('change', this.onDesktopChange);
 				this.trap?.release();
 				this.trap = null;
 			}

@@ -24,6 +24,18 @@ export interface PageMeta {
 /** Fallback social preview image (site logo). */
 const DEFAULT_OG_IMAGE = '/android-chrome-512x512.png';
 
+/**
+ * Target of the `x-default` hreflang alternate.
+ *
+ * `/` is the language-decision page, so it is the correct x-default for
+ * the entry points it decides between (itself and the two home pages).
+ * Every other route has no locale-neutral equivalent; those fall back to
+ * the German version, matching {@link DEFAULT_LOCALE}.
+ */
+function xDefaultPath(alternates: Record<Locale, string>): string {
+	return alternates.de === '/de/' ? '/' : alternates.de;
+}
+
 export function absoluteUrl(path: string): string {
 	return `${SITE_ORIGIN}${path}`;
 }
@@ -162,7 +174,7 @@ export function renderHeadMeta(meta: PageMeta): SafeHtml {
 	const ogImage = absoluteUrl(meta.ogImage ?? DEFAULT_OG_IMAGE);
 	lines.push(
 		`<link rel="alternate" hreflang="x-default" href="${escape(
-			absoluteUrl(alternates.de),
+			absoluteUrl(xDefaultPath(alternates)),
 		)}">`,
 		`<meta property="og:type" content="${meta.ogType ?? 'website'}">`,
 		`<meta property="og:title" content="${escape(meta.title)}">`,

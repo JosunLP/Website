@@ -122,6 +122,17 @@ examples/hosting/ Apache/nginx reference configs
 - Front matter is parsed by a strict, dependency-free subset parser
   (`front-matter.ts`) and validated (`blog.ts`); malformed content
   produces accessible error states, never crashes.
+- Reading time is derived from the Markdown body during manifest
+  generation (`reading-time.ts`), not authored, so it cannot drift from
+  the text it describes.
+- One Atom feed per locale at `/{locale}/blog/feed.xml`, generated into
+  `public/` rather than as a prerender route: posts can be published by
+  upload alone, and a feed that only existed as build output would go
+  stale on exactly that path.
+- `jp-article-tools` layers reading affordances (progress bar, heading
+  permalinks, code copy buttons, table-of-contents scroll-spy) onto both
+  the prerendered article and the client-rendered shell. Every piece is
+  additive and skipped when the DOM it needs is absent.
 
 ## 7. SEO model
 
@@ -133,7 +144,15 @@ examples/hosting/ Apache/nginx reference configs
 - `sitemap.xml` (static pages, generated in postbuild) +
   `blog-sitemap.xml` (generated from Markdown sources) + `robots.txt`
   referencing both. `noindex` on the 404 pages and the article shell.
-- `scripts/validate-dist.ts` enforces all of this on every build.
+- `hreflang="x-default"` names `/` — the language-decision page — for the
+  entry points it decides between, and the German equivalent everywhere
+  else, where no locale-neutral page exists.
+- Breadcrumbs are rendered from the same item list that produces the
+  `BreadcrumbList` JSON-LD, so the two cannot disagree.
+- Every page carries a feed autodiscovery link for its locale.
+- `scripts/validate-dist.ts` enforces all of this on every build —
+  including that highlight.js classes reaching the HTML have matching
+  rules in the stylesheet.
 
 ## 8. Accessibility strategy
 

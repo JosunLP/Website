@@ -6,7 +6,12 @@ import {
 	webSiteJsonLd,
 } from '@/domain/services/seo';
 import { FOCUS_AREAS } from '@/content/skills';
-import { featuredProjects, flagshipProject } from '@/content/projects';
+import {
+	PROJECTS,
+	featuredProjects,
+	flagshipProject,
+	technologyCount,
+} from '@/content/projects';
 import { formatMessage } from '@/features/i18n';
 import type { RenderContext } from '@/render/layout';
 import {
@@ -44,9 +49,24 @@ export function renderHomePage(
 			<!-- Hero -->
 			<section class="relative py-14 sm:py-28" aria-labelledby="hero-heading">
 				${heroArt()}
+				${
+					flagship !== undefined
+						? html`<p>
+								<a
+									href="${pagePath(locale, 'projects')}#flagship-heading"
+									class="jp-chip border-line dark:border-night-line text-ink-muted dark:text-snow-muted hover:border-accent hover:text-accent dark:hover:border-accent-dark dark:hover:text-accent-dark inline-flex min-h-9 items-center gap-2 rounded-full border px-3.5 text-sm"
+									>${raw(
+										'<span class="jp-chip-dot bg-accent dark:bg-accent-dark h-1.5 w-1.5 rounded-full" aria-hidden="true"></span>',
+									)}${formatMessage(messages.home.flagshipChip, {
+										name: flagship.name,
+									})}<span aria-hidden="true">→</span></a
+								>
+							</p>`
+						: null
+				}
 				<h1
 					id="hero-heading"
-					class="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl"
+					class="mt-6 max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl"
 				>
 					${messages.home.heroHeading}
 				</h1>
@@ -67,6 +87,30 @@ export function renderHomePage(
 						'secondary',
 					)}
 				</p>
+				<dl
+					class="border-line dark:border-night-line mt-12 grid max-w-xl grid-cols-3 gap-6 border-t pt-8"
+				>
+					${[
+						{ value: PROJECTS.length, label: messages.home.statsProjects },
+						{ value: technologyCount(), label: messages.home.statsTech },
+						{ value: latestPosts.length, label: messages.home.statsPosts },
+					].map(
+						(stat) =>
+							// Column-reverse so the figure reads first visually while
+							// the DOM keeps the term-before-definition order a <dl>
+							// requires.
+							html`<div class="flex flex-col-reverse">
+								<dt class="text-ink-muted dark:text-snow-muted mt-1 text-sm">
+									${formatMessage(stat.label, { count: stat.value })}
+								</dt>
+								<dd
+									class="text-ink dark:text-snow text-3xl font-semibold tracking-tight tabular-nums sm:text-4xl"
+								>
+									${stat.value}
+								</dd>
+							</div>`,
+					)}
+				</dl>
 			</section>
 
 			<!-- Selected work -->
@@ -85,7 +129,7 @@ export function renderHomePage(
 								class="jp-card jp-card--feature rounded-card border-accent/40 bg-accent-soft/40 dark:border-accent-dark/40 dark:bg-accent-dark-soft/40 mb-8 border p-6 sm:p-8"
 							>
 								<p
-									class="text-accent dark:text-accent-dark mb-3 text-sm font-semibold tracking-widest uppercase"
+									class="jp-kicker text-accent dark:text-accent-dark mb-3 text-sm font-semibold tracking-widest uppercase"
 								>
 									${messages.projects.flagshipHeading}
 								</p>

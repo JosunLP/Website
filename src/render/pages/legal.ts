@@ -3,6 +3,7 @@ import type { LegalPageContent } from '@/content/pages/legal';
 import { breadcrumbJsonLd, webPageJsonLd } from '@/domain/services/seo';
 import { formatIsoDate } from '@/features/i18n';
 import type { RenderContext } from '@/render/layout';
+import { breadcrumbs } from '@/render/ui';
 import { html } from '@/utils/html';
 import type { RenderedPage } from './types';
 
@@ -23,8 +24,13 @@ export function renderLegalPage(
 		title: content.title[locale],
 		description: content.metaDescription[locale],
 	};
+	const trail = [
+		{ name: messages.nav.home, path: pagePath(locale, 'home') },
+		{ name: messages.nav[page], path: ctx.path },
+	];
 	const main = html`
 		<div class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+			${breadcrumbs(trail, messages)}
 			<h1 class="text-4xl font-semibold tracking-tight">
 				${content.heading[locale]}
 			</h1>
@@ -60,13 +66,7 @@ export function renderLegalPage(
 	return {
 		meta: {
 			...meta,
-			jsonLd: [
-				webPageJsonLd(meta),
-				breadcrumbJsonLd([
-					{ name: messages.nav.home, path: pagePath(locale, 'home') },
-					{ name: messages.nav[page], path: ctx.path },
-				]),
-			],
+			jsonLd: [webPageJsonLd(meta), breadcrumbJsonLd(trail)],
 		},
 		main,
 	};

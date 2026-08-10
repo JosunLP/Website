@@ -17,6 +17,23 @@ import { blogCard } from '@/render/ui';
  * failure the static content remains and an error is announced only when
  * there is no static content to fall back to.
  */
+
+/**
+ * True when the rendered cards already match the manifest exactly — same
+ * posts, same order. Comparing slugs rather than counts matters when a
+ * post is replaced instead of added: an equal count would otherwise be
+ * read as "nothing changed" and the stale card would stay on the page.
+ */
+function sameSlugs(grid: Element, posts: readonly { slug: string }[]): boolean {
+	const rendered = [...grid.querySelectorAll('article')].map(
+		(card) => card.getAttribute('data-slug') ?? '',
+	);
+	return (
+		rendered.length === posts.length &&
+		rendered.every((slug, index) => slug === posts[index]?.slug)
+	);
+}
+
 export function registerBlogList(fetchFn: FetchLike = fetch): void {
 	if (customElements.get('jp-blog-list') != null) {
 		return;
@@ -46,8 +63,7 @@ export function registerBlogList(fetchFn: FetchLike = fetch): void {
 						manifest,
 						localeAttr,
 					);
-					const staticCount = grid?.querySelectorAll('article').length ?? 0;
-					if (grid === null || posts.length === staticCount) {
+					if (grid === null || sameSlugs(grid, posts)) {
 						return;
 					}
 					const cards = posts

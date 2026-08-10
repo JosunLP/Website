@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { alternatePaths, equivalentPath, localeFromPath } from '@/app/routes';
-import { blogPostPath, pagePath } from '@/app/configuration';
+import { HEADER_NAV, blogPostPath, pagePath } from '@/app/configuration';
+import { VIEW_TRANSITION_TYPES_SNIPPET } from '@/features/navigation/view-transition-types';
 
 describe('localeFromPath', () => {
 	it('extracts supported locales', () => {
@@ -47,5 +48,22 @@ describe('path helpers', () => {
 
 	it('builds blog post paths', () => {
 		expect(blogPostPath('en', 'my-post')).toBe('/en/blog/my-post/');
+	});
+});
+
+describe('view-transition direction snippet', () => {
+	/**
+	 * The snippet decides whether a navigation slides forwards or
+	 * backwards by ranking the first path segment. It is an inlined string
+	 * and cannot import HEADER_NAV, so the order is asserted here — a
+	 * mismatch silently sends half the navigations the wrong way.
+	 */
+	it('ranks pages in header-navigation order', () => {
+		const expected = HEADER_NAV.map((page) =>
+			pagePath('de', page)
+				.replace(/^\/de\/?/, '')
+				.replace(/\/$/, ''),
+		);
+		expect(VIEW_TRANSITION_TYPES_SNIPPET).toContain(JSON.stringify(expected));
 	});
 });

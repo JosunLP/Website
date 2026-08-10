@@ -5,12 +5,18 @@ the live server **without rebuilding the site**.
 
 ## 1. Content contract
 
-```
+```text
 content/blog/
   index.json          # generated manifest — never edit by hand
   de/<slug>.md        # German posts
   en/<slug>.md        # English posts
 ```
+
+Three artifacts are generated from these files and must travel with
+them: the manifest (`content/blog/index.json`), the blog sitemap
+(`public/blog-sitemap.xml`), and the Atom feeds
+(`public/{locale}/blog/feed.xml`). Reading time is derived from the
+Markdown body at manifest-generation time — it is not front matter.
 
 Rules enforced by the tooling:
 
@@ -66,6 +72,7 @@ removed by the sanitizer.
    ```bash
    bun run generate:blog-manifest
    bun run generate:blog-sitemap
+   bun run generate:blog-feeds
    bun run test
    bun run build && bun run validate
    bun run preview
@@ -84,6 +91,7 @@ shell. Uploading a post requires **all** of these steps:
    ```bash
    bun run generate:blog-manifest
    bun run generate:blog-sitemap
+   bun run generate:blog-feeds
    ```
 
 2. Upload the Markdown file to
@@ -95,8 +103,11 @@ shell. Uploading a post requires **all** of these steps:
    `<webroot>/content/blog/index.json`.
 5. Upload the regenerated `blog-sitemap.xml` to
    `<webroot>/blog-sitemap.xml`.
-6. Optional: upload translations with the same `translationKey` (repeat
-   steps 2–5 per locale).
+6. Upload the regenerated `public/{locale}/blog/feed.xml` to
+   `<webroot>/{locale}/blog/feed.xml`. Skipping this leaves subscribers
+   on a feed that never mentions the new post.
+7. Optional: upload translations with the same `translationKey` (repeat
+   steps 2–6 per locale).
 
 Verify: open `/{locale}/blog/` (the list now shows the post) and
 `/{locale}/blog/<slug>/` (the article renders).

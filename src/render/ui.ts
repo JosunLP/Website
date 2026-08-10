@@ -12,6 +12,11 @@ import { html, raw, type SafeHtml } from '@/utils/html';
  * Components that enhance this markup client-side.
  */
 
+/** Inline metadata separator; decorative, so it stays out of the a11y tree. */
+const SEPARATOR = raw(
+	'<span aria-hidden="true" class="text-line dark:text-night-line">·</span>',
+);
+
 /** External links: new tab + safe rel + visually hidden hint. */
 export function externalLink(
 	href: string,
@@ -47,6 +52,59 @@ export function buttonLink(
 	>`;
 }
 
+/** One step of a breadcrumb trail: a label and the page it points at. */
+export interface BreadcrumbItem {
+	readonly name: string;
+	readonly path: string;
+}
+
+/**
+ * Visible breadcrumb trail. Takes the same item list that feeds
+ * {@link import('@/domain/services/seo').breadcrumbJsonLd}, so the
+ * structured data and what the page actually shows cannot drift apart.
+ *
+ * The current page is rendered as plain text rather than a self-link:
+ * a link that goes nowhere is a known screen-reader annoyance.
+ */
+export function breadcrumbs(
+	items: readonly BreadcrumbItem[],
+	messages: AppMessages,
+): SafeHtml {
+	return html`<nav aria-label="${messages.breadcrumbLabel}" class="mb-6">
+		<ol
+			class="text-ink-muted dark:text-snow-muted flex flex-wrap items-center gap-x-2 text-sm"
+		>
+			${items.map((item, index) => {
+				const isLast = index === items.length - 1;
+				return html`<li class="flex items-center gap-x-2">
+					${
+						index > 0
+							? raw(
+									'<span aria-hidden="true" class="text-line dark:text-night-line">/</span>',
+								)
+							: null
+					}${
+						isLast
+							? // Truncated: article titles are long, and the <h1>
+								// directly below repeats them in full. The complete
+								// text stays in the DOM for assistive technology.
+								html`<span
+									aria-current="page"
+									class="text-ink dark:text-snow max-w-[min(100%,42ch)] truncate"
+									>${item.name}</span
+								>`
+							: html`<a
+									href="${item.path}"
+									class="hover:text-accent dark:hover:text-accent-dark underline-offset-2 hover:underline"
+									>${item.name}</a
+								>`
+					}
+				</li>`;
+			})}
+		</ol>
+	</nav>`;
+}
+
 /** Section heading with an eyebrow-style kicker. */
 export function sectionHeading(
 	id: string,
@@ -55,7 +113,7 @@ export function sectionHeading(
 ): SafeHtml {
 	return html`<div class="mb-10">
 		<p
-			class="text-accent dark:text-accent-dark mb-2 text-sm font-semibold tracking-widest uppercase"
+			class="jp-kicker text-accent dark:text-accent-dark mb-3 text-sm font-semibold tracking-widest uppercase"
 			aria-hidden="true"
 		>
 			${kicker}
@@ -196,13 +254,17 @@ export function blogCard(
 ): SafeHtml {
 	const heading = options.headingLevel ?? 'h3';
 	const path = blogPostPath(locale, post.slug);
+	const minutes = readingTime(post.readingMinutes, messages);
 	return html`<article
+		data-slug="${post.slug}"
 		class="jp-card rounded-card border-line bg-paper-raised shadow-card dark:border-night-line dark:bg-night-raised flex h-full flex-col gap-3 border p-6"
 	>
-		<p class="text-ink-muted dark:text-snow-muted text-sm">
+		<p
+			class="text-ink-muted dark:text-snow-muted flex flex-wrap items-center gap-x-2 text-sm"
+		>
 			<time datetime="${post.publishedAt}"
 				>${formatIsoDate(post.publishedAt, locale)}</time
-			>
+			>${minutes !== null ? html`${SEPARATOR}${minutes}` : null}
 		</p>
 		<${raw(heading)} class="text-xl font-semibold tracking-tight">
 			<a href="${path}" class="hover:text-accent dark:hover:text-accent-dark"
@@ -241,9 +303,26 @@ export function callout(
 	</div>`;
 }
 
-/** Formats "Published on …" / "Updated on …" metadata line. */
+/** Renders "N min read", or nothing when no estimate is available. */
+export function readingTime(
+	minutes: number | undefined,
+	messages: AppMessages,
+): SafeHtml | null {
+	if (minutes === undefined || minutes < 1) {
+		return null;
+	}
+	return html`<span
+		>${formatMessage(messages.blog.readingTime, { count: minutes })}</span
+	>`;
+}
+
+/** Formats the "Published on … · Updated on … · N min read" metadata line. */
 export function postDates(
-	post: { publishedAt: string; updatedAt?: string | undefined },
+	post: {
+		publishedAt: string;
+		updatedAt?: string | undefined;
+		readingMinutes?: number | undefined;
+	},
 	locale: Locale,
 	messages: AppMessages,
 ): SafeHtml {
@@ -256,11 +335,16 @@ export function postDates(
 					date: formatIsoDate(post.updatedAt, locale),
 				})
 			: undefined;
-	return html`<p class="text-ink-muted dark:text-snow-muted text-sm">
+	const minutes = readingTime(post.readingMinutes, messages);
+	return html`<p
+		class="text-ink-muted dark:text-snow-muted flex flex-wrap items-center gap-x-2 text-sm"
+	>
 		<time datetime="${post.publishedAt}">${published}</time>${
 			updated !== undefined
-				? html` · <time datetime="${post.updatedAt ?? ''}">${updated}</time>`
+				? html`${SEPARATOR}<time datetime="${post.updatedAt ?? ''}"
+							>${updated}</time
+						>`
 				: null
-		}
+		}${minutes !== null ? html`${SEPARATOR}${minutes}` : null}
 	</p>`;
 }

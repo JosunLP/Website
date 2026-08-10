@@ -76,9 +76,53 @@ describe('jp-theme-toggle', () => {
 		expect(localStorage.getItem('jp:theme')).toBe('dark');
 		expect(document.documentElement.classList.contains('dark')).toBe(true);
 	});
+
+	it('replaces the icon element on each swap so the animation replays', async () => {
+		document.documentElement.classList.remove('dark');
+		localStorage.clear();
+		document.body.innerHTML = `<jp-theme-toggle data-label="Color scheme" data-light="Light" data-dark="Dark" data-system="System"></jp-theme-toggle>`;
+		await tick();
+		const button = document.querySelector<HTMLButtonElement>(
+			'jp-theme-toggle button',
+		)!;
+		const before = button.querySelector('.jp-theme-icon')!;
+
+		button.click();
+		await tick();
+		const after = button.querySelector('.jp-theme-icon')!;
+		expect(after.classList.contains('jp-theme-icon--dark')).toBe(true);
+		// A CSS animation does not restart while the same element keeps the
+		// same animation-name, so the glyph must be a fresh node.
+		expect(after).not.toBe(before);
+	});
 });
 
 describe('jp-site-nav', () => {
+	/**
+	 * happy-dom hands out a fresh MediaQueryList per `matchMedia` call, so
+	 * a test cannot reach the one the component captured. This swaps in a
+	 * single shared, dispatchable stub for the desktop query.
+	 */
+	function stubDesktopQuery(): { setMatches(value: boolean): void } {
+		const target = new EventTarget() as EventTarget & {
+			matches: boolean;
+			media: string;
+		};
+		target.matches = false;
+		target.media = '(min-width: 48rem)';
+		const original = window.matchMedia.bind(window);
+		window.matchMedia = ((query: string) =>
+			query === target.media
+				? target
+				: original(query)) as typeof window.matchMedia;
+		return {
+			setMatches(value: boolean): void {
+				target.matches = value;
+				target.dispatchEvent(new Event('change'));
+			},
+		};
+	}
+
 	function mount(): void {
 		document.body.innerHTML = `
 			<jp-site-nav>
@@ -134,6 +178,24 @@ describe('jp-site-nav', () => {
 		link.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 		expect(toggle.getAttribute('aria-expanded')).toBe('false');
 	});
+
+	it('closes the panel when the viewport grows past the md breakpoint', async () => {
+		const desktop = stubDesktopQuery();
+		mount();
+		await tick();
+		const toggle =
+			document.querySelector<HTMLButtonElement>('[data-nav-toggle]')!;
+		toggle.click();
+		expect(toggle.getAttribute('aria-expanded')).toBe('true');
+
+		// Past `md` the toggle is hidden by CSS, so an open panel could no
+		// longer be closed and its focus trap would keep swallowing Tab.
+		desktop.setMatches(true);
+		expect(toggle.getAttribute('aria-expanded')).toBe('false');
+		expect(
+			document.querySelector('#main-nav')!.classList.contains('hidden'),
+		).toBe(true);
+	});
 });
 
 describe('jp-blog-list', () => {
@@ -153,5 +215,22 @@ describe('jp-blog-list', () => {
 		expect(document.querySelector('[data-post-count]')!.textContent).toContain(
 			'1 article',
 		);
+	});
+
+	it('refreshes when a post was replaced rather than added', async () => {
+		// Same count as the manifest, different post: comparing counts alone
+		// would read this as "nothing changed" and leave the stale card up.
+		document.body.innerHTML = `
+			<jp-blog-list locale="en">
+				<p data-post-count>1 article</p>
+				<div data-post-grid>
+					<article data-slug="removed-since-build"><h2>Removed since build</h2></article>
+				</div>
+			</jp-blog-list>`;
+		await tick(80);
+		const grid = document.querySelector('[data-post-grid]')!;
+		expect(grid.querySelectorAll('article')).toHaveLength(1);
+		expect(grid.textContent).toContain('Uploaded later');
+		expect(grid.textContent).not.toContain('Removed since build');
 	});
 });

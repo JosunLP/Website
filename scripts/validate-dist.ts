@@ -9,7 +9,9 @@ import { join, sep } from 'node:path';
  * - JSON-LD blocks parse as JSON,
  * - internal links and asset references resolve to files,
  * - sitemaps exist, parse, and only reference existing pages,
- * - robots.txt references both sitemaps.
+ * - robots.txt references both sitemaps,
+ * - one Atom feed per locale exists and is linked from every page,
+ * - highlighted code carries classes the stylesheet actually styles.
  */
 const DIST = join(process.cwd(), 'dist');
 const ORIGIN = 'https://josunlp.de';
@@ -101,6 +103,59 @@ for (const file of htmlFiles) {
 		if (!match[0].includes('noopener') || !match[0].includes('noreferrer')) {
 			errors.push(`${rel}: target="_blank" link without noopener noreferrer`);
 		}
+	}
+
+	if (!html.includes('type="application/atom+xml"')) {
+		errors.push(`${rel}: missing feed autodiscovery link`);
+	}
+}
+
+// Atom feeds.
+for (const locale of ['de', 'en']) {
+	const file = join(DIST, locale, 'blog', 'feed.xml');
+	if (!existsSync(file)) {
+		errors.push(`${locale}/blog/feed.xml missing from dist/`);
+		continue;
+	}
+	const xml = readFileSync(file, 'utf8');
+	if (!xml.includes('<feed xmlns="http://www.w3.org/2005/Atom"')) {
+		errors.push(`${locale}/blog/feed.xml: not an Atom feed`);
+	}
+	for (const match of xml.matchAll(
+		/<link rel="alternate" type="text\/html" href="([^"]+)"\/>/g,
+	)) {
+		const url = match[1] ?? '';
+		if (!resolvesToFile(url.slice(ORIGIN.length))) {
+			errors.push(`${locale}/blog/feed.xml: dead entry link ${url}`);
+		}
+	}
+}
+
+/*
+ * Syntax highlighting is only visible if the stylesheet defines rules for
+ * the classes highlight.js emits. Shipping the highlighter without them
+ * costs ~19 KB gzip and renders identically to plain text, which is easy
+ * to miss because nothing errors.
+ */
+const cssFiles = walk(join(DIST, 'assets')).filter((file) =>
+	file.endsWith('.css'),
+);
+const css = cssFiles.map((file) => readFileSync(file, 'utf8')).join('');
+const highlighted = new Set<string>();
+for (const file of htmlFiles) {
+	for (const match of readFileSync(file, 'utf8').matchAll(
+		/class="(hljs-[^"]*)"/g,
+	)) {
+		for (const token of (match[1] ?? '').split(/\s+/)) {
+			if (token.startsWith('hljs-')) {
+				highlighted.add(token);
+			}
+		}
+	}
+}
+for (const token of highlighted) {
+	if (!css.includes(`.${token}`)) {
+		errors.push(`stylesheet has no rule for highlight class "${token}"`);
 	}
 }
 

@@ -133,3 +133,8 @@ export function featuredProjects(): readonly Project[] {
 export function flagshipProject(): Project | undefined {
 	return PROJECTS.find((project) => project.flagship === true);
 }
+
+/** Distinct technologies across the catalog, used for the home page stats. */
+export function technologyCount(): number {
+	return new Set(PROJECTS.flatMap((project) => project.technologies)).size;
+}

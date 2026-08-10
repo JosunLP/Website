@@ -113,13 +113,23 @@ for (const { post, locale } of loaded) {
 
 const routes = buildRoutes(createAssetResolver(), { entries, articles });
 
+/**
+ * Directory-style routes ("/de/blog/") become `index.html`; routes that
+ * already name a file ("/de/404.html", "/de/blog/feed.xml") are written
+ * as-is.
+ */
+function outputPath(route: string): string {
+	const isFile = /\.[a-z0-9]+$/i.test(route);
+	return isFile
+		? join(DIST, route.slice(1))
+		: join(DIST, route.slice(1), 'index.html');
+}
+
 let count = 0;
 for (const [path, render] of routes) {
-	const filePath = path.endsWith('.html')
-		? join(DIST, path.slice(1))
-		: join(DIST, path.slice(1), 'index.html');
+	const filePath = outputPath(path);
 	mkdirSync(dirname(filePath), { recursive: true });
 	writeFileSync(filePath, render());
 	count += 1;
 }
-console.log(`Prerendered ${String(count)} pages into dist/.`);
+console.log(`Prerendered ${String(count)} routes into dist/.`);

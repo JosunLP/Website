@@ -27,17 +27,24 @@ const MIME_TYPES: Record<string, string> = {
 	'.json': 'application/json',
 	'.webmanifest': 'application/manifest+json',
 	'.xml': 'application/xml',
+	// The Atom feeds are the only .xml files a reader subscribes to; the
+	// sitemaps are fetched by crawlers that do not care about the subtype.
+	'/feed.xml': 'application/atom+xml; charset=utf-8',
 	'.txt': 'text/plain; charset=utf-8',
 	'.woff2': 'font/woff2',
 	'.css': 'text/css; charset=utf-8',
 };
 
 function contentTypeFor(path: string): string | undefined {
-	const dot = path.lastIndexOf('.');
+	const lower = path.toLowerCase();
+	if (lower.endsWith('/feed.xml')) {
+		return MIME_TYPES['/feed.xml'];
+	}
+	const dot = lower.lastIndexOf('.');
 	if (dot === -1) {
 		return undefined;
 	}
-	return MIME_TYPES[path.slice(dot).toLowerCase()];
+	return MIME_TYPES[lower.slice(dot)];
 }
 
 /**

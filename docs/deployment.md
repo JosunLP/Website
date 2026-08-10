@@ -14,13 +14,13 @@ Upload the **contents of `dist/`** to the web root.
 
 ## 2. Required host configuration
 
-| Concern       | Requirement                                                                                          |
-| ------------- | ---------------------------------------------------------------------------------------------------- |
-| Blog fallback | Rewrite unknown `/{de\|en}/blog/{slug}/` URLs to `/{locale}/blog/_article/index.html` (see examples) |
-| 404           | Serve `/404.html` for unknown URLs (locale variants exist at `/de/404.html`, `/en/404.html`)         |
-| MIME          | Serve `.md` as `text/markdown; charset=utf-8`, `.json` as `application/json`                         |
-| Headers       | Apply the security headers from [security-headers.md](security-headers.md)                           |
-| Caching       | `/assets/*` immutable (1 year); HTML, `content/*`, sitemaps, robots `no-cache`                       |
+| Concern       | Requirement                                                                                                                       |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Blog fallback | Rewrite unknown `/{de\|en}/blog/{slug}/` URLs to `/{locale}/blog/_article/index.html` (see examples)                              |
+| 404           | Serve `/404.html` for unknown URLs (locale variants exist at `/de/404.html`, `/en/404.html`)                                      |
+| MIME          | Serve `.md` as `text/markdown; charset=utf-8`, `.json` as `application/json`, `feed.xml` as `application/atom+xml; charset=utf-8` |
+| Headers       | Apply the security headers from [security-headers.md](security-headers.md)                                                        |
+| Caching       | `/assets/*` immutable (1 year); HTML, `content/*`, sitemaps, robots `no-cache`                                                    |
 
 Reference configurations (review before use):
 
@@ -38,6 +38,7 @@ to them 404 — built posts are unaffected.
 /                      index.html (locale decision), 404.html
 /de/, /en/             prerendered pages
 /de|en/blog/_article/  client-side article shell (noindex)
+/de|en/blog/feed.xml   Atom feed per locale
 /assets/               hashed JS/CSS (immutable)
 /content/blog/         Markdown + index.json (public content contract)
 /images/               logos and other stable-path images
@@ -60,3 +61,5 @@ Publishing a blog post without a rebuild is documented step by step in
 6. Response headers include the CSP and security headers.
 7. `https://josunlp.de/sitemap.xml`, `/blog-sitemap.xml`, `/robots.txt`
    are reachable.
+8. `/de/blog/feed.xml` and `/en/blog/feed.xml` are served as
+   `application/atom+xml` and load in a feed reader.

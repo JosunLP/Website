@@ -5,7 +5,7 @@ import {
 	webPageJsonLd,
 } from '@/domain/services/seo';
 import type { RenderContext } from '@/render/layout';
-import { externalLink } from '@/render/ui';
+import { breadcrumbs, externalLink } from '@/render/ui';
 import { html } from '@/utils/html';
 import type { RenderedPage } from './types';
 
@@ -17,8 +17,13 @@ export function renderAboutPage(ctx: RenderContext): RenderedPage {
 		title: messages.about.title,
 		description: messages.about.description,
 	};
+	const trail = [
+		{ name: messages.nav.home, path: pagePath(locale, 'home') },
+		{ name: messages.nav.about, path: ctx.path },
+	];
 	const main = html`
 		<div class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+			${breadcrumbs(trail, messages)}
 			<h1 class="text-4xl font-semibold tracking-tight">
 				${messages.about.heading}
 			</h1>
@@ -66,14 +71,7 @@ export function renderAboutPage(ctx: RenderContext): RenderedPage {
 	return {
 		meta: {
 			...meta,
-			jsonLd: [
-				personJsonLd(),
-				webPageJsonLd(meta),
-				breadcrumbJsonLd([
-					{ name: messages.nav.home, path: pagePath(locale, 'home') },
-					{ name: messages.nav.about, path: ctx.path },
-				]),
-			],
+			jsonLd: [personJsonLd(), webPageJsonLd(meta), breadcrumbJsonLd(trail)],
 		},
 		main,
 	};

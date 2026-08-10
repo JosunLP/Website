@@ -260,8 +260,19 @@ html:active-view-transition-type(backwards) {
 	.jp-prose ol {
 		@apply list-decimal pl-6;
 	}
-	.jp-prose ul.jp-task-list {
-		@apply list-none pl-1;
+	/*
+	 * GFM task lists. `renderMarkdown` tags each task `<li>` with
+	 * `jp-task-item` after sanitization; the list itself carries no class,
+	 * so the enclosing `<ul>` is matched through its children.
+	 */
+	.jp-prose ul:has(> li.jp-task-item) {
+		@apply list-none pl-0;
+	}
+	.jp-prose li.jp-task-item {
+		@apply flex items-start gap-2.5;
+	}
+	.jp-prose li.jp-task-item input[type='checkbox'] {
+		@apply accent-accent dark:accent-accent-dark mt-1.5 shrink-0;
 	}
 	.jp-prose blockquote {
 		@apply border-accent dark:border-accent-dark border-l-4 pl-4 italic;
@@ -293,6 +304,87 @@ html:active-view-transition-type(backwards) {
 	}
 	.jp-prose th {
 		@apply font-semibold;
+	}
+}
+
+/*
+ * Syntax highlighting theme for highlight.js output.
+ *
+ * Written by hand instead of importing one of the highlight.js themes:
+ * those ship dozens of rules for languages this blog never uses and a
+ * background/foreground pair that fights the design tokens. Code blocks
+ * are dark in both color schemes (`.jp-prose pre`), so one palette is
+ * enough. Every hue is chosen for ≥ 4.5:1 against `--color-night` and
+ * `--color-night-raised`.
+ */
+@layer components {
+	.jp-prose pre code {
+		--jp-hl-comment: oklch(0.68 0.02 270);
+		--jp-hl-keyword: oklch(0.79 0.11 300);
+		--jp-hl-string: oklch(0.83 0.13 150);
+		--jp-hl-number: oklch(0.85 0.11 75);
+		--jp-hl-title: oklch(0.81 0.11 235);
+		--jp-hl-attr: oklch(0.84 0.08 200);
+		--jp-hl-type: oklch(0.85 0.09 175);
+		--jp-hl-muted: oklch(0.74 0.03 270);
+	}
+
+	.jp-prose .hljs-comment,
+	.jp-prose .hljs-quote {
+		color: var(--jp-hl-comment);
+		font-style: italic;
+	}
+	.jp-prose .hljs-keyword,
+	.jp-prose .hljs-selector-tag,
+	.jp-prose .hljs-literal,
+	.jp-prose .hljs-doctag,
+	.jp-prose .hljs-name {
+		color: var(--jp-hl-keyword);
+	}
+	.jp-prose .hljs-string,
+	.jp-prose .hljs-regexp,
+	.jp-prose .hljs-addition,
+	.jp-prose .hljs-meta .hljs-string {
+		color: var(--jp-hl-string);
+	}
+	.jp-prose .hljs-number,
+	.jp-prose .hljs-symbol,
+	.jp-prose .hljs-bullet,
+	.jp-prose .hljs-link {
+		color: var(--jp-hl-number);
+	}
+	.jp-prose .hljs-title,
+	.jp-prose .hljs-section,
+	.jp-prose .hljs-selector-id {
+		color: var(--jp-hl-title);
+	}
+	.jp-prose .hljs-attr,
+	.jp-prose .hljs-attribute,
+	.jp-prose .hljs-property,
+	.jp-prose .hljs-variable,
+	.jp-prose .hljs-template-variable,
+	.jp-prose .hljs-selector-attr,
+	.jp-prose .hljs-selector-pseudo {
+		color: var(--jp-hl-attr);
+	}
+	.jp-prose .hljs-type,
+	.jp-prose .hljs-built_in,
+	.jp-prose .hljs-class .hljs-title,
+	.jp-prose .hljs-title.class_,
+	.jp-prose .hljs-params {
+		color: var(--jp-hl-type);
+	}
+	.jp-prose .hljs-meta,
+	.jp-prose .hljs-punctuation,
+	.jp-prose .hljs-operator,
+	.jp-prose .hljs-deletion {
+		color: var(--jp-hl-muted);
+	}
+	.jp-prose .hljs-emphasis {
+		font-style: italic;
+	}
+	.jp-prose .hljs-strong {
+		font-weight: 600;
 	}
 }
 
@@ -334,6 +426,108 @@ html:active-view-transition-type(backwards) {
 	.jp-theme-icon--dark {
 		--jp-theme-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z'/%3E%3C/svg%3E");
 	}
+}
+
+/*
+ * ---------------------------------------------------------------------------
+ * Editorial details
+ * ---------------------------------------------------------------------------
+ * Small, structural touches that carry the "modular systems" identity into
+ * the page furniture. Each one is a single class so the markup stays free
+ * of decorative utility soup.
+ */
+@layer components {
+	/* Eyebrow kicker: a short accent rule anchors it to the section edge. */
+	.jp-kicker {
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
+	}
+	.jp-kicker::before {
+		content: '';
+		flex: none;
+		width: 1.5rem;
+		height: 2px;
+		border-radius: 1px;
+		background-color: currentColor;
+	}
+
+	/* Hero chip: a pill that points at the flagship project. */
+	.jp-chip {
+		transition:
+			border-color var(--duration-swift) ease-out,
+			color var(--duration-swift) ease-out;
+	}
+
+	/*
+	 * Article table of contents: the entry for the section currently in
+	 * view gets an accent rail. The rail is a border rather than a
+	 * background so the highlight survives forced-colors mode.
+	 */
+	.jp-toc-link {
+		border-left: 2px solid transparent;
+		padding-left: 0.75rem;
+		margin-left: -0.75rem;
+		transition:
+			color var(--duration-swift) ease-out,
+			border-color var(--duration-swift) ease-out;
+	}
+	/* H3 entries, indented against the rail rather than the text. */
+	.jp-toc-link--sub {
+		padding-left: 1.75rem;
+	}
+	.jp-toc-link--active {
+		@apply text-ink dark:text-snow font-medium;
+		border-left-color: var(--color-accent);
+	}
+	.dark .jp-toc-link--active {
+		border-left-color: var(--color-accent-dark);
+	}
+
+	/*
+	 * Heading permalinks, added by the jp-article-tools island. Hidden
+	 * until the heading is hovered or something inside it has focus, so
+	 * the reading column stays clean without hiding the affordance from
+	 * keyboard users (the island also emits a visually hidden link).
+	 */
+	.jp-heading-anchor {
+		@apply text-accent dark:text-accent-dark no-underline;
+		opacity: 0;
+		transition: opacity var(--duration-swift) ease-out;
+	}
+	.jp-prose :is(h2, h3):hover .jp-heading-anchor,
+	.jp-prose :is(h2, h3):focus-within .jp-heading-anchor {
+		opacity: 1;
+	}
+}
+
+/*
+ * Reading progress. A 2px bar across the very top of the viewport, filled
+ * from a `--jp-progress` ratio the jp-article-tools island writes on
+ * scroll. It sits above the sticky header but below the navigation
+ * progress bar, which reports a different thing and must stay visible.
+ *
+ * Deliberately not a scroll-driven CSS animation: the bar is feedback
+ * rather than decoration, so it must also work for readers who ask for
+ * reduced motion — and only JavaScript can keep `aria-valuenow` honest.
+ */
+.jp-reading-progress {
+	position: fixed;
+	inset-inline: 0;
+	top: 0;
+	height: 2px;
+	z-index: 45;
+	pointer-events: none;
+	transform: scaleX(var(--jp-progress, 0));
+	transform-origin: left;
+	background: linear-gradient(90deg, var(--color-accent), oklch(0.62 0.11 200));
+}
+.dark .jp-reading-progress {
+	background: linear-gradient(
+		90deg,
+		var(--color-accent-dark),
+		oklch(0.7 0.09 210)
+	);
 }
 
 /*
@@ -473,6 +667,7 @@ body::after {
 
 /* Card hover: a small lift, deeper shadow, and accent border. */
 .jp-card {
+	position: relative;
 	transition:
 		transform var(--duration-swift) ease-out,
 		box-shadow var(--duration-swift) ease-out,
@@ -483,6 +678,41 @@ body::after {
 }
 .dark .jp-card:hover {
 	border-color: var(--color-accent-dark);
+}
+
+/*
+ * A hairline of accent along the card's top edge on hover. The gradient
+ * fades out at both ends so it never collides with the rounded corners,
+ * which a solid rule would cut across.
+ */
+.jp-card::after {
+	content: '';
+	position: absolute;
+	inset-inline: 1rem;
+	top: -1px;
+	height: 2px;
+	border-radius: 1px;
+	opacity: 0;
+	pointer-events: none;
+	background: linear-gradient(
+		90deg,
+		transparent,
+		var(--color-accent),
+		transparent
+	);
+	transition: opacity var(--duration-swift) ease-out;
+}
+.dark .jp-card::after {
+	background: linear-gradient(
+		90deg,
+		transparent,
+		var(--color-accent-dark),
+		transparent
+	);
+}
+.jp-card:hover::after,
+.jp-card:focus-within::after {
+	opacity: 1;
 }
 
 /* Button hover: subtle lift + shadow, layered on the existing colour swap. */
@@ -552,18 +782,28 @@ body::after {
 		transform: translateY(0);
 	}
 
-	/* Staggered hero entrance (the decorative motif is handled separately). */
+	/*
+	 * Staggered hero entrance. Delays key off `nth-child` rather than
+	 * element type so the cascade holds regardless of what each row is;
+	 * the decorative motif is child 1 and animates separately below.
+	 */
 	section[aria-labelledby='hero-heading'] > *:not(.jp-hero-art) {
 		animation: jp-hero-in 700ms cubic-bezier(0.2, 0, 0, 1) both;
 	}
-	section[aria-labelledby='hero-heading'] > h1 {
-		animation-delay: 80ms;
+	section[aria-labelledby='hero-heading'] > *:nth-child(2) {
+		animation-delay: 60ms;
 	}
-	section[aria-labelledby='hero-heading'] > p:nth-of-type(1) {
-		animation-delay: 200ms;
+	section[aria-labelledby='hero-heading'] > *:nth-child(3) {
+		animation-delay: 150ms;
 	}
-	section[aria-labelledby='hero-heading'] > p:nth-of-type(2) {
-		animation-delay: 320ms;
+	section[aria-labelledby='hero-heading'] > *:nth-child(4) {
+		animation-delay: 250ms;
+	}
+	section[aria-labelledby='hero-heading'] > *:nth-child(5) {
+		animation-delay: 350ms;
+	}
+	section[aria-labelledby='hero-heading'] > *:nth-child(6) {
+		animation-delay: 450ms;
 	}
 
 	/* The hero motif fades in, then floats indefinitely. */
@@ -571,6 +811,116 @@ body::after {
 		animation:
 			jp-hero-in 900ms ease-out both,
 			jp-hero-float 9s ease-in-out 900ms infinite alternate;
+	}
+
+	/* The flagship chip's dot breathes, marking it as a live pointer. */
+	.jp-chip-dot {
+		animation: jp-chip-pulse 2.4s ease-in-out infinite;
+	}
+}
+
+@keyframes jp-chip-pulse {
+	0%,
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 0.45;
+		transform: scale(0.75);
+	}
+}
+
+/*
+ * ---------------------------------------------------------------------------
+ * Forced colors (Windows High Contrast and friends)
+ * ---------------------------------------------------------------------------
+ * The UA replaces every author colour with a system one, which silently
+ * erases anything built out of colour alone: mask-image icons lose the
+ * `background-color` that fills them, and the ambient/decorative layers
+ * become opaque blocks over the content. Restore the icons from system
+ * colours and drop the decoration entirely.
+ */
+@media (forced-colors: active) {
+	.jp-theme-icon {
+		background-color: CanvasText;
+	}
+	body::before,
+	body::after,
+	.jp-card::after {
+		display: none;
+	}
+	.jp-reading-progress,
+	html.jp-navigating::before {
+		background: Highlight;
+	}
+	.jp-toc-link--active {
+		border-left-color: Highlight;
+	}
+	/* Borders are the only reliable separator left; make them visible. */
+	.jp-card,
+	.jp-chip {
+		border-color: CanvasText;
+	}
+}
+
+/*
+ * ---------------------------------------------------------------------------
+ * Print
+ * ---------------------------------------------------------------------------
+ * Articles and the legal pages are the realistic print targets. Drop the
+ * chrome, flatten the dark code blocks, and spell out where links point —
+ * a printed page cannot be hovered or clicked.
+ */
+@media print {
+	body {
+		background: #fff;
+		color: #000;
+	}
+	body::before,
+	body::after,
+	body > header,
+	body > footer,
+	.jp-reading-progress,
+	.jp-code-copy,
+	.jp-heading-anchor,
+	jp-theme-toggle,
+	jp-language-switcher,
+	nav[data-toc] {
+		display: none !important;
+	}
+	main#main-content {
+		padding: 0;
+	}
+	.jp-prose {
+		max-width: none;
+	}
+	.jp-prose pre,
+	.jp-prose pre code,
+	.jp-prose code {
+		background: #f4f4f4 !important;
+		color: #000 !important;
+	}
+	.jp-prose pre {
+		border: 1px solid #ccc;
+		white-space: pre-wrap;
+		word-break: break-word;
+	}
+	.jp-prose a[href^='http']::after {
+		content: ' (' attr(href) ')';
+		font-size: 0.85em;
+		word-break: break-all;
+	}
+	/* Never strand a heading at the bottom of a page. */
+	h1,
+	h2,
+	h3 {
+		break-after: avoid;
+	}
+	.jp-prose pre,
+	.jp-prose blockquote,
+	.jp-prose table {
+		break-inside: avoid;
 	}
 }
 

@@ -107,9 +107,7 @@ export function registerThemeToggle(): void {
 				button.type = 'button';
 				button.className = BUTTON_CLASS;
 
-				const icon = document.createElement('span');
-				icon.className = `jp-theme-icon jp-theme-icon--${this.mode}`;
-				icon.setAttribute('aria-hidden', 'true');
+				const icon = this.createIcon(this.mode);
 
 				const srLabel = document.createElement('span');
 				srLabel.className = 'sr-only';
@@ -127,13 +125,35 @@ export function registerThemeToggle(): void {
 					this.mode = next;
 					persistTheme(next);
 					this.applyTheme();
-					if (this.icon !== null) {
-						this.icon.className = `jp-theme-icon jp-theme-icon--${next}`;
-					}
+					this.swapIcon(next);
 					if (this.srLabel !== null) {
 						this.srLabel.textContent = this.label(next);
 					}
 				});
+			}
+
+			private createIcon(mode: ThemeMode): HTMLSpanElement {
+				const icon = document.createElement('span');
+				icon.className = `jp-theme-icon jp-theme-icon--${mode}`;
+				icon.setAttribute('aria-hidden', 'true');
+				return icon;
+			}
+
+			/**
+			 * Swaps the glyph by replacing the element rather than rewriting
+			 * its class list: `jp-theme-icon` carries the swap animation, and
+			 * a CSS animation does not restart while the same element keeps
+			 * the same animation-name — the icon would change without the
+			 * transition it is styled for.
+			 */
+			private swapIcon(mode: ThemeMode): void {
+				const previous = this.icon;
+				if (previous === null) {
+					return;
+				}
+				const next = this.createIcon(mode);
+				previous.replaceWith(next);
+				this.icon = next;
 			}
 		},
 	);
