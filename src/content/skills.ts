@@ -1,3 +1,4 @@
+import { PROJECTS } from '@/content/projects';
 import type { Localized } from '@/domain/models/locale';
 
 /** One curated area of technical focus shown on the home page. */
@@ -53,3 +54,25 @@ export const FOCUS_AREAS: readonly FocusArea[] = [
 		keywords: ['WCAG 2.2', 'Core Web Vitals', 'SEO'],
 	},
 ];
+
+/**
+ * Topics the owner demonstrably works on, derived from the curated focus
+ * areas and the technologies of the shipped projects. Used as
+ * `knowsAbout` in the structured-data graph, where it helps search
+ * engines tell this Person entity apart from same-named ones — so it is
+ * generated from evidence on the site rather than hand-written claims.
+ */
+export function expertiseTopics(): readonly string[] {
+	const topics = new Set<string>();
+	for (const area of FOCUS_AREAS) {
+		for (const keyword of area.keywords) {
+			topics.add(keyword);
+		}
+	}
+	for (const project of PROJECTS) {
+		for (const technology of project.technologies) {
+			topics.add(technology);
+		}
+	}
+	return [...topics].sort((a, b) => a.localeCompare(b, 'en'));
+}

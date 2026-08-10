@@ -132,6 +132,12 @@ export interface AppMessages {
 		readonly copyCodeFailed: string;
 		readonly headingLink: string;
 		readonly readingProgress: string;
+		/** Title/description of the client-side article shell route. */
+		readonly shellTitle: string;
+		readonly shellDescription: string;
+		readonly moreReading: string;
+		readonly newerPost: string;
+		readonly olderPost: string;
 	};
 	readonly contact: {
 		readonly title: string;
@@ -146,6 +152,7 @@ export interface AppMessages {
 	};
 	readonly notFound: {
 		readonly title: string;
+		readonly description: string;
 		readonly heading: string;
 		readonly text: string;
 		readonly backHome: string;

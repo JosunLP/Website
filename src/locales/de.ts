@@ -5,7 +5,10 @@ export const de: AppMessages = {
 	siteTagline: 'Full-Stack-Entwickler & Open-Source-Maintainer',
 	skipToContent: 'Zum Inhalt springen',
 	nav: {
-		home: 'Start',
+		// Not 'Start': as link text that is on the non-descriptive-anchor
+		// blocklist auditors use, and it appears in the header nav and in
+		// every breadcrumb trail.
+		home: 'Startseite',
 		about: 'Über mich',
 		projects: 'Projekte',
 		blog: 'Blog',
@@ -133,7 +136,7 @@ export const de: AppMessages = {
 		},
 	},
 	blog: {
-		title: 'Blog — Jonas Pfalzgraf',
+		title: 'Blog von Jonas Pfalzgraf — TypeScript und Tooling',
 		description:
 			'Artikel von Jonas Pfalzgraf über TypeScript, Web-Engineering, Open Source und Developer Experience.',
 		heading: 'Blog',
@@ -161,6 +164,12 @@ export const de: AppMessages = {
 		copyCodeFailed: 'Kopieren fehlgeschlagen',
 		headingLink: 'Link zu diesem Abschnitt',
 		readingProgress: 'Lesefortschritt',
+		shellTitle: 'Blogartikel — Jonas Pfalzgraf',
+		shellDescription:
+			'Diese Adresse lädt einen nach dem letzten Build veröffentlichten Blogartikel. Der Artikel selbst ist unter seiner eigenen URL erreichbar.',
+		moreReading: 'Weiterlesen',
+		newerPost: 'Neuerer Artikel',
+		olderPost: 'Älterer Artikel',
 	},
 	contact: {
 		title: 'Kontakt — Jonas Pfalzgraf',
@@ -179,6 +188,8 @@ export const de: AppMessages = {
 	},
 	notFound: {
 		title: 'Seite nicht gefunden — JosunLP.de',
+		description:
+			'Diese Adresse führt zu keiner Seite auf josunlp.de. Über die Navigation oder die Startseite geht es zurück zu Projekten, Blog und Kontakt.',
 		heading: 'Seite nicht gefunden',
 		text: 'Die angeforderte Seite existiert nicht oder wurde verschoben.',
 		backHome: 'Zur Startseite',

@@ -2,14 +2,18 @@ import { blogPostPath, pagePath } from '@/app/configuration';
 import type { BlogManifestEntry } from '@/domain/models/blog';
 import type { BlogPost } from '@/domain/models/blog';
 import {
-	blogJsonLd,
+	absoluteUrl,
 	blogPostingJsonLd,
-	breadcrumbJsonLd,
-	webPageJsonLd,
+	pageGraphJsonLd,
+	pageTitle,
+	ENTITY_ID,
 } from '@/domain/services/seo';
 import { feedPath } from '@/domain/services/feed';
 import type { RenderedMarkdown } from '@/domain/services/markdown';
-import { estimateReadingMinutes } from '@/domain/services/reading-time';
+import {
+	estimateReadingMinutes,
+	estimateWordCount,
+} from '@/domain/services/reading-time';
 import { formatMessage } from '@/features/i18n';
 import type { RenderContext } from '@/render/layout';
 import { blogCard, breadcrumbs, postDates, techTags } from '@/render/ui';
@@ -89,17 +93,51 @@ export function renderBlogIndexPage(
 			</jp-blog-list>
 		</div>
 	`;
+	// Every listed post gets its own node so the index describes the
+	// collection rather than just declaring that a blog exists.
+	const postNodes = posts.map((post) =>
+		blogPostingJsonLd({
+			title: post.title,
+			description: post.description,
+			path: blogPostPath(post.locale, post.slug),
+			locale: post.locale,
+			publishedAt: post.publishedAt,
+			...(post.updatedAt !== undefined ? { updatedAt: post.updatedAt } : {}),
+			tags: post.tags,
+			...(post.coverImage !== undefined ? { coverImage: post.coverImage } : {}),
+			...(post.readingMinutes !== undefined
+				? { readingMinutes: post.readingMinutes }
+				: {}),
+		}),
+	);
+	const blogNode = {
+		'@type': 'Blog',
+		'@id': `${absoluteUrl(ctx.path)}#blog`,
+		name: messages.blog.heading,
+		description: messages.blog.description,
+		url: absoluteUrl(ctx.path),
+		inLanguage: locale,
+		author: { '@id': ENTITY_ID.person },
+		publisher: { '@id': ENTITY_ID.person },
+		blogPost: postNodes.map((node) => ({
+			'@id': (node as { '@id': string })['@id'],
+		})),
+	};
 	return {
 		meta: {
 			...meta,
 			jsonLd: [
-				webPageJsonLd(meta),
-				blogJsonLd(locale, ctx.path),
-				breadcrumbJsonLd(trail),
+				pageGraphJsonLd({
+					meta,
+					pageType: 'CollectionPage',
+					breadcrumb: trail,
+					mainEntity: blogNode['@id'],
+					nodes: [blogNode, ...postNodes],
+				}),
 			],
 		},
 		main,
-		options: { extraScripts: ['article'] },
+		options: { extraScripts: ['blog-index'] },
 	};
 }
 
@@ -203,50 +241,128 @@ export function articleBody(
 	`;
 }
 
+/** Neighbouring posts in the same locale, newest first. */
+export interface ArticleNeighbours {
+	readonly newer?: BlogManifestEntry;
+	readonly older?: BlogManifestEntry;
+}
+
+/**
+ * Links to the adjacent posts. Purely additive for readers, and it gives
+ * every article at least two inbound links from other articles instead of
+ * leaving each one reachable only through the index.
+ */
+function articleNeighbourNav(
+	ctx: RenderContext,
+	neighbours: ArticleNeighbours,
+): SafeHtml | null {
+	const { messages, locale } = ctx;
+	const entries = [
+		{ entry: neighbours.newer, label: messages.blog.newerPost },
+		{ entry: neighbours.older, label: messages.blog.olderPost },
+	].filter(
+		(candidate): candidate is { entry: BlogManifestEntry; label: string } =>
+			candidate.entry !== undefined,
+	);
+	if (entries.length === 0) {
+		return null;
+	}
+	return html`<nav
+		aria-labelledby="more-reading"
+		class="border-line dark:border-night-line mt-14 border-t pt-8"
+	>
+		<h2
+			id="more-reading"
+			class="text-ink-muted dark:text-snow-muted text-xs font-semibold tracking-widest uppercase"
+		>
+			${messages.blog.moreReading}
+		</h2>
+		<ul class="mt-4 grid gap-4 sm:grid-cols-2">
+			${entries.map(
+				({ entry, label }) =>
+					html`<li>
+						<a
+							href="${blogPostPath(locale, entry.slug)}"
+							class="jp-card rounded-card border-line dark:border-night-line hover:border-accent dark:hover:border-accent-dark flex h-full flex-col gap-1 border p-4"
+						>
+							<span
+								class="text-ink-muted dark:text-snow-muted text-xs font-semibold tracking-widest uppercase"
+								>${label}</span
+							>
+							<span class="text-ink dark:text-snow font-medium"
+								>${entry.title}</span
+							>
+						</a>
+					</li>`,
+			)}
+		</ul>
+	</nav>`;
+}
+
 /** Fully pre-rendered article page for posts known at build time. */
 export function renderBlogArticlePage(
 	ctx: RenderContext,
 	post: BlogPost,
 	rendered: RenderedMarkdown,
 	translations: readonly BlogManifestEntry[],
+	neighbours: ArticleNeighbours = {},
 ): RenderedPage {
 	const { messages, locale } = ctx;
 	const path = blogPostPath(locale, post.meta.slug);
 	const readingMinutes = estimateReadingMinutes(post.markdown);
-	const jsonLdPost = {
+	const meta = {
+		locale,
+		path,
+		title: pageTitle(post.meta.title, messages.siteName),
+		description: post.meta.description,
+		ogType: 'article' as const,
+		article: {
+			publishedAt: post.meta.publishedAt,
+			...(post.meta.updatedAt !== undefined
+				? { updatedAt: post.meta.updatedAt }
+				: {}),
+			tags: post.meta.tags,
+			...(post.meta.tags[0] !== undefined
+				? { section: post.meta.tags[0] }
+				: {}),
+		},
+		...(post.meta.canonicalUrl !== undefined
+			? { canonicalUrl: post.meta.canonicalUrl }
+			: {}),
+		...(post.meta.coverImage !== undefined
+			? { ogImage: post.meta.coverImage }
+			: {}),
+	};
+	const article = blogPostingJsonLd({
 		title: post.meta.title,
 		description: post.meta.description,
 		path,
 		locale,
 		publishedAt: post.meta.publishedAt,
 		tags: post.meta.tags,
+		wordCount: estimateWordCount(post.markdown),
+		readingMinutes,
 		...(post.meta.updatedAt !== undefined
 			? { updatedAt: post.meta.updatedAt }
 			: {}),
 		...(post.meta.coverImage !== undefined
 			? { coverImage: post.meta.coverImage }
 			: {}),
-	};
+	});
 	return {
 		meta: {
-			locale,
-			path,
-			title: `${post.meta.title} — ${messages.siteName}`,
-			description: post.meta.description,
-			ogType: 'article',
-			...(post.meta.canonicalUrl !== undefined
-				? { canonicalUrl: post.meta.canonicalUrl }
-				: {}),
-			...(post.meta.coverImage !== undefined
-				? { ogImage: post.meta.coverImage }
-				: {}),
+			...meta,
 			jsonLd: [
-				blogPostingJsonLd(jsonLdPost),
-				breadcrumbJsonLd([
-					{ name: messages.nav.home, path: pagePath(locale, 'home') },
-					{ name: messages.nav.blog, path: pagePath(locale, 'blog') },
-					{ name: post.meta.title, path },
-				]),
+				pageGraphJsonLd({
+					meta,
+					mainEntity: (article as { '@id': string })['@id'],
+					breadcrumb: [
+						{ name: messages.nav.home, path: pagePath(locale, 'home') },
+						{ name: messages.nav.blog, path: pagePath(locale, 'blog') },
+						{ name: post.meta.title, path },
+					],
+					nodes: [article],
+				}),
 			],
 		},
 		main: html`<jp-article-tools
@@ -257,7 +373,7 @@ export function renderBlogArticlePage(
 			data-progress="${messages.blog.readingProgress}"
 			class="block"
 		>
-			<article class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+			<article class="mx-auto max-w-3xl px-4 pt-16 sm:px-6">
 				${articleBody(
 					ctx,
 					{ ...post.meta, readingMinutes },
@@ -265,6 +381,9 @@ export function renderBlogArticlePage(
 					translations,
 				)}
 			</article>
+			<div class="mx-auto max-w-3xl px-4 pb-16 sm:px-6">
+				${articleNeighbourNav(ctx, neighbours)}
+			</div>
 		</jp-article-tools>`,
 		// Only the reading affordances — a prerendered article needs
 		// neither the manifest client nor bQuery's component runtime.
@@ -284,8 +403,10 @@ export function renderBlogArticleShellPage(ctx: RenderContext): RenderedPage {
 		meta: {
 			locale,
 			path: ctx.path,
-			title: messages.blog.title,
-			description: messages.blog.description,
+			// Distinct from the blog index on purpose: the shell is a
+			// different route and must not present itself as a copy of it.
+			title: messages.blog.shellTitle,
+			description: messages.blog.shellDescription,
 			noindex: true,
 		},
 		main: html`<jp-article-tools

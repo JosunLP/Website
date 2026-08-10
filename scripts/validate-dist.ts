@@ -56,6 +56,37 @@ if (htmlFiles.length < 20) {
 	);
 }
 
+/**
+ * Display budgets for search results. Not spec limits — the points past
+ * which Google truncates, which is where a title stops earning clicks.
+ * Enforced only on indexable pages.
+ */
+const TITLE_MAX = 60;
+const DESCRIPTION_MIN = 70;
+const DESCRIPTION_MAX = 160;
+
+/**
+ * Anchor texts that describe nothing on their own. Matched case-folded
+ * against the whole link text, so German "Start" trips over "start" the
+ * same way English "here" does — which is the point: auditors do not
+ * special-case a language either.
+ */
+const NON_DESCRIPTIVE_LINK_TEXT = new Set([
+	'click here',
+	'click this',
+	'go',
+	'here',
+	'this',
+	'start',
+	'right here',
+	'more',
+	'learn more',
+]);
+
+/** Indexable pages must not compete with each other for the same query. */
+const seenTitles = new Map<string, string>();
+const seenDescriptions = new Map<string, string>();
+
 for (const file of htmlFiles) {
 	const rel = file.slice(DIST.length + 1).replaceAll(sep, '/');
 	const html = readFileSync(file, 'utf8');
@@ -76,25 +107,116 @@ for (const file of htmlFiles) {
 	if (!/<html lang="[a-z]{2}"/.test(html)) {
 		errors.push(`${rel}: missing html lang attribute`);
 	}
-	const noindex = html.includes('name="robots" content="noindex"');
+	// The directive carries a crawl policy after the index policy
+	// ("noindex, follow"), so match the prefix, not the whole value.
+	const noindex = html.includes('name="robots" content="noindex');
 	if (!noindex && !html.includes('hreflang="x-default"')) {
 		errors.push(`${rel}: missing hreflang alternates`);
 	}
 
+	// Snippet budgets and uniqueness, for pages that can actually appear in
+	// a result list.
+	if (!noindex) {
+		const title = /<title>([^<]*)<\/title>/.exec(html)?.[1] ?? '';
+		const description =
+			/<meta name="description" content="([^"]*)"/.exec(html)?.[1] ?? '';
+		if (title.length > TITLE_MAX) {
+			errors.push(
+				`${rel}: title is ${String(title.length)} characters, over the ${String(TITLE_MAX)}-character display budget`,
+			);
+		}
+		if (
+			description.length < DESCRIPTION_MIN ||
+			description.length > DESCRIPTION_MAX
+		) {
+			errors.push(
+				`${rel}: meta description is ${String(description.length)} characters, outside ${String(DESCRIPTION_MIN)}–${String(DESCRIPTION_MAX)}`,
+			);
+		}
+		const duplicateTitle = seenTitles.get(title);
+		if (duplicateTitle !== undefined) {
+			errors.push(`${rel}: duplicate title, shared with ${duplicateTitle}`);
+		}
+		seenTitles.set(title, rel);
+		const duplicateDescription = seenDescriptions.get(description);
+		if (duplicateDescription !== undefined) {
+			errors.push(
+				`${rel}: duplicate meta description, shared with ${duplicateDescription}`,
+			);
+		}
+		seenDescriptions.set(description, rel);
+	}
+
+	// Structured data: one @graph per page whose nodes are all typed and
+	// whose internal @id references resolve. A dangling reference is
+	// silently dropped by consumers, so nothing would otherwise surface it.
+	const graphIds = new Set<string>();
+	const graphRefs: string[] = [];
 	for (const match of html.matchAll(
 		/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g,
 	)) {
+		let data: unknown;
 		try {
-			JSON.parse(match[1] ?? '');
+			data = JSON.parse(match[1] ?? '');
 		} catch {
 			errors.push(`${rel}: invalid JSON-LD`);
+			continue;
 		}
+		const graph = (data as { '@graph'?: unknown })['@graph'];
+		if (!Array.isArray(graph)) {
+			errors.push(`${rel}: JSON-LD block is not a @graph document`);
+			continue;
+		}
+		for (const node of graph as Record<string, unknown>[]) {
+			if (typeof node['@type'] !== 'string') {
+				errors.push(`${rel}: JSON-LD node without @type`);
+			}
+			if (typeof node['@id'] === 'string') {
+				graphIds.add(node['@id']);
+			}
+		}
+		// Collect every {"@id": …} used as a reference value.
+		for (const reference of (match[1] ?? '').matchAll(/\{"@id":"([^"]+)"\}/g)) {
+			graphRefs.push(reference[1] ?? '');
+		}
+	}
+	for (const reference of graphRefs) {
+		if (!graphIds.has(reference)) {
+			errors.push(`${rel}: JSON-LD reference to unknown node "${reference}"`);
+		}
+	}
+
+	// Social preview: crawlers need an absolute image URL that exists.
+	const ogImage = /<meta property="og:image" content="([^"]+)"/.exec(html)?.[1];
+	if (ogImage?.startsWith(ORIGIN) !== true) {
+		errors.push(`${rel}: missing or non-absolute og:image`);
+	} else if (!resolvesToFile(ogImage.slice(ORIGIN.length))) {
+		errors.push(`${rel}: og:image does not resolve to a file (${ogImage})`);
+	}
+	if (!/<meta name="robots" content="[^"]+"/.test(html)) {
+		errors.push(`${rel}: missing robots directive`);
 	}
 
 	for (const match of html.matchAll(/(?:href|src)="(\/[^"]*)"/g)) {
 		const target = match[1] ?? '';
 		if (!resolvesToFile(target)) {
 			errors.push(`${rel}: broken internal reference "${target}"`);
+		}
+	}
+
+	// Anchor text has to describe the destination on its own: it is what
+	// search engines attribute to the target page, and what a screen
+	// reader announces when a user tabs through links out of context.
+	// This is the blocklist Lighthouse's "link-text" audit uses.
+	for (const match of html.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a\s*>/g)) {
+		const text = (match[1] ?? '')
+			.replace(/<[^>]+>/g, ' ')
+			.replace(/&[a-z]+;/g, ' ')
+			.replace(/\s+/g, ' ')
+			.trim()
+			.toLowerCase();
+		if (NON_DESCRIPTIVE_LINK_TEXT.has(text)) {
+			errors.push(`${rel}: non-descriptive link text "${text}"`);
 		}
 	}
 
@@ -178,6 +300,19 @@ for (const name of ['sitemap.xml', 'blog-sitemap.xml']) {
 		}
 		if (!resolvesToFile(url.slice(ORIGIN.length) || '/')) {
 			errors.push(`${name}: URL does not resolve to a file: ${url}`);
+		}
+	}
+	for (const match of xml.matchAll(/<lastmod>([^<]*)<\/lastmod>/g)) {
+		if (!/^\d{4}-\d{2}-\d{2}$/.test(match[1] ?? '')) {
+			errors.push(`${name}: malformed lastmod "${match[1] ?? ''}"`);
+		}
+	}
+	// A sitemap alternate that disagrees with the page's own hreflang is
+	// worse than none: search engines treat the pair as a conflict.
+	for (const match of xml.matchAll(/hreflang="([^"]+)" href="([^"]+)"/g)) {
+		const url = match[2] ?? '';
+		if (!resolvesToFile(url.slice(ORIGIN.length) || '/')) {
+			errors.push(`${name}: dead hreflang alternate ${url}`);
 		}
 	}
 }

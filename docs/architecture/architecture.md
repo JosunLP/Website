@@ -23,9 +23,15 @@ CSP-strict HTML beats client rendering for a portfolio, and there is no
 server. The bQuery `view` directive system was rejected because it needs
 `unsafe-eval` (or a compile step) under CSP.
 
-Build order: `generate:blog-manifest` → `generate:blog-sitemap` →
-`vite build` → `prerender` → `postbuild` (copy `content/blog/`, root
-sitemap, top-level 404).
+Build order:
+
+1. `generate:og-image` — the social preview card
+2. `generate:blog-manifest`, `generate:blog-sitemap`,
+   `generate:blog-feeds`
+3. `vite build` — hashed client assets + manifest
+4. `prerender` — every route to a real `.html` file
+5. `postbuild` — copy `content/blog/`, root sitemap, top-level 404
+6. `precompress` — `.br`/`.gz` siblings for every text file
 
 ## 2. bQuery.js module usage
 
@@ -71,8 +77,10 @@ src/
   styles/         Tailwind + design tokens
   utils/          html templating
 scripts/          build pipeline (prerender, generators, validate, dev)
+  lib/            shared build helpers, incl. the SVG→PNG rasterizer
 content/blog/     public Markdown content + generated manifest
-public/           static assets (favicons, logos, robots, blog sitemap)
+public/           static assets (favicons, logos, robots, blog sitemap,
+                  generated og-image.png)
 tests/            Vitest suites incl. tests/a11y (axe-core)
 examples/hosting/ Apache/nginx reference configs
 ```
@@ -137,13 +145,28 @@ examples/hosting/ Apache/nginx reference configs
 ## 7. SEO model
 
 - One `h1` per page, semantic landmarks, localized titles and meta
-  descriptions, canonical URLs, `hreflang`, Open Graph, Twitter Cards.
-- JSON-LD: `Person`, `WebSite`, `WebPage`, `BreadcrumbList`,
-  `SoftwareSourceCode` (projects), `Blog`, `BlogPosting` — all generated
-  from the same typed data as the visible content.
-- `sitemap.xml` (static pages, generated in postbuild) +
+  descriptions, canonical URLs, `hreflang`, Open Graph, Twitter Cards,
+  `article:*` metadata on posts, and an explicit robots directive
+  (`max-image-preview:large` on indexable pages).
+- JSON-LD is emitted as **one `@graph` per page** whose nodes reference
+  each other by `@id` — `Person` and `WebSite` under site-wide ids, plus
+  the page (`WebPage`/`AboutPage`/`ProfilePage`/`ContactPage`/
+  `CollectionPage`), its `BreadcrumbList`, and whatever the page adds
+  (`SoftwareSourceCode` + `ItemList` on projects, `Blog` + `BlogPosting`
+  on the blog). Repeating the same Person object per page would let
+  search engines treat each page as a separate entity; shared ids merge
+  them. All of it is generated from the same typed data as the visible
+  content, and `validate-dist.ts` fails the build on a dangling `@id`.
+- The social preview card at `/og-image.png` is generated at build time
+  from the real logo geometry and the design tokens
+  (`scripts/generate-og-image.ts`), so link previews are a branded
+  1200×630 `summary_large_image` rather than a scaled favicon.
+- `sitemap.xml` (static pages, generated in postbuild, with `lastmod`
+  taken from the last commit touching each page's content sources) +
   `blog-sitemap.xml` (generated from Markdown sources) + `robots.txt`
   referencing both. `noindex` on the 404 pages and the article shell.
+- Articles link to their newer and older neighbour, so every post is
+  reachable from another post rather than only from the index.
 - `hreflang="x-default"` names `/` — the language-decision page — for the
   entry points it decides between, and the German equivalent everywhere
   else, where no locale-neutral page exists.
@@ -154,7 +177,34 @@ examples/hosting/ Apache/nginx reference configs
   including that highlight.js classes reaching the HTML have matching
   rules in the stylesheet.
 
-## 8. Accessibility strategy
+## 8. Performance budget
+
+Nothing on the critical path is negotiable, so it is kept small by
+construction rather than by optimization passes:
+
+- **No network cost for typography or third parties.** System font stack,
+  zero external requests, zero trackers.
+- **No image requests for the site mark.** The logo is inlined once per
+  document as an SVG `<symbol>` and referenced with `<use>`. The previous
+  light/dark `<img>` pair cost two requests per placement — browsers
+  fetch both files even though CSS hides one.
+- **Chunks follow routes, not convenience.** `bootstrap` (~3 kB gzip) is
+  the only script on most pages. The blog index loads `blog-index`, which
+  deliberately excludes the client-side article renderer; the article
+  shell loads `article`; prerendered posts load only `article-tools`.
+  `marked` and highlight.js stay behind dynamic imports and never reach a
+  page that does not render Markdown in the browser.
+- **Shared chunks are preloaded, not discovered.** The prerenderer reads
+  Vite's manifest and emits `<link rel="modulepreload">` for the
+  transitive imports of a page's entries.
+- **Compression happens once, at build time.** `scripts/precompress.ts`
+  writes maximum-quality `.br` and `.gz` siblings for every text file
+  (≈ −79 %), so a static host spends no CPU per request.
+- Two deliberate omissions — `<link rel="expect" blocking="render">` and
+  speculation rules — are documented at their absence in
+  `src/render/layout.ts`; both measured worse on these pages.
+
+## 9. Accessibility strategy
 
 Target: WCAG 2.2 AA. Implemented: skip link, visible focus indicators,
 full keyboard support, focus trap only while the mobile menu is open
@@ -166,7 +216,7 @@ rendered representative pages (`tests/a11y`). Color contrast is validated
 against the design tokens manually since jsdom computes no styles; the
 accessibility statement documents remaining limitations honestly.
 
-## 9. Security and privacy decisions
+## 10. Security and privacy decisions
 
 - Markdown is untrusted: `marked` renders with raw HTML escaped to text,
   then everything passes bQuery `sanitizeHtml` (allow-list; no scripts,
@@ -183,7 +233,7 @@ accessibility statement documents remaining limitations honestly.
 - Local preferences (`jp:locale`, `jp:theme`) are stored only after an
   explicit user action and documented in the privacy policy.
 
-## 10. Deployment and content-upload workflow
+## 11. Deployment and content-upload workflow
 
 See [../deployment.md](../deployment.md) (host setup, rewrites, caching)
 and [../blog-content-workflow.md](../blog-content-workflow.md)

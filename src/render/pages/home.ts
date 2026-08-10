@@ -1,11 +1,7 @@
 import { OWNER, pagePath } from '@/app/configuration';
 import type { BlogManifestEntry } from '@/domain/models/blog';
-import {
-	breadcrumbJsonLd,
-	personJsonLd,
-	webSiteJsonLd,
-} from '@/domain/services/seo';
-import { FOCUS_AREAS } from '@/content/skills';
+import { ENTITY_ID, pageGraphJsonLd } from '@/domain/services/seo';
+import { FOCUS_AREAS, expertiseTopics } from '@/content/skills';
 import {
 	PROJECTS,
 	featuredProjects,
@@ -169,6 +165,8 @@ export function renderHomePage(
 										alt="${formatMessage(messages.projects.logoAlt, { name: flagship.name })}"
 										width="96"
 										height="96"
+										loading="lazy"
+										decoding="async"
 										class="hidden h-24 w-24 shrink-0 sm:block"
 									/>
 								</div>
@@ -274,18 +272,29 @@ export function renderHomePage(
 		</div>
 	`;
 
+	const meta = {
+		locale,
+		path: ctx.path,
+		title: messages.home.title,
+		description: messages.home.description,
+	};
 	return {
 		meta: {
-			locale,
-			path: ctx.path,
-			title: messages.home.title,
-			description: messages.home.description,
+			...meta,
 			jsonLd: [
-				personJsonLd(),
-				webSiteJsonLd(locale),
-				breadcrumbJsonLd([
-					{ name: messages.nav.home, path: pagePath(locale, 'home') },
-				]),
+				pageGraphJsonLd({
+					meta,
+					// The home page is the site's canonical description of the
+					// person; every other page's Person node points back at it.
+					pageType: 'ProfilePage',
+					mainEntity: ENTITY_ID.person,
+					about: ENTITY_ID.person,
+					personDescription: messages.home.description,
+					knowsAbout: expertiseTopics(),
+					breadcrumb: [
+						{ name: messages.nav.home, path: pagePath(locale, 'home') },
+					],
+				}),
 			],
 		},
 		main,

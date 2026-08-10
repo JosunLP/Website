@@ -1,7 +1,11 @@
 import { readFileSync, existsSync } from 'node:fs';
-import { createServer as createHttpServer } from 'node:http';
+import {
+	createServer as createHttpServer,
+	type IncomingMessage,
+} from 'node:http';
 import { join } from 'node:path';
 import { createServer as createViteServer } from 'vite';
+import { SITE_ORIGIN } from '@/app/configuration';
 import { installDomGlobals } from './lib/dom-globals';
 import type * as SiteModule from '@/render/site';
 import type * as MarkdownModule from '@/domain/services/markdown';
@@ -104,6 +108,33 @@ async function renderPath(path: string): Promise<string | null> {
 	return render === undefined ? null : render();
 }
 
+/**
+ * Rewrites production-absolute URLs to the origin that actually served
+ * the request.
+ *
+ * Canonical, hreflang, `og:url` and the JSON-LD `@id`s are built from
+ * {@link SITE_ORIGIN} because that is what they must say in production.
+ * Served from `localhost` or a forwarded tunnel they instead make every
+ * auditing tool report a canonical pointing at a foreign domain — a
+ * finding about the preview, not about the site, and one that hides the
+ * real ones behind it. Only fully qualified occurrences are rewritten, so
+ * prose mentioning the bare domain is left alone.
+ */
+function withRequestOrigin(html: string, req: IncomingMessage): string {
+	const host = req.headers.host;
+	if (host === undefined || host === '') {
+		return html;
+	}
+	const forwarded = req.headers['x-forwarded-proto'];
+	const protocol =
+		(Array.isArray(forwarded) ? forwarded[0] : forwarded)?.split(',')[0] ??
+		(host.startsWith('localhost') || host.startsWith('127.0.0.1')
+			? 'http'
+			: 'https');
+	const origin = `${protocol}://${host}`;
+	return origin === SITE_ORIGIN ? html : html.replaceAll(SITE_ORIGIN, origin);
+}
+
 const server = createHttpServer((req, res) => {
 	const url = (req.url ?? '/').split('?')[0] ?? '/';
 
@@ -147,7 +178,7 @@ const server = createHttpServer((req, res) => {
 			if (html !== null) {
 				const transformed = await vite.transformIndexHtml(path, html);
 				res.setHeader('content-type', 'text/html; charset=utf-8');
-				res.end(transformed);
+				res.end(withRequestOrigin(transformed, req));
 				return;
 			}
 			// Not a page — let Vite serve module/asset requests.

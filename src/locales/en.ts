@@ -132,7 +132,7 @@ export const en: AppMessages = {
 		},
 	},
 	blog: {
-		title: 'Blog — Jonas Pfalzgraf',
+		title: 'Blog by Jonas Pfalzgraf — TypeScript and tooling',
 		description:
 			'Articles by Jonas Pfalzgraf on TypeScript, web engineering, open source, and developer experience.',
 		heading: 'Blog',
@@ -157,6 +157,12 @@ export const en: AppMessages = {
 		copyCodeFailed: 'Copy failed',
 		headingLink: 'Link to this section',
 		readingProgress: 'Reading progress',
+		shellTitle: 'Blog article — Jonas Pfalzgraf',
+		shellDescription:
+			'This address loads a blog article published after the last build. The article itself is reachable under its own URL.',
+		moreReading: 'Keep reading',
+		newerPost: 'Newer post',
+		olderPost: 'Older post',
 	},
 	contact: {
 		title: 'Contact — Jonas Pfalzgraf',
@@ -175,6 +181,8 @@ export const en: AppMessages = {
 	},
 	notFound: {
 		title: 'Page not found — JosunLP.de',
+		description:
+			'This address does not lead to a page on josunlp.de. Use the navigation or the home page to get back to the projects, blog and contact pages.',
 		heading: 'Page not found',
 		text: 'The requested page does not exist or has been moved.',
 		backHome: 'Back to the home page',

@@ -1,12 +1,11 @@
 import { registerArticleTools } from '@/components/article-tools';
 import { registerBlogArticle } from '@/components/blog-article';
-import { registerBlogList } from '@/components/blog-list';
 
 /**
- * Blog entry chunk, loaded only on blog routes: manifest-driven listing
- * refresh, client-side rendering of posts uploaded after the build, and
- * the reading affordances layered onto article pages.
+ * Article-shell chunk, loaded only on the client-side article route:
+ * rendering of posts uploaded after the build, plus the reading
+ * affordances layered onto the result. The blog index has its own,
+ * smaller chunk (see `blog-index.ts`).
  */
-registerBlogList();
 registerBlogArticle();
 registerArticleTools();

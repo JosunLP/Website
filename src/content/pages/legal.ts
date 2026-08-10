@@ -31,8 +31,8 @@ export const IMPRINT: LegalPageContent = {
 		en: 'Imprint — Jonas Pfalzgraf',
 	},
 	metaDescription: {
-		de: 'Impressum und Anbieterkennzeichnung von josunlp.de.',
-		en: 'Legal notice (Impressum) and provider identification for josunlp.de.',
+		de: 'Impressum und Anbieterkennzeichnung von josunlp.de — verantwortlich für Inhalt und Betrieb dieser Website ist Jonas Pfalzgraf (JosunLP).',
+		en: 'Legal notice (Impressum) and provider identification for josunlp.de — the person responsible for the content and operation of this website.',
 	},
 	heading: { de: 'Impressum', en: 'Imprint' },
 	reviewedAt: '2026-07-10',

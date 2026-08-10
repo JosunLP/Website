@@ -14,6 +14,7 @@ import type { AppMessages } from '@/features/i18n/messages';
 import { VIEW_TRANSITION_TYPES_SNIPPET } from '@/features/navigation/view-transition-types';
 import { THEME_INIT_SNIPPET } from '@/features/theme/theme-init';
 import { escape, html, raw, type SafeHtml } from '@/utils/html';
+import { LOGO_SPRITE, siteLogo } from './logo';
 import { externalLink } from './ui';
 
 /**
@@ -140,20 +141,7 @@ function siteHeader(ctx: RenderContext): SafeHtml {
 				href="${pagePath(locale, 'home')}"
 				class="flex min-w-0 items-center gap-2.5 text-lg font-semibold tracking-tight sm:gap-3"
 			>
-				<img
-					src="/images/logo-jonas-light.svg"
-					alt=""
-					width="40"
-					height="40"
-					class="h-9 w-9 shrink-0 dark:hidden sm:h-10 sm:w-10"
-				/>
-				<img
-					src="/images/logo-jonas-dark.svg"
-					alt=""
-					width="40"
-					height="40"
-					class="hidden h-9 w-9 shrink-0 dark:block sm:h-10 sm:w-10"
-				/>
+				${siteLogo(40, 'h-9 w-9 shrink-0 sm:h-10 sm:w-10')}
 				<span class="min-w-0 truncate">
 					${messages.siteName}
 					<span
@@ -250,20 +238,7 @@ function siteFooter(ctx: RenderContext): SafeHtml {
 		>
 			<div class="space-y-3">
 				<div class="flex items-center gap-2.5">
-					<img
-						src="/images/logo-jonas-light.svg"
-						alt=""
-						width="32"
-						height="32"
-						class="h-8 w-8 dark:hidden"
-					/>
-					<img
-						src="/images/logo-jonas-dark.svg"
-						alt=""
-						width="32"
-						height="32"
-						class="hidden h-8 w-8 dark:block"
-					/>
+					${siteLogo(32, 'h-8 w-8')}
 					<p class="text-ink dark:text-snow font-semibold">
 						${messages.siteName}
 					</p>
@@ -370,8 +345,8 @@ export function renderDocument(
 		)
 		.join('\n\t\t');
 	const body = options.bare
-		? html`${main}`
-		: html`<a
+		? html`${LOGO_SPRITE}${main}`
+		: html`${LOGO_SPRITE}<a
 					href="#main-content"
 					class="focus:bg-accent sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-full focus:px-4 focus:py-2 focus:text-white"
 					>${messages.skipToContent}</a

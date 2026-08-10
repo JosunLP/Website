@@ -23,6 +23,15 @@ function countWords(text: string): number {
 }
 
 /**
+ * Prose word count of a Markdown body, excluding fenced code. Feeds
+ * `wordCount` in structured data, where the value is meant to describe
+ * the article text rather than its listings.
+ */
+export function estimateWordCount(markdown: string): number {
+	return countWords(markdown.replace(FENCED_CODE, ' '));
+}
+
+/**
  * Estimates how many minutes a Markdown post takes to read. Always at
  * least one minute — "0 min read" reads like a rendering bug.
  */

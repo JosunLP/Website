@@ -16,7 +16,7 @@ export function renderNotFoundPage(ctx: RenderContext): RenderedPage {
 			locale,
 			path: `/${locale}/404.html`,
 			title: messages.notFound.title,
-			description: messages.notFound.text,
+			description: messages.notFound.description,
 			noindex: true,
 		},
 		main: html`

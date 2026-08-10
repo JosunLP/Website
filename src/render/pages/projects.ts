@@ -1,9 +1,9 @@
 import { pagePath } from '@/app/configuration';
 import { PROJECTS, flagshipProject } from '@/content/projects';
 import {
-	breadcrumbJsonLd,
+	absoluteUrl,
+	pageGraphJsonLd,
 	projectJsonLd,
-	webPageJsonLd,
 } from '@/domain/services/seo';
 import { formatMessage } from '@/features/i18n';
 import type { RenderContext } from '@/render/layout';
@@ -90,6 +90,8 @@ export function renderProjectsPage(ctx: RenderContext): RenderedPage {
 									alt="${formatMessage(messages.projects.logoAlt, { name: flagship.name })}"
 									width="96"
 									height="96"
+									loading="lazy"
+									decoding="async"
 									class="hidden h-24 w-24 shrink-0 sm:block"
 								/>
 							</div>
@@ -105,21 +107,45 @@ export function renderProjectsPage(ctx: RenderContext): RenderedPage {
 		</div>
 	`;
 
+	// Flagship first, matching the visible order — `ItemList` positions are
+	// a ranking signal, so they must agree with what the page shows.
+	const ordered = flagship === undefined ? rest : [flagship, ...rest];
+	const projectNodes = ordered.map((project) =>
+		projectJsonLd({
+			name: project.name,
+			description: project.description[locale],
+			repositoryUrl: project.repositoryUrl,
+			...(project.websiteUrl !== undefined
+				? { websiteUrl: project.websiteUrl }
+				: {}),
+			technologies: project.technologies,
+			license: project.license,
+		}),
+	);
+	const itemList = {
+		'@type': 'ItemList',
+		'@id': `${absoluteUrl(ctx.path)}#projects`,
+		name: messages.projects.heading,
+		numberOfItems: ordered.length,
+		itemListOrder: 'https://schema.org/ItemListOrderAscending',
+		itemListElement: projectNodes.map((node, index) => ({
+			'@type': 'ListItem',
+			position: index + 1,
+			item: { '@id': (node as { '@id': string })['@id'] },
+		})),
+	};
+
 	return {
 		meta: {
 			...meta,
 			jsonLd: [
-				webPageJsonLd(meta),
-				breadcrumbJsonLd(trail),
-				...PROJECTS.map((project) =>
-					projectJsonLd({
-						name: project.name,
-						description: project.description[locale],
-						repositoryUrl: project.repositoryUrl,
-						technologies: project.technologies,
-						license: project.license,
-					}),
-				),
+				pageGraphJsonLd({
+					meta,
+					pageType: 'CollectionPage',
+					breadcrumb: trail,
+					mainEntity: itemList['@id'],
+					nodes: [itemList, ...projectNodes],
+				}),
 			],
 		},
 		main,

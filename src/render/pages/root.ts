@@ -1,6 +1,8 @@
 import { OWNER } from '@/app/configuration';
-import { personJsonLd } from '@/domain/services/seo';
+import { expertiseTopics } from '@/content/skills';
+import { ENTITY_ID, pageGraphJsonLd } from '@/domain/services/seo';
 import type { RenderContext } from '@/render/layout';
+import { siteLogo } from '@/render/logo';
 import { html } from '@/utils/html';
 import type { RenderedPage } from './types';
 
@@ -11,14 +13,24 @@ import type { RenderedPage } from './types';
  * visible immediately — nobody is trapped.
  */
 export function renderRootPage(ctx: RenderContext): RenderedPage {
+	const meta = {
+		locale: ctx.locale,
+		path: '/',
+		title: `${OWNER.name} — ${OWNER.alias}`,
+		description:
+			'Jonas Pfalzgraf (JosunLP), Full-Stack-Entwickler und Open-Source-Maintainer. Diese Website gibt es auf Deutsch und Englisch. / Also available in English.',
+	};
 	return {
 		meta: {
-			locale: ctx.locale,
-			path: '/',
-			title: `${OWNER.name} — ${OWNER.alias}`,
-			description:
-				'Jonas Pfalzgraf (JosunLP) — Full-Stack Developer & Open Source. Diese Seite ist auf Deutsch und Englisch verfügbar. / This site is available in German and English.',
-			jsonLd: [personJsonLd()],
+			...meta,
+			jsonLd: [
+				pageGraphJsonLd({
+					meta,
+					mainEntity: ENTITY_ID.person,
+					about: ENTITY_ID.person,
+					knowsAbout: expertiseTopics(),
+				}),
+			],
 		},
 		main: html`
 			<main
@@ -26,20 +38,7 @@ export function renderRootPage(ctx: RenderContext): RenderedPage {
 				class="flex min-h-screen items-center justify-center px-4"
 			>
 				<div class="max-w-md space-y-8 text-center">
-					<img
-						src="/images/logo-jonas-light.svg"
-						alt=""
-						width="96"
-						height="96"
-						class="mx-auto h-24 w-24 dark:hidden"
-					/>
-					<img
-						src="/images/logo-jonas-dark.svg"
-						alt=""
-						width="96"
-						height="96"
-						class="mx-auto hidden h-24 w-24 dark:block"
-					/>
+					${siteLogo(96, 'mx-auto h-24 w-24')}
 					<h1 class="text-3xl font-semibold tracking-tight">${OWNER.name}</h1>
 					<p class="text-ink-muted dark:text-snow-muted">
 						<span lang="de"

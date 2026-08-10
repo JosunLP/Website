@@ -49,15 +49,48 @@ bun run dev          # dev server at http://localhost:5173/
 Pages are rendered on the fly through Vite's SSR pipeline; client islands
 and styles are served by the regular Vite dev server.
 
+### Auditing a preview
+
+The dev server rewrites canonical, `hreflang`, `og:url` and the JSON-LD
+`@id`s to the origin that served the request, so Lighthouse and similar
+tools audit the preview instead of reporting "canonical points to a
+different domain" for every page. Two caveats remain, both properties of
+the preview rather than the site:
+
+- **Forwarded ports must be public.** A private Codespaces port answers
+  `/site.webmanifest` and `/robots.txt` with a 302 to `github.dev`, which
+  surfaces as a CORS error in the console and an invalid `robots.txt` in
+  the report.
+- **Dev-server performance is not production performance.** Modules are
+  unbundled and unminified with no compression. Measure performance
+  against `bun run build && bun run preview` — but note that `preview`
+  serves the real build, whose canonical URLs correctly name
+  `josunlp.de`. A canonical finding there is the audit doing its job, not
+  a defect.
+
+So: audit **SEO** against `bun run dev`, and **performance** against
+`bun run preview`. Restart the dev server after pulling changes to it —
+the origin rewrite only applies to a server started afterwards.
+
 ## Build
 
 ```bash
-bun run build        # manifest + sitemaps + assets + prerendered HTML → dist/
+bun run build        # social card + manifest + sitemaps + assets +
+                     # prerendered HTML + precompression → dist/
 bun run preview      # serve dist/ locally
 ```
 
 The build fails on invalid project data or broken blog content — by
 design.
+
+Two build steps produce artefacts worth knowing about:
+
+- `generate:og-image` draws `public/og-image.png` (1200×630) from the
+  real logo geometry and the design tokens, with no image toolchain —
+  see [scripts/generate-og-image.ts](scripts/generate-og-image.ts).
+- `precompress` writes maximum-quality `.br` and `.gz` siblings for every
+  text file in `dist/`, so a static host serves compressed bytes without
+  spending CPU per request. Uploading them is optional.
 
 ## Quality checks
 
@@ -82,6 +115,9 @@ bun run generate:blog-manifest
 bun run generate:blog-sitemap
 bun run generate:blog-feeds
 ```
+
+Articles link to their newer and older neighbour, so publishing a post
+also changes the previously newest one — rebuild when that matters.
 
 Posts can be published **without a rebuild** by uploading the Markdown
 file and the regenerated `index.json`, `blog-sitemap.xml`, and

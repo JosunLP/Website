@@ -101,7 +101,7 @@ export function buildRoutes(
 			locale,
 		);
 
-		for (const entry of posts) {
+		for (const [index, entry] of posts.entries()) {
 			const key = `${locale}:${entry.slug}`;
 			const article = blog.articles.get(key);
 			if (article === undefined) {
@@ -112,6 +112,11 @@ export function buildRoutes(
 					candidate.translationKey === entry.translationKey &&
 					candidate.locale !== locale,
 			);
+			// `posts` is newest first, so the lower index is the newer post.
+			const neighbours = {
+				...(posts[index - 1] !== undefined ? { newer: posts[index - 1] } : {}),
+				...(posts[index + 1] !== undefined ? { older: posts[index + 1] } : {}),
+			};
 			add(
 				blogPostPath(locale, entry.slug),
 				(ctx) =>
@@ -120,6 +125,7 @@ export function buildRoutes(
 						article.post,
 						article.rendered,
 						translations,
+						neighbours,
 					),
 				locale,
 			);

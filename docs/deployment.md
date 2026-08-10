@@ -20,7 +20,8 @@ Upload the **contents of `dist/`** to the web root.
 | 404           | Serve `/404.html` for unknown URLs (locale variants exist at `/de/404.html`, `/en/404.html`)                                      |
 | MIME          | Serve `.md` as `text/markdown; charset=utf-8`, `.json` as `application/json`, `feed.xml` as `application/atom+xml; charset=utf-8` |
 | Headers       | Apply the security headers from [security-headers.md](security-headers.md)                                                        |
-| Caching       | `/assets/*` immutable (1 year); HTML, `content/*`, sitemaps, robots `no-cache`                                                    |
+| Caching       | `/assets/*` immutable (1 year); images at stable paths one week; HTML, `content/*`, sitemaps, robots `no-cache`                   |
+| Compression   | Serve the precompressed `.br`/`.gz` siblings, or compress on the fly — see below                                                  |
 
 Reference configurations (review before use):
 
@@ -32,6 +33,20 @@ support, the dynamic-upload blog workflow degrades: uploaded posts are
 reachable from the blog index (client-side list refresh) but deep links
 to them 404 — built posts are unaffected.
 
+### Compression
+
+`bun run build` writes a `.br` and a `.gz` sibling next to every text
+file in `dist/` (HTML, CSS, JS, JSON, XML, SVG, Markdown), compressed at
+maximum quality — roughly 80 % smaller than the original. Servers that
+can serve them do so without spending CPU per request:
+
+- nginx: `gzip_static on;` plus `brotli_static on;` (ngx_brotli)
+- most CDNs pick the siblings up automatically
+
+The Apache example compresses on the fly with `mod_brotli`/`mod_deflate`
+instead; the extra files are ignored there and cost only disk. Uploading
+them is optional — nothing breaks if only the originals are deployed.
+
 ## 3. Directory layout in the web root
 
 ```
@@ -42,7 +57,9 @@ to them 404 — built posts are unaffected.
 /assets/               hashed JS/CSS (immutable)
 /content/blog/         Markdown + index.json (public content contract)
 /images/               logos and other stable-path images
+og-image.png           generated 1200×630 social preview card
 sitemap.xml, blog-sitemap.xml, robots.txt, favicons, site.webmanifest
+*.br, *.gz             precompressed siblings of every text file
 ```
 
 ## 4. Content uploads after deployment
@@ -63,3 +80,7 @@ Publishing a blog post without a rebuild is documented step by step in
    are reachable.
 8. `/de/blog/feed.xml` and `/en/blog/feed.xml` are served as
    `application/atom+xml` and load in a feed reader.
+9. Responses carry `Content-Encoding: br` (or `gzip`) and
+   `Vary: Accept-Encoding`.
+10. `https://josunlp.de/og-image.png` loads, and a link to the site
+    renders a large preview card in a messenger or social network.

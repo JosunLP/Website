@@ -10,8 +10,10 @@
 	},
 	"scripts": {
 		"dev": "bun scripts/dev.ts",
-		"build": "bun run generate:blog-manifest && bun run generate:blog-sitemap && bun run generate:blog-feeds && vite build && bun run prerender && bun scripts/postbuild.ts",
+		"build": "bun run generate:og-image && bun run generate:blog-manifest && bun run generate:blog-sitemap && bun run generate:blog-feeds && vite build && bun run prerender && bun scripts/postbuild.ts && bun run precompress",
 		"prerender": "bun scripts/prerender.ts",
+		"precompress": "bun scripts/precompress.ts",
+		"generate:og-image": "bun scripts/generate-og-image.ts",
 		"generate:csp-hash": "bun scripts/generate-csp-hash.ts",
 		"preview": "vite preview",
 		"typecheck": "tsc --noEmit",

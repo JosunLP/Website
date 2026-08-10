@@ -1,9 +1,6 @@
 import { OWNER, pagePath } from '@/app/configuration';
-import {
-	breadcrumbJsonLd,
-	personJsonLd,
-	webPageJsonLd,
-} from '@/domain/services/seo';
+import { expertiseTopics } from '@/content/skills';
+import { ENTITY_ID, pageGraphJsonLd } from '@/domain/services/seo';
 import type { RenderContext } from '@/render/layout';
 import { breadcrumbs, externalLink } from '@/render/ui';
 import { html } from '@/utils/html';
@@ -71,7 +68,16 @@ export function renderAboutPage(ctx: RenderContext): RenderedPage {
 	return {
 		meta: {
 			...meta,
-			jsonLd: [personJsonLd(), webPageJsonLd(meta), breadcrumbJsonLd(trail)],
+			jsonLd: [
+				pageGraphJsonLd({
+					meta,
+					pageType: 'AboutPage',
+					about: ENTITY_ID.person,
+					personDescription: messages.about.description,
+					knowsAbout: expertiseTopics(),
+					breadcrumb: trail,
+				}),
+			],
 		},
 		main,
 	};

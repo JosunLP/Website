@@ -45,7 +45,11 @@ function createAssetResolver(): AssetResolver {
 	};
 	const styles = new Set<string>();
 	styles.add(`/${chunk('src/styles/main.css').file}`);
-	for (const entry of ['src/app/bootstrap.ts', 'src/app/article.ts']) {
+	for (const entry of [
+		'src/app/bootstrap.ts',
+		'src/app/article.ts',
+		'src/app/blog-index.ts',
+	]) {
 		for (const css of manifest[entry]?.css ?? []) {
 			styles.add(`/${css}`);
 		}

@@ -1,6 +1,6 @@
 import { pagePath, type PageId } from '@/app/configuration';
 import type { LegalPageContent } from '@/content/pages/legal';
-import { breadcrumbJsonLd, webPageJsonLd } from '@/domain/services/seo';
+import { pageGraphJsonLd } from '@/domain/services/seo';
 import { formatIsoDate } from '@/features/i18n';
 import type { RenderContext } from '@/render/layout';
 import { breadcrumbs } from '@/render/ui';
@@ -66,7 +66,7 @@ export function renderLegalPage(
 	return {
 		meta: {
 			...meta,
-			jsonLd: [webPageJsonLd(meta), breadcrumbJsonLd(trail)],
+			jsonLd: [pageGraphJsonLd({ meta, breadcrumb: trail })],
 		},
 		main,
 	};

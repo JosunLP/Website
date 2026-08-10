@@ -1,5 +1,5 @@
 import { OWNER, pagePath } from '@/app/configuration';
-import { breadcrumbJsonLd, webPageJsonLd } from '@/domain/services/seo';
+import { pageGraphJsonLd } from '@/domain/services/seo';
 import type { RenderContext } from '@/render/layout';
 import { breadcrumbs, externalLink } from '@/render/ui';
 import { html } from '@/utils/html';
@@ -78,7 +78,13 @@ export function renderContactPage(ctx: RenderContext): RenderedPage {
 	return {
 		meta: {
 			...meta,
-			jsonLd: [webPageJsonLd(meta), breadcrumbJsonLd(trail)],
+			jsonLd: [
+				pageGraphJsonLd({
+					meta,
+					pageType: 'ContactPage',
+					breadcrumb: trail,
+				}),
+			],
 		},
 		main,
 	};
