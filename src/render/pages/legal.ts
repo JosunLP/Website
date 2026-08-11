@@ -9,8 +9,12 @@ import type { RenderedPage } from './types';
 
 /**
  * Generic renderer for legal pages (imprint, privacy, accessibility
- * statement). Content comes from typed draft templates with visible
- * `[[OWNER: …]]` placeholders — see docs/OWNER_ACTION_REQUIRED.md.
+ * statement). Content comes from typed, owner-supplied copy that is not
+ * legally reviewed — see docs/OWNER_ACTION_REQUIRED.md.
+ *
+ * Paragraphs the owner has not filled in yet are empty strings. They are
+ * dropped here, along with any section left without a paragraph, so an
+ * open item never ships as a heading with nothing under it.
  */
 export function renderLegalPage(
 	ctx: RenderContext,
@@ -35,17 +39,20 @@ export function renderLegalPage(
 				${content.heading[locale]}
 			</h1>
 			${content.sections.map((section, index) => {
-				// The privacy page's local-preferences section is the target of
-				// the footer "Privacy preferences" link.
-				const id =
-					page === 'privacy' && index === 3
-						? 'local-preferences'
-						: `section-${String(index + 1)}`;
+				const paragraphs = section.paragraphs[locale].filter(
+					(paragraph) => paragraph.trim() !== '',
+				);
+				if (paragraphs.length === 0) {
+					return '';
+				}
+				// Numbered ids stay tied to the section's position in the source
+				// so they do not shift when an unanswered section drops out.
+				const id = section.anchor ?? `section-${String(index + 1)}`;
 				return html`<section class="mt-10" aria-labelledby="${id}">
 					<h2 id="${id}" class="text-2xl font-semibold tracking-tight">
 						${section.heading[locale]}
 					</h2>
-					${section.paragraphs[locale].map(
+					${paragraphs.map(
 						(paragraph) =>
 							html`<p
 								class="text-ink-muted dark:text-snow-muted mt-4 leading-relaxed whitespace-pre-line"

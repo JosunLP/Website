@@ -75,24 +75,24 @@ rebuilding instead.
 
 See `docs/OWNER_ACTION_REQUIRED.md`. Highlights: verify imprint address
 sufficiency, name hosting provider + supervisory authority in the privacy
-policy, perform manual a11y tests, have legal pages reviewed — they ship
-as clearly marked draft templates with visible `[[OWNER: …]]`
-placeholders. No personal/legal data was invented.
+policy, perform manual a11y tests, have legal pages reviewed. Unanswered
+items are empty paragraphs that the renderer omits, so they never ship as
+an empty heading. No personal/legal data was invented.
 
-## Test and build results (2026-07-10)
+## Test and build results (2026-08-11)
 
 | Check                  | Result                             |
 | ---------------------- | ---------------------------------- |
 | `bun run typecheck`    | ✅ clean (strict)                  |
 | `bun run lint`         | ✅ 0 problems                      |
 | `bun run format:check` | ✅ clean                           |
-| `bun run test`         | ✅ 86/86 (9 files)                 |
+| `bun run test`         | ✅ 151/151 (16 files)              |
 | `bun run test:a11y`    | ✅ 13 pages, 0 axe violations      |
 | `bun run build`        | ✅ 23 pages + hashed assets        |
 | `bun run validate`     | ✅ 24 HTML files, sitemaps, robots |
 
-Bundle: bootstrap ~8.7 kB (3.4 kB gzip), styles ~26 kB (5.5 kB gzip);
-blog chunk ~114 kB (36 kB gzip) loaded on blog routes only. No remote
+Bundle: bootstrap ~8.7 kB (3.2 kB gzip), styles ~45 kB (9.5 kB gzip);
+blog chunk ~117 kB (39 kB gzip) loaded on blog routes only. No remote
 requests of any kind at runtime except same-origin content fetches.
 
 ## Known limitations

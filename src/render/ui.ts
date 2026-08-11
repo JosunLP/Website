@@ -287,22 +287,6 @@ export function blogCard(
 	</article>`;
 }
 
-/** Note/callout block (used for legal draft notices and blog states). */
-export function callout(
-	content: SafeHtml | string,
-	tone: 'info' | 'warning' = 'info',
-): SafeHtml {
-	const toneClasses =
-		tone === 'warning'
-			? 'border-amber-600/50 bg-amber-50 text-amber-950 dark:border-amber-400/40 dark:bg-amber-950/40 dark:text-amber-100'
-			: 'border-accent/40 bg-accent-soft/50 text-ink dark:border-accent-dark/40 dark:bg-accent-dark-soft/50 dark:text-snow';
-	return html`<div
-		class="${`rounded-card border p-4 text-sm leading-relaxed ${toneClasses}`}"
-	>
-		${content}
-	</div>`;
-}
-
 /** Renders "N min read", or nothing when no estimate is available. */
 export function readingTime(
 	minutes: number | undefined,

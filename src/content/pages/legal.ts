@@ -3,15 +3,26 @@ import type { Localized } from '@/domain/models/locale';
 /**
  * Legal page content (imprint, privacy policy, accessibility statement).
  *
- * IMPORTANT: These are DRAFT TEMPLATES. Placeholders in the form
- * `[[OWNER: …]]` mark information only the site owner can provide and are
- * intentionally visible. Nothing here may be treated as verified legal
- * content before owner/legal review — see docs/OWNER_ACTION_REQUIRED.md.
+ * IMPORTANT: this is owner-supplied copy that has not been reviewed by
+ * legal counsel — see docs/OWNER_ACTION_REQUIRED.md before relying on it.
+ *
+ * A paragraph left empty marks information only the site owner can
+ * supply (a VAT ID, the hosting provider). The renderer drops empty
+ * paragraphs and any section left with none, so an unanswered item is
+ * simply absent from the page instead of shipping as a bare heading —
+ * absent, not answered. The checklist is what tracks them.
  */
 
 export interface LegalSection {
 	readonly heading: Localized<string>;
 	readonly paragraphs: Localized<readonly string[]>;
+	/**
+	 * Stable fragment identifier, for sections that are linked to from
+	 * elsewhere. Set it explicitly rather than relying on the section's
+	 * position: reordering or inserting a section would otherwise move the
+	 * anchor to a different section without anything failing.
+	 */
+	readonly anchor?: string;
 }
 
 export interface LegalPageContent {
@@ -165,6 +176,8 @@ export const PRIVACY: LegalPageContent = {
 			},
 		},
 		{
+			// Target of the footer's "Privacy preferences" link.
+			anchor: 'local-preferences',
 			heading: { de: 'Lokale Einstellungen', en: 'Local preferences' },
 			paragraphs: {
 				de: [

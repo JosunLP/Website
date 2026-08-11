@@ -4,6 +4,7 @@ import {
 	cpSync,
 	existsSync,
 	readdirSync,
+	rmSync,
 	writeFileSync,
 } from 'node:fs';
 import { join } from 'node:path';
@@ -17,7 +18,8 @@ import { alternatePaths } from '@/app/routes';
  * 1. copy `content/blog/` into `dist/` (Markdown + manifest are public),
  * 2. generate the root `sitemap.xml` for all static pages,
  * 3. place the top-level `404.html` (German copy with visible language
- *    links; locale-specific variants live at /{locale}/404.html).
+ *    links; locale-specific variants live at /{locale}/404.html),
+ * 4. drop Vite's build manifest, which `prerender.ts` has already read.
  */
 const DIST = join(process.cwd(), 'dist');
 
@@ -123,6 +125,13 @@ const de404 = join(DIST, 'de', '404.html');
 if (existsSync(de404)) {
 	copyFileSync(de404, join(DIST, '404.html'));
 }
+
+// 4. `dist/.vite/manifest.json` is build scaffolding: prerender.ts has
+// resolved every hashed asset URL from it by now, and nothing at runtime
+// reads it. Shipping it would publish the module graph — every entry,
+// chunk and source path — for no benefit. Removed here rather than in
+// vite.config.ts because the prerender step still needs the file.
+rmSync(join(DIST, '.vite'), { recursive: true, force: true });
 
 console.log(
 	`Postbuild done: sitemap.xml (${String(paths.length)} URLs), blog content copied, 404.html placed.`,

@@ -91,8 +91,10 @@ examples/hosting/ Apache/nginx reference configs
   localized descriptions, curated by hand and validated at build time.
   No GitHub API at runtime (rate limits, privacy, SEO stability).
 - **Pages**: copy lives in typed locale dictionaries; legal pages are
-  structured `LegalPageContent` templates with explicit `[[OWNER: …]]`
-  placeholders.
+  structured `LegalPageContent` records whose empty paragraphs mark
+  owner-supplied information that is still missing. The renderer omits
+  them, and any section left without a paragraph, so nothing ships as a
+  bare heading — see [../OWNER_ACTION_REQUIRED.md](../OWNER_ACTION_REQUIRED.md).
 - **Blog**: Markdown + YAML front matter under `content/blog/{locale}/`;
   public contract documented in
   [../blog-content-workflow.md](../blog-content-workflow.md).
