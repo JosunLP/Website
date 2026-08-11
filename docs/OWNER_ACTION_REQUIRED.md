@@ -69,8 +69,34 @@ Ko-fi (`ko-fi.com/josunlp`).
       every push to `main`.
 - [ ] Confirm `server-dir: website/` in that workflow matches the web
       root on the target host.
+- [ ] Merge the release branch into `main`: the deploy workflow only runs
+      on pushes to `main`, so nothing ships until it lands there.
+- [ ] `LICENSE` reads `Copyright (c) 2024`. Decide whether to leave the
+      year of first publication or widen it.
 
-## 7. Accessibility review checklist (recurring)
+## 7. Project licence claims (`src/content/projects.ts`)
+
+Checked against each repository on 2026-08-11. Two entries do not match
+what the repository actually says, and only you can resolve them —
+either by changing the repository or by changing the claim:
+
+- [ ] **planning-poker** — the site states `license: 'MIT'`, but the
+      repository has no licence file on any branch, so GitHub reports
+      none. Without one the code is "all rights reserved" by default and
+      the site's claim is not backed by anything. Add a licence file, or
+      correct the entry.
+- [ ] **sort-it-now** — the site states `license: 'See repository'`; the
+      repository ships a **Non-Commercial Source License (NCSL) v1.0**.
+      Naming it outright would be more useful than the pointer, and it is
+      worth checking against the "MIT-like licences" phrasing in the
+      about page (`src/locales/{de,en}.ts` → `about.ossText`) and the
+      README, which NCSL is not.
+
+The other six entries (bQuery, ThreadTS Universal, UserScriptProject-
+Template, BrowserExtensionTemplate, checkai, retro-rumble) carry MIT on
+both sides and match.
+
+## 8. Accessibility review checklist (recurring)
 
 - [ ] Keyboard-only pass over all pages (focus visible, no traps, menu
       Escape works).
