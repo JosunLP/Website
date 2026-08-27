@@ -66,29 +66,28 @@ function isStringArray(value: unknown): value is string[] {
 	);
 }
 
-/**
- * Validates unknown data as front matter. Returns a list of problems;
- * an empty list means the value is a valid {@link BlogFrontMatter}.
- */
-export function validateFrontMatter(value: unknown): string[] {
-	const errors: string[] = [];
-	if (typeof value !== 'object' || value === null) {
-		return ['front matter is not an object'];
-	}
-	const data = value as Record<string, unknown>;
-	for (const key of [
-		'title',
-		'description',
-		'publishedAt',
-		'slug',
-		'locale',
-		'translationKey',
-	]) {
-		const field = data[key];
-		if (typeof field !== 'string' || field.trim() === '') {
-			errors.push(`"${key}" must be a non-empty string`);
-		}
-	}
+const REQUIRED_FRONT_MATTER_FIELDS = [
+	'title',
+	'description',
+	'publishedAt',
+	'slug',
+	'locale',
+	'translationKey',
+] as const;
+
+function validateRequiredFields(
+	data: Record<string, unknown>,
+	fields: readonly string[],
+): string[] {
+	return fields.flatMap((key) =>
+		typeof data[key] !== 'string' || data[key].trim() === ''
+			? [`"${key}" must be a non-empty string`]
+			: [],
+	);
+}
+
+function validateFrontMatterDetails(data: Record<string, unknown>): string[] {
+	const errors = validateRequiredFields(data, REQUIRED_FRONT_MATTER_FIELDS);
 	if (
 		typeof data.publishedAt === 'string' &&
 		!ISO_DATE.test(data.publishedAt)
@@ -105,8 +104,13 @@ export function validateFrontMatter(value: unknown): string[] {
 		errors.push(`"slug" must be kebab-case, got "${data.slug}"`);
 	}
 	if (typeof data.locale === 'string' && !isLocale(data.locale)) {
-		errors.push(`"locale" must be one of the supported locales`);
+		errors.push('"locale" must be one of the supported locales');
 	}
+	return errors;
+}
+
+function validateOptionalFrontMatter(data: Record<string, unknown>): string[] {
+	const errors: string[] = [];
 	if (data.tags !== undefined && !isStringArray(data.tags)) {
 		errors.push('"tags" must be a list of strings');
 	}
@@ -123,6 +127,21 @@ export function validateFrontMatter(value: unknown): string[] {
 		errors.push('"coverImageAlt" is required when "coverImage" is set');
 	}
 	return errors;
+}
+
+/**
+ * Validates unknown data as front matter. Returns a list of problems;
+ * an empty list means the value is a valid {@link BlogFrontMatter}.
+ */
+export function validateFrontMatter(value: unknown): string[] {
+	if (typeof value !== 'object' || value === null) {
+		return ['front matter is not an object'];
+	}
+	const data = value as Record<string, unknown>;
+	return [
+		...validateFrontMatterDetails(data),
+		...validateOptionalFrontMatter(data),
+	];
 }
 
 /** Parses and normalizes validated front-matter data. */

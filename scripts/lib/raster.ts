@@ -19,6 +19,21 @@ export interface Rgb {
 	readonly b: number;
 }
 
+interface Edge {
+	readonly x0: number;
+	readonly y0: number;
+	readonly x1: number;
+	readonly y1: number;
+}
+
+interface Geometry {
+	readonly edges: readonly Edge[];
+	readonly minX: number;
+	readonly maxX: number;
+	readonly minY: number;
+	readonly maxY: number;
+}
+
 /** Vertical sub-samples per pixel row; horizontal coverage is exact. */
 const SUB_ROWS = 4;
 
@@ -60,77 +75,51 @@ export class Canvas {
 	 * logo declares.
 	 */
 	fill(polygons: readonly Polygon[], color: Rgb, opacity = 1): void {
-		const edges: { x0: number; y0: number; x1: number; y1: number }[] = [];
-		let minY = Infinity;
-		let maxY = -Infinity;
-		let minX = Infinity;
-		let maxX = -Infinity;
-		for (const polygon of polygons) {
-			const count = polygon.length / 2;
-			for (let index = 0; index < count; index += 1) {
-				const next = (index + 1) % count;
-				const x0 = polygon[index * 2] ?? 0;
-				const y0 = polygon[index * 2 + 1] ?? 0;
-				const x1 = polygon[next * 2] ?? 0;
-				const y1 = polygon[next * 2 + 1] ?? 0;
-				if (y0 !== y1) {
-					edges.push({ x0, y0, x1, y1 });
-				}
-				minY = Math.min(minY, y0);
-				maxY = Math.max(maxY, y0);
-				minX = Math.min(minX, x0);
-				maxX = Math.max(maxX, x0);
-			}
-		}
-		if (edges.length === 0) {
+		const geometry = geometryOf(polygons);
+		if (geometry === undefined) {
 			return;
 		}
-		const firstRow = Math.max(0, Math.floor(minY));
-		const lastRow = Math.min(this.height - 1, Math.ceil(maxY));
-		const firstCol = Math.max(0, Math.floor(minX));
-		const lastCol = Math.min(this.width - 1, Math.ceil(maxX));
+		const firstRow = Math.max(0, Math.floor(geometry.minY));
+		const lastRow = Math.min(this.height - 1, Math.ceil(geometry.maxY));
+		const firstCol = Math.max(0, Math.floor(geometry.minX));
+		const lastCol = Math.min(this.width - 1, Math.ceil(geometry.maxX));
 		if (lastRow < firstRow || lastCol < firstCol) {
 			return;
 		}
+		for (let y = firstRow; y <= lastRow; y += 1) {
+			this.fillRow(y, geometry.edges, firstCol, lastCol, color, opacity);
+		}
+	}
+
+	private fillRow(
+		y: number,
+		edges: readonly Edge[],
+		firstCol: number,
+		lastCol: number,
+		color: Rgb,
+		opacity: number,
+	): void {
 		const coverage = new Float32Array(lastCol - firstCol + 1);
 		const crossings: number[] = [];
-		for (let y = firstRow; y <= lastRow; y += 1) {
-			coverage.fill(0);
-			for (let sub = 0; sub < SUB_ROWS; sub += 1) {
-				const sampleY = y + (sub + 0.5) / SUB_ROWS;
-				crossings.length = 0;
-				for (const edge of edges) {
-					const { x0, y0, x1, y1 } = edge;
-					const inside =
-						y0 <= sampleY ? sampleY < y1 : y1 <= sampleY && sampleY < y0;
-					if (inside) {
-						crossings.push(x0 + ((sampleY - y0) * (x1 - x0)) / (y1 - y0));
-					}
-				}
-				if (crossings.length < 2) {
-					continue;
-				}
-				crossings.sort((a, b) => a - b);
-				for (let pair = 0; pair + 1 < crossings.length; pair += 2) {
-					const spanStart = Math.max(crossings[pair] ?? 0, firstCol);
-					const spanEnd = Math.min(crossings[pair + 1] ?? 0, lastCol + 1);
-					if (spanEnd <= spanStart) {
-						continue;
-					}
-					const from = Math.floor(spanStart);
-					const to = Math.ceil(spanEnd) - 1;
-					for (let x = from; x <= to; x += 1) {
-						const covered = Math.min(spanEnd, x + 1) - Math.max(spanStart, x);
-						if (covered > 0) {
-							const slot = x - firstCol;
-							coverage[slot] = (coverage[slot] ?? 0) + covered / SUB_ROWS;
-						}
-					}
+		for (let sub = 0; sub < SUB_ROWS; sub += 1) {
+			const sampleY = y + (sub + 0.5) / SUB_ROWS;
+			crossings.length = 0;
+			for (const edge of edges) {
+				const inside =
+					edge.y0 <= sampleY
+						? sampleY < edge.y1
+						: edge.y1 <= sampleY && sampleY < edge.y0;
+				if (inside) {
+					crossings.push(
+						edge.x0 +
+							((sampleY - edge.y0) * (edge.x1 - edge.x0)) / (edge.y1 - edge.y0),
+					);
 				}
 			}
-			for (let x = firstCol; x <= lastCol; x += 1) {
-				this.blend(x, y, color, (coverage[x - firstCol] ?? 0) * opacity);
-			}
+			paintCrossings(crossings, coverage, firstCol, lastCol);
+		}
+		for (let x = firstCol; x <= lastCol; x += 1) {
+			this.blend(x, y, color, (coverage[x - firstCol] ?? 0) * opacity);
 		}
 	}
 
@@ -161,6 +150,58 @@ export class Canvas {
 			chunk('IDAT', deflateSync(raw, { level: 9 })),
 			chunk('IEND', Buffer.alloc(0)),
 		]);
+	}
+}
+
+function geometryOf(polygons: readonly Polygon[]): Geometry | undefined {
+	const edges: Edge[] = [];
+	let minY = Infinity;
+	let maxY = -Infinity;
+	let minX = Infinity;
+	let maxX = -Infinity;
+	for (const polygon of polygons) {
+		const count = polygon.length / 2;
+		for (let index = 0; index < count; index += 1) {
+			const next = (index + 1) % count;
+			const x0 = polygon[index * 2] ?? 0;
+			const y0 = polygon[index * 2 + 1] ?? 0;
+			const x1 = polygon[next * 2] ?? 0;
+			const y1 = polygon[next * 2 + 1] ?? 0;
+			if (y0 !== y1) {
+				edges.push({ x0, y0, x1, y1 });
+			}
+			minY = Math.min(minY, y0);
+			maxY = Math.max(maxY, y0);
+			minX = Math.min(minX, x0);
+			maxX = Math.max(maxX, x0);
+		}
+	}
+	return edges.length === 0 ? undefined : { edges, minX, maxX, minY, maxY };
+}
+
+function paintCrossings(
+	crossings: number[],
+	coverage: Float32Array,
+	firstCol: number,
+	lastCol: number,
+): void {
+	if (crossings.length < 2) {
+		return;
+	}
+	crossings.sort((a, b) => a - b);
+	for (let pair = 0; pair + 1 < crossings.length; pair += 2) {
+		const spanStart = Math.max(crossings[pair] ?? 0, firstCol);
+		const spanEnd = Math.min(crossings[pair + 1] ?? 0, lastCol + 1);
+		if (spanEnd <= spanStart) {
+			continue;
+		}
+		for (let x = Math.floor(spanStart); x < Math.ceil(spanEnd); x += 1) {
+			const covered = Math.min(spanEnd, x + 1) - Math.max(spanStart, x);
+			if (covered > 0) {
+				const slot = x - firstCol;
+				coverage[slot] = (coverage[slot] ?? 0) + covered / SUB_ROWS;
+			}
+		}
 	}
 }
 

@@ -304,6 +304,36 @@ export function pageGraphJsonLd(options: PageGraphOptions): object {
 const ROBOTS_INDEXABLE =
 	'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 
+function renderArticleMeta(article: ArticleMeta): string[] {
+	const lines = [
+		`<meta property="article:published_time" content="${escape(article.publishedAt)}">`,
+		`<meta property="article:author" content="${escape(OWNER.gitHubUrl)}">`,
+	];
+	if (article.updatedAt !== undefined) {
+		lines.push(
+			`<meta property="article:modified_time" content="${escape(article.updatedAt)}">`,
+		);
+	}
+	if (article.section !== undefined) {
+		lines.push(
+			`<meta property="article:section" content="${escape(article.section)}">`,
+		);
+	}
+	for (const tag of article.tags ?? []) {
+		lines.push(`<meta property="article:tag" content="${escape(tag)}">`);
+	}
+	return lines;
+}
+
+function renderJsonLd(jsonLd: readonly object[]): string[] {
+	return jsonLd.map((data) => {
+		// JSON-LD scripts are data, not executable code; escape "<" to keep
+		// "</script>" sequences inert inside the script element.
+		const json = JSON.stringify(data).replaceAll('<', '\\u003c');
+		return `<script type="application/ld+json">${json}</script>`;
+	});
+}
+
 /**
  * Renders all head metadata for a page: title, description, canonical,
  * hreflang alternates (de/en/x-default), robots, Open Graph (including
@@ -321,11 +351,12 @@ export function renderHeadMeta(meta: PageMeta): SafeHtml {
 			meta.noindex === true ? 'noindex, follow' : ROBOTS_INDEXABLE
 		}">`,
 	];
-	for (const [locale, path] of Object.entries(alternates)) {
-		lines.push(
-			`<link rel="alternate" hreflang="${locale}" href="${escape(absoluteUrl(path))}">`,
-		);
-	}
+	lines.push(
+		...Object.entries(alternates).map(
+			([locale, path]) =>
+				`<link rel="alternate" hreflang="${locale}" href="${escape(absoluteUrl(path))}">`,
+		),
+	);
 	const ogImage = absoluteUrl(meta.ogImage ?? OG_IMAGE.path);
 	const usesDefaultImage = meta.ogImage === undefined;
 	lines.push(
@@ -359,35 +390,15 @@ export function renderHeadMeta(meta: PageMeta): SafeHtml {
 		`<meta name="twitter:image:alt" content="${escape(meta.title)}">`,
 	);
 	if (meta.ogType === 'article' && meta.article !== undefined) {
-		const { article } = meta;
-		lines.push(
-			`<meta property="article:published_time" content="${escape(article.publishedAt)}">`,
-			`<meta property="article:author" content="${escape(OWNER.gitHubUrl)}">`,
-		);
-		if (article.updatedAt !== undefined) {
-			lines.push(
-				`<meta property="article:modified_time" content="${escape(article.updatedAt)}">`,
-			);
-		}
-		if (article.section !== undefined) {
-			lines.push(
-				`<meta property="article:section" content="${escape(article.section)}">`,
-			);
-		}
-		for (const tag of article.tags ?? []) {
-			lines.push(`<meta property="article:tag" content="${escape(tag)}">`);
-		}
+		lines.push(...renderArticleMeta(meta.article));
 	}
-	for (const locale of Object.keys(alternates)) {
-		if (locale !== meta.locale) {
-			lines.push(`<meta property="og:locale:alternate" content="${locale}">`);
-		}
-	}
-	for (const data of meta.jsonLd ?? []) {
-		// JSON-LD scripts are data, not executable code; escape "<" to keep
-		// "</script>" sequences inert inside the script element.
-		const json = JSON.stringify(data).replaceAll('<', '\\u003c');
-		lines.push(`<script type="application/ld+json">${json}</script>`);
-	}
+	lines.push(
+		...Object.keys(alternates)
+			.filter((locale) => locale !== meta.locale)
+			.map(
+				(locale) => `<meta property="og:locale:alternate" content="${locale}">`,
+			),
+		...renderJsonLd(meta.jsonLd ?? []),
+	);
 	return raw(lines.join('\n\t\t'));
 }
