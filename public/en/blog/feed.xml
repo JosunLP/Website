@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+	<title>Jonas Pfalzgraf — Blog</title>
+	<subtitle>Notes on TypeScript, tooling, and the open web.</subtitle>
+	<link rel="self" type="application/atom+xml" href="https://josunlp.de/en/blog/feed.xml"/>
+	<link rel="alternate" type="text/html" href="https://josunlp.de/en/blog/"/>
+	<id>https://josunlp.de/en/blog/</id>
+	<updated>2026-07-10T00:00:00Z</updated>
+	<author>
+		<name>Jonas Pfalzgraf</name>
+		<uri>https://josunlp.de</uri>
+	</author>
+	<generator uri="https://josunlp.de">josunlp.de</generator>
+	<entry>
+		<title>Rebuilding josunlp.de: a static site with bQuery.js</title>
+		<link rel="alternate" type="text/html" href="https://josunlp.de/en/blog/rebuilding-josunlp-de/"/>
+		<id>tag:josunlp.de,2026-07-10:en/rebuilding-josunlp-de</id>
+		<published>2026-07-10T00:00:00Z</published>
+		<updated>2026-07-10T00:00:00Z</updated>
+		<summary type="text">How this website is built: pre-rendered HTML, bQuery.js islands, a strict CSP, and a Markdown blog that works on plain static hosting.</summary>
+		<category term="TypeScript"/>
+		<category term="bQuery.js"/>
+		<category term="Open Source"/>
+	</entry>
+</feed>
