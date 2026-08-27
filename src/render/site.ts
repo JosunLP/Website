@@ -1,7 +1,7 @@
 import { blogPostPath, pagePath } from '@/app/configuration';
+import { ACCESSIBILITY, IMPRINT, PRIVACY } from '@/content/pages/legal';
 import type { BlogManifestEntry, BlogPost } from '@/domain/models/blog';
 import { LOCALES, type Locale } from '@/domain/models/locale';
-import { ACCESSIBILITY, IMPRINT, PRIVACY } from '@/content/pages/legal';
 import type { RenderedMarkdown } from '@/domain/services/markdown';
 import {
 	createRenderContext,

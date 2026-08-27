@@ -16,9 +16,8 @@
 		"skipLibCheck": true,
 		"noEmit": true,
 		"resolveJsonModule": true,
-		"baseUrl": ".",
 		"paths": {
-			"@/*": ["src/*"]
+			"@/*": ["./src/*"]
 		}
 	},
 	"include": ["src", "scripts", "tests", "vite.config.ts"]
