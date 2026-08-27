@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# The Markdown sources and the blog manifest are a public data contract
+# for the site's own client (posts can be published by upload alone), not
+# pages. Crawled, they would be near-duplicates of the rendered articles.
+Disallow: /content/
+
+Sitemap: https://josunlp.de/sitemap.xml
+Sitemap: https://josunlp.de/blog-sitemap.xml

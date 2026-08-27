@@ -1,0 +1,22 @@
+{
+	"name": "Jonas Pfalzgraf — JosunLP",
+	"short_name": "JosunLP",
+	"description": "Personal portfolio and open-source presence of Jonas Pfalzgraf (JosunLP), full-stack developer and open-source maintainer.",
+	"start_url": "/",
+	"scope": "/",
+	"display": "browser",
+	"theme_color": "#20242f",
+	"background_color": "#fbfaf7",
+	"icons": [
+		{
+			"src": "/android-chrome-192x192.png",
+			"sizes": "192x192",
+			"type": "image/png"
+		},
+		{
+			"src": "/android-chrome-512x512.png",
+			"sizes": "512x512",
+			"type": "image/png"
+		}
+	]
+}

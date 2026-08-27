@@ -1,0 +1,40 @@
+{
+	"version": 1,
+	"generatedAt": "2026-08-10T10:04:22.139Z",
+	"posts": [
+		{
+			"title": "josunlp.de neu gebaut: eine statische Website mit bQuery.js",
+			"description": "Wie diese Website funktioniert: vorgerendertes HTML, bQuery.js-Islands, eine strikte CSP und ein Markdown-Blog auf gewöhnlichem Static Hosting.",
+			"publishedAt": "2026-07-10",
+			"updatedAt": "2026-07-10",
+			"slug": "rebuilding-josunlp-de",
+			"locale": "de",
+			"translationKey": "rebuilding-josunlp-de",
+			"tags": [
+				"TypeScript",
+				"bQuery.js",
+				"Open Source"
+			],
+			"featured": true,
+			"path": "/content/blog/de/rebuilding-josunlp-de.md",
+			"readingMinutes": 2
+		},
+		{
+			"title": "Rebuilding josunlp.de: a static site with bQuery.js",
+			"description": "How this website is built: pre-rendered HTML, bQuery.js islands, a strict CSP, and a Markdown blog that works on plain static hosting.",
+			"publishedAt": "2026-07-10",
+			"updatedAt": "2026-07-10",
+			"slug": "rebuilding-josunlp-de",
+			"locale": "en",
+			"translationKey": "rebuilding-josunlp-de",
+			"tags": [
+				"TypeScript",
+				"bQuery.js",
+				"Open Source"
+			],
+			"featured": true,
+			"path": "/content/blog/en/rebuilding-josunlp-de.md",
+			"readingMinutes": 2
+		}
+	]
+}

@@ -1,0 +1,77 @@
+# Example Apache configuration for josunlp.de (static hosting).
+# Review before use; adjust paths to your document root.
+
+# --- Blog fallback -------------------------------------------------------
+# Blog articles uploaded after a build have no prerendered HTML file.
+# Rewrite unknown /{locale}/blog/{slug}/ URLs to the client-side shell.
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(de|en)/blog/([a-z0-9-]+)/?$ /$1/blog/_article/index.html [L]
+
+# --- Error page ----------------------------------------------------------
+ErrorDocument 404 /404.html
+
+# --- Security headers ----------------------------------------------------
+# See docs/security-headers.md for the rationale and the CSP hash source.
+<IfModule mod_headers.c>
+	Header always set Content-Security-Policy "default-src 'none'; script-src 'self' 'sha256-nTPhegqmvrjZuRuiDtWRYUA0nsamNqLzG7buGcTJGsk=' 'sha256-7sGlICR1u1ehkP45UGXitl7/ffJ1IWxU3psQ/HzGX+M='; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+	Header always set X-Content-Type-Options "nosniff"
+	Header always set Referrer-Policy "strict-origin-when-cross-origin"
+	Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+	# Enable HSTS only when HTTPS is confirmed working, then consider preload.
+	Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# --- Compression ---------------------------------------------------------
+# Apache compresses on the fly here. The .br/.gz siblings the build writes
+# are not used by this configuration: serving them from .htaccess needs a
+# rewrite that has to special-case directory URLs, and getting that subtly
+# wrong ships mislabelled bodies. They exist for nginx (`gzip_static` /
+# `brotli_static`) and for CDNs that pick them up automatically, and are
+# simply ignored here.
+<IfModule mod_brotli.c>
+	AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css
+	AddOutputFilterByType BROTLI_COMPRESS text/javascript application/javascript
+	AddOutputFilterByType BROTLI_COMPRESS application/json application/xml
+	AddOutputFilterByType BROTLI_COMPRESS application/atom+xml image/svg+xml
+	AddOutputFilterByType BROTLI_COMPRESS text/markdown
+</IfModule>
+<IfModule mod_deflate.c>
+	AddOutputFilterByType DEFLATE text/html text/plain text/css
+	AddOutputFilterByType DEFLATE text/javascript application/javascript
+	AddOutputFilterByType DEFLATE application/json application/xml
+	AddOutputFilterByType DEFLATE application/atom+xml image/svg+xml
+	AddOutputFilterByType DEFLATE text/markdown
+</IfModule>
+<IfModule mod_headers.c>
+	Header append Vary Accept-Encoding
+</IfModule>
+
+# --- Caching -------------------------------------------------------------
+# Only /assets/ carries a content hash in its file name, so only /assets/
+# may be immutable. Favicons, logos and the social card live at stable
+# paths and must stay replaceable — a year of immutable caching on those
+# cannot be undone without renaming the files.
+<IfModule mod_expires.c>
+	ExpiresActive On
+	ExpiresByType text/html "access plus 0 seconds"
+	ExpiresByType application/json "access plus 0 seconds"
+	ExpiresByType text/markdown "access plus 0 seconds"
+</IfModule>
+<IfModule mod_headers.c>
+	<FilesMatch "\.(png|webp|avif|svg|ico)$">
+		Header set Cache-Control "public, max-age=604800"
+	</FilesMatch>
+	<FilesMatch "\.(html|json|md|xml|txt)$">
+		Header set Cache-Control "no-cache"
+	</FilesMatch>
+	# Last, so it wins over the extension rules above.
+	<If "%{REQUEST_URI} =~ m#^/assets/#">
+		Header set Cache-Control "public, max-age=31536000, immutable"
+	</If>
+</IfModule>
+
+# --- Content types -------------------------------------------------------
+AddType text/markdown .md
+AddCharset utf-8 .html .css .js .json .md .xml .txt
