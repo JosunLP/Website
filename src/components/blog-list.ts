@@ -3,7 +3,7 @@ import {
 	BlogManifestService,
 	type FetchLike,
 } from '@/domain/services/blog-manifest-service';
-import type { BlogManifestEntry } from '@/domain/models/blog';
+import { blogRowRevision, type BlogManifestEntry } from '@/domain/models/blog';
 import { isLocale, type Locale } from '@/domain/models/locale';
 import { formatIsoDate, formatMessage } from '@/features/i18n/format';
 import * as css from '@/render/classes';
@@ -31,17 +31,31 @@ import { whenIdle } from '@/utils/schedule';
 
 /**
  * True when the rendered rows already match the manifest exactly — same
- * posts, same order. Comparing slugs rather than counts matters when a
- * post is replaced instead of added: an equal count would otherwise be
- * read as "nothing changed" and the stale row would stay on the page.
+ * posts, same order, same displayed content.
+ *
+ * Counts alone would miss a post being replaced rather than added. Slugs
+ * alone would miss an edit to a post that kept its slug, leaving the old
+ * title or summary on the page until the next build — see
+ * {@link blogRowRevision}.
  */
-function sameSlugs(grid: Element, posts: readonly { slug: string }[]): boolean {
-	const rendered = [...grid.querySelectorAll('article')].map(
-		(row) => row.getAttribute('data-slug') ?? '',
-	);
+function rowsMatch(
+	grid: Element,
+	posts: readonly BlogManifestEntry[],
+): boolean {
+	const rendered = [...grid.querySelectorAll('article')].map((row) => [
+		row.getAttribute('data-slug') ?? '',
+		row.getAttribute('data-rev') ?? '',
+	]);
 	return (
 		rendered.length === posts.length &&
-		rendered.every((slug, index) => slug === posts[index]?.slug)
+		rendered.every(([slug, rev], index) => {
+			const post = posts[index];
+			return (
+				post !== undefined &&
+				slug === post.slug &&
+				rev === blogRowRevision(post)
+			);
+		})
 	);
 }
 
@@ -84,6 +98,7 @@ function buildRow(
 ): HTMLElement {
 	const row = element('article', css.ROW);
 	row.dataset.slug = post.slug;
+	row.dataset.rev = blogRowRevision(post);
 	row.dataset.tags = tagAttribute(post.tags);
 
 	const grid = element('div', css.ROW_GRID);
@@ -164,7 +179,7 @@ export function registerBlogList(fetchFn: FetchLike = fetch): void {
 						manifest,
 						localeAttr,
 					);
-					if (grid === null || sameSlugs(grid, posts)) {
+					if (grid === null || rowsMatch(grid, posts)) {
 						return;
 					}
 					const labels: RowLabels = {

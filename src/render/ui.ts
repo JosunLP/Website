@@ -1,4 +1,4 @@
-import type { BlogManifestEntry } from '@/domain/models/blog';
+import { blogRowRevision, type BlogManifestEntry } from '@/domain/models/blog';
 import type { Locale } from '@/domain/models/locale';
 import type { Project } from '@/domain/models/project';
 import { blogPostPath } from '@/app/configuration';
@@ -285,6 +285,7 @@ export function blogCard(
 	// form.
 	return html`<article
 		data-slug="${post.slug}"
+		data-rev="${blogRowRevision(post)}"
 		data-tags="${tagAttribute(post.tags)}"
 		class="${css.ROW}"
 	>

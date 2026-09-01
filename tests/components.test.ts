@@ -3,7 +3,7 @@ import { registerSiteNav } from '@/components/site-nav';
 import { registerThemeToggle } from '@/components/theme-toggle';
 import { registerBlogList } from '@/components/blog-list';
 import { registerTagFilter } from '@/components/tag-filter';
-import type { BlogManifestEntry } from '@/domain/models/blog';
+import { blogRowRevision, type BlogManifestEntry } from '@/domain/models/blog';
 import type { FetchLike } from '@/domain/services/blog-manifest-service';
 import { messagesFor } from '@/features/i18n';
 import { blogCard } from '@/render/ui';
@@ -30,6 +30,9 @@ const MANIFEST = {
 		},
 	],
 };
+
+/** The single manifest post, typed so the revision helper accepts it. */
+const POST: BlogManifestEntry = MANIFEST.posts[0] as BlogManifestEntry;
 
 const manifestFetch: FetchLike = () =>
 	Promise.resolve({
@@ -231,6 +234,45 @@ describe('jp-blog-list', () => {
 		expect(document.querySelector('[data-empty-state]')).toBeNull();
 		expect(document.querySelector('[data-post-count]')!.textContent).toContain(
 			'1 article',
+		);
+	});
+
+	it('refreshes when a post kept its slug but changed its content', async () => {
+		// The no-rebuild workflow also covers editing a published post.
+		// Comparing slugs alone answered "nothing was added or removed",
+		// not "nothing changed", and left the old title on the page.
+		const stale = blogRowRevision({
+			...POST,
+			title: 'Title as built',
+		});
+		document.body.innerHTML = `
+			<jp-blog-list locale="en" ${LIST_LABELS}>
+				<p data-post-count>1 article</p>
+				<div data-post-grid>
+					<article data-slug="uploaded-later" data-rev="${stale}"><h2>Title as built</h2></article>
+				</div>
+			</jp-blog-list>`;
+		await tick(80);
+		const grid = document.querySelector('[data-post-grid]')!;
+		expect(grid.querySelectorAll('article')).toHaveLength(1);
+		expect(grid.textContent).toContain('Uploaded later');
+		expect(grid.textContent).not.toContain('Title as built');
+	});
+
+	it('leaves the page alone when nothing changed', async () => {
+		const rev = blogRowRevision(POST);
+		document.body.innerHTML = `
+			<jp-blog-list locale="en" ${LIST_LABELS}>
+				<p data-post-count>1 article</p>
+				<div data-post-grid>
+					<article data-slug="uploaded-later" data-rev="${rev}"><h2>Server rendered</h2></article>
+				</div>
+			</jp-blog-list>`;
+		await tick(80);
+		// Untouched: re-rendering identical rows would churn the DOM and
+		// announce a change that did not happen.
+		expect(document.querySelector('[data-post-grid]')!.textContent).toContain(
+			'Server rendered',
 		);
 	});
 

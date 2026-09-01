@@ -137,6 +137,11 @@ function themeToggle(messages: AppMessages): SafeHtml {
  * looks impressive in a screenshot and makes running text harder to read
  * in use. A single hairline does the same job of separating the bar from
  * the page.
+ *
+ * The navigation list is rendered collapsed (`hidden … md:flex`) — the
+ * state jp-site-nav would otherwise have to put it in after the first
+ * paint, at the cost of a large layout shift on every mobile load. The
+ * `.no-js` rules in main.css invert it for readers without scripting.
  */
 function siteHeader(ctx: RenderContext): SafeHtml {
 	const { messages, locale } = ctx;
@@ -185,13 +190,6 @@ function siteHeader(ctx: RenderContext): SafeHtml {
 						</svg>
 					</button>
 					<nav aria-label="${messages.nav.mainNavLabel}">
-						${
-							// Rendered collapsed, which is the state jp-site-nav would
-							// otherwise have to put it in after the first paint. See the
-							// `.no-js` rules in main.css for how this stays usable
-							// without scripting.
-							null
-						}
 						<ul
 							id="main-nav"
 							class="hidden flex-wrap items-center gap-x-6 gap-y-1 text-sm md:flex"

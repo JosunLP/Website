@@ -147,7 +147,12 @@ export function registerSiteNav(): void {
 			private async trapWhileOpen(): Promise<void> {
 				try {
 					const { trapFocus } = await import('@bquery/bquery/a11y');
-					if (!this.isOpen() || this.trap !== null) {
+					// `isConnected` matters because disconnectedCallback may have
+					// run while the import was in flight: it released the trap and
+					// will not run again, so installing one here would leave a
+					// focus trap on a detached subtree with nothing left to
+					// release it.
+					if (!this.isConnected || !this.isOpen() || this.trap !== null) {
 						return;
 					}
 					this.trap = trapFocus(this);
