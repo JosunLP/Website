@@ -16,7 +16,13 @@ import {
 } from '@/domain/services/reading-time';
 import { formatMessage } from '@/features/i18n';
 import type { RenderContext } from '@/render/layout';
-import { blogCard, breadcrumbs, postDates, techTags } from '@/render/ui';
+import {
+	blogCard,
+	breadcrumbs,
+	postDates,
+	ROW_LIST,
+	techTags,
+} from '@/render/ui';
 import { html, raw, type SafeHtml } from '@/utils/html';
 import type { RenderedPage } from './types';
 
@@ -45,33 +51,32 @@ export function renderBlogIndexPage(
 		{ name: messages.nav.blog, path: ctx.path },
 	];
 	const main = html`
-		<div class="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+		<div class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
 			${breadcrumbs(trail, messages)}
-			<h1 class="text-4xl font-semibold tracking-tight">
+			<h1 class="jp-display max-w-2xl text-4xl sm:text-6xl">
 				${messages.blog.heading}
 			</h1>
-			<p class="text-ink-muted dark:text-snow-muted mt-4 max-w-2xl text-lg">
+			<p
+				class="text-ink-muted dark:text-snow-muted mt-8 max-w-[52ch] text-lg leading-relaxed"
+			>
 				${messages.blog.intro}
 			</p>
-			<p class="mt-4">
+			<p class="mt-8">
 				<a
 					href="${feedPath(locale)}"
-					class="text-accent dark:text-accent-dark inline-flex min-h-9 items-center gap-2 text-sm font-medium underline underline-offset-2 hover:no-underline"
+					class="jp-link jp-meta inline-flex min-h-9 items-center gap-2"
 					>${raw(FEED_ICON)}${messages.blog.feedLink}</a
 				>
 			</p>
 			<jp-blog-list locale="${locale}">
 				<div data-blog-status aria-live="polite" class="sr-only"></div>
 				<p
-					class="text-ink-muted dark:text-snow-muted mt-8 text-sm"
+					class="jp-label text-ink-muted dark:text-snow-muted mt-20"
 					data-post-count
 				>
 					${formatMessage(messages.blog.postCount, { count: posts.length })}
 				</p>
-				<div
-					class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-					data-post-grid
-				>
+				<div class="${ROW_LIST} mt-4" data-post-grid>
 					${
 						posts.length > 0
 							? posts.map((post) =>
@@ -156,21 +161,18 @@ export function articleToc(
 	return html`<nav
 		aria-labelledby="toc-heading"
 		data-toc
-		class="jp-toc rounded-card border-line dark:border-night-line bg-paper-raised/60 dark:bg-night-raised/50 mt-8 border p-5"
+		class="jp-toc border-line dark:border-night-line mt-12 border-t pt-6"
 	>
-		<h2
-			id="toc-heading"
-			class="text-ink-muted dark:text-snow-muted text-xs font-semibold tracking-widest uppercase"
-		>
+		<h2 id="toc-heading" class="jp-label text-ink-muted dark:text-snow-muted">
 			${messages.blog.tocHeading}
 		</h2>
-		<ol class="text-ink-muted dark:text-snow-muted mt-3 space-y-1 text-sm">
+		<ol class="jp-meta text-ink-muted dark:text-snow-muted mt-4 space-y-1">
 			${rendered.toc.map(
 				(entry) =>
 					html`<li>
 						<a
 							href="#${entry.id}"
-							class="${`jp-toc-link hover:text-accent dark:hover:text-accent-dark block rounded py-1 underline-offset-2 hover:underline${entry.level === 3 ? ' jp-toc-link--sub' : ''}`}"
+							class="${`jp-toc-link hover:text-ink dark:hover:text-snow block py-1${entry.level === 3 ? ' jp-toc-link--sub' : ''}`}"
 							>${entry.text}</a
 						>
 					</li>`,
@@ -194,7 +196,7 @@ export function articleBody(
 ): SafeHtml {
 	const { messages, locale } = ctx;
 	return html`
-		<header class="space-y-4">
+		<header>
 			${breadcrumbs(
 				[
 					{ name: messages.nav.home, path: pagePath(locale, 'home') },
@@ -203,10 +205,8 @@ export function articleBody(
 				],
 				messages,
 			)}
-			<h1 class="text-4xl font-semibold tracking-tight text-balance">
-				${post.title}
-			</h1>
-			${postDates(post, locale, messages)}
+			<h1 class="jp-display text-4xl sm:text-5xl">${post.title}</h1>
+			<div class="mt-6">${postDates(post, locale, messages)}</div>
 			${
 				post.tags.length > 0
 					? techTags(post.tags, messages.blog.tagsLabel)
@@ -214,14 +214,14 @@ export function articleBody(
 			}
 			${
 				translations.length > 0
-					? html`<p class="text-ink-muted dark:text-snow-muted text-sm">
+					? html`<p class="jp-meta text-ink-muted dark:text-snow-muted mt-4">
 							${messages.blog.availableIn}${translations.map(
 								(translation, index) =>
 									html`${index > 0 ? ', ' : ''}<a
 											href="${blogPostPath(translation.locale, translation.slug)}"
 											hreflang="${translation.locale}"
 											lang="${translation.locale}"
-											class="text-accent dark:text-accent-dark underline underline-offset-2 hover:no-underline"
+											class="jp-link"
 											>${messages.language[translation.locale]}</a
 										>`,
 							)}
@@ -230,12 +230,12 @@ export function articleBody(
 			}
 		</header>
 		${articleToc(rendered, messages)}
-		<div class="jp-prose mt-10" data-article-body>${raw(rendered.html)}</div>
-		<footer class="border-line dark:border-night-line mt-14 border-t pt-6">
+		<div class="jp-prose mt-14" data-article-body>${raw(rendered.html)}</div>
+		<footer class="border-line dark:border-night-line mt-16 border-t pt-6">
 			<a
 				href="${pagePath(locale, 'blog')}"
-				class="text-accent dark:text-accent-dark inline-flex min-h-11 items-center text-sm font-medium underline underline-offset-2 hover:no-underline"
-				>← ${messages.blog.backToBlog}</a
+				class="jp-link jp-meta inline-flex min-h-11 items-center gap-2"
+				><span aria-hidden="true">←</span>${messages.blog.backToBlog}</a
 			>
 		</footer>
 	`;
@@ -269,27 +269,24 @@ function articleNeighbourNav(
 	}
 	return html`<nav
 		aria-labelledby="more-reading"
-		class="border-line dark:border-night-line mt-14 border-t pt-8"
+		class="border-line dark:border-night-line mt-16 border-t pt-8"
 	>
-		<h2
-			id="more-reading"
-			class="text-ink-muted dark:text-snow-muted text-xs font-semibold tracking-widest uppercase"
-		>
+		<h2 id="more-reading" class="jp-label text-ink-muted dark:text-snow-muted">
 			${messages.blog.moreReading}
 		</h2>
-		<ul class="mt-4 grid gap-4 sm:grid-cols-2">
+		<ul class="mt-6 grid sm:grid-cols-2 sm:gap-x-10">
 			${entries.map(
 				({ entry, label }) =>
-					html`<li>
+					html`<li class="border-line dark:border-night-line border-t">
 						<a
 							href="${blogPostPath(locale, entry.slug)}"
-							class="jp-card rounded-card border-line dark:border-night-line hover:border-accent dark:hover:border-accent-dark flex h-full flex-col gap-1 border p-4"
+							class="group flex h-full flex-col gap-2 py-5 no-underline"
 						>
-							<span
-								class="text-ink-muted dark:text-snow-muted text-xs font-semibold tracking-widest uppercase"
+							<span class="jp-label text-ink-muted dark:text-snow-muted"
 								>${label}</span
 							>
-							<span class="text-ink dark:text-snow font-medium"
+							<span
+								class="text-ink dark:text-snow font-medium underline-offset-4 group-hover:underline"
 								>${entry.title}</span
 							>
 						</a>
@@ -425,10 +422,13 @@ export function renderBlogArticleShellPage(ctx: RenderContext): RenderedPage {
 				data-back="${messages.blog.backToBlog}"
 				data-back-href="${pagePath(locale, 'blog')}"
 			>
-				<h1 class="text-4xl font-semibold tracking-tight">
+				<h1 class="jp-display text-4xl sm:text-5xl">
 					${messages.blog.heading}
 				</h1>
-				<p class="text-ink-muted dark:text-snow-muted mt-6" aria-live="polite">
+				<p
+					class="jp-meta text-ink-muted dark:text-snow-muted mt-6"
+					aria-live="polite"
+				>
 					${messages.blog.loading}
 				</p>
 			</jp-blog-article>

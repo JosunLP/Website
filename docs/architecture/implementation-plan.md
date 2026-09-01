@@ -138,15 +138,27 @@ maintainer, with bQuery.js as the flagship project.
 
 ### Design
 
-- Original identity: calm, editorial, "modular systems" motif — a
-  restrained geometric grid/node SVG pattern (static, decorative,
-  `aria-hidden`), strong type hierarchy using a system font stack
-  (documented: zero-download typography beats a self-hosted webfont for
-  CWV and privacy; revisit if branding demands it).
-- Tailwind CSS 4 with a design-token layer in `@theme` (colors, spacing,
-  radii, shadows, motion durations); light/dark via `prefers-color-scheme`
-  default plus explicit user override persisted only on user action.
-- Motion: micro-transitions only, fully disabled under
+- Identity: a printed page, not an interface. Neutral paper and ink with
+  no colour cast, hairline rules instead of cards and shadows, square
+  corners, and content laid out in ruled rows on a 12-column grid.
+- Three typographic voices and no more: a display voice for headings, the
+  body voice, and a monospace voice reserved for structural information
+  (section indices, dates, licences, technologies). Both come from the
+  system font stack — zero-download typography beats a self-hosted
+  webfont for CWV and privacy; revisit if branding demands it.
+- One accent: the red already carried by the site mark
+  (`rgb(170,53,53)`), used for the current-page marker, the flagship
+  rule, link underlines and progress feedback — never as a fill, a tint
+  or a gradient. Taking the accent from the logo instead of inventing a
+  second brand colour is what makes the page and the wordmark read as one
+  thing.
+- Tailwind CSS 4 with a design-token layer in `@theme` (colors, radii,
+  display leading, motion durations); light/dark via
+  `prefers-color-scheme` default plus explicit user override persisted
+  only on user action.
+- Motion: micro-transitions only — a hover colour, a link's arrow, a
+  short navigation fade. No ambient backgrounds, entrance staggers,
+  scroll reveals or hover lift. Everything is disabled under
   `prefers-reduced-motion`.
 
 ### Quality gates

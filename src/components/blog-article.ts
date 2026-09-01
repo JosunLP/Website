@@ -132,16 +132,16 @@ export function registerBlogArticle(fetchFn: FetchLike = fetch): void {
 			const host = document.querySelector('jp-blog-article');
 			const label = (name: string, fallback: string): string =>
 				host?.getAttribute(`data-${name}`) ?? fallback;
-			const backLink = `<p class="mt-6"><a href="${label('back-href', `/${localeAttr}/blog/`)}" class="text-accent dark:text-accent-dark font-medium underline underline-offset-2 hover:no-underline">← ${label('back', 'Blog')}</a></p>`;
+			const backLink = `<p class="mt-8"><a href="${label('back-href', `/${localeAttr}/blog/`)}" class="jp-link jp-meta">← ${label('back', 'Blog')}</a></p>`;
 			switch (state.status) {
 				case 'loading':
 					// Empty first render keeps the server-rendered fallback
 					// (heading + loading message) in place.
 					return '';
 				case 'not-found':
-					return `<div role="alert"><h1 class="text-3xl font-semibold tracking-tight">404</h1><p class="text-ink-muted dark:text-snow-muted mt-4">${label('not-found', 'Not found')}</p>${backLink}</div>`;
+					return `<div role="alert"><h1 class="jp-display text-4xl">404</h1><p class="text-ink-muted dark:text-snow-muted mt-6">${label('not-found', 'Not found')}</p>${backLink}</div>`;
 				case 'error':
-					return `<div role="alert"><h1 class="text-3xl font-semibold tracking-tight">${label('back', 'Blog')}</h1><p class="text-ink-muted dark:text-snow-muted mt-4">${label('error', 'Error')}</p>${backLink}</div>`;
+					return `<div role="alert"><h1 class="jp-display text-4xl">${label('back', 'Blog')}</h1><p class="text-ink-muted dark:text-snow-muted mt-6">${label('error', 'Error')}</p>${backLink}</div>`;
 				case 'ready':
 					return `<article>${state.html}</article>`;
 			}

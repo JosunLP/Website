@@ -7,7 +7,13 @@ import {
 } from '@/domain/services/seo';
 import { formatMessage } from '@/features/i18n';
 import type { RenderContext } from '@/render/layout';
-import { breadcrumbs, externalLink, projectCard, techTags } from '@/render/ui';
+import {
+	breadcrumbs,
+	externalLink,
+	projectCard,
+	ROW_LIST,
+	techTags,
+} from '@/render/ui';
 import { html } from '@/utils/html';
 import type { RenderedPage } from './types';
 
@@ -28,13 +34,13 @@ export function renderProjectsPage(ctx: RenderContext): RenderedPage {
 	];
 
 	const main = html`
-		<div class="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+		<div class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
 			${breadcrumbs(trail, messages)}
-			<h1 class="text-4xl font-semibold tracking-tight">
+			<h1 class="jp-display max-w-2xl text-4xl sm:text-6xl">
 				${messages.projects.heading}
 			</h1>
 			<p
-				class="text-ink-muted dark:text-snow-muted mt-4 max-w-2xl text-lg leading-relaxed"
+				class="text-ink-muted dark:text-snow-muted mt-8 max-w-[52ch] text-lg leading-relaxed"
 			>
 				${messages.projects.intro}
 			</p>
@@ -42,23 +48,31 @@ export function renderProjectsPage(ctx: RenderContext): RenderedPage {
 			${
 				flagship !== undefined
 					? html`<section
-							class="rounded-card border-accent/40 bg-accent-soft/40 dark:border-accent-dark/40 dark:bg-accent-dark-soft/40 mt-12 border p-6 sm:p-8"
+							class="border-accent dark:border-accent-dark mt-16 border-t-2 pt-8"
 							aria-labelledby="flagship-heading"
 						>
-							<p
-								class="jp-kicker text-accent dark:text-accent-dark mb-3 text-sm font-semibold tracking-widest uppercase"
-								aria-hidden="true"
-							>
-								${messages.projects.flagshipHeading}
-							</p>
-							<div class="flex flex-wrap items-start justify-between gap-6">
-								<div class="max-w-2xl space-y-4">
-									<h2
-										id="flagship-heading"
-										class="text-2xl font-semibold tracking-tight"
+							<div class="grid gap-x-10 gap-y-6 md:grid-cols-12 md:items-start">
+								<div class="md:col-span-4">
+									<p
+										class="jp-label text-accent dark:text-accent-dark"
+										aria-hidden="true"
 									>
+										${messages.projects.flagshipHeading}
+									</p>
+									<h2 id="flagship-heading" class="jp-title mt-3 text-3xl">
 										${flagship.name}
 									</h2>
+									<img
+										src="/images/logo-bquery.svg"
+										alt="${formatMessage(messages.projects.logoAlt, { name: flagship.name })}"
+										width="64"
+										height="64"
+										loading="lazy"
+										decoding="async"
+										class="mt-6 hidden h-16 w-16 sm:block"
+									/>
+								</div>
+								<div class="md:col-span-7 md:col-start-6">
 									<p
 										class="text-ink-muted dark:text-snow-muted leading-relaxed"
 									>
@@ -68,7 +82,7 @@ export function renderProjectsPage(ctx: RenderContext): RenderedPage {
 										flagship.technologies,
 										messages.projects.technologiesLabel,
 									)}
-									<p class="flex flex-wrap gap-4 text-sm font-medium">
+									<p class="jp-meta mt-5 flex flex-wrap gap-x-6 gap-y-1">
 										${
 											flagship.websiteUrl !== undefined
 												? externalLink(
@@ -85,23 +99,17 @@ export function renderProjectsPage(ctx: RenderContext): RenderedPage {
 										)}
 									</p>
 								</div>
-								<img
-									src="/images/logo-bquery.svg"
-									alt="${formatMessage(messages.projects.logoAlt, { name: flagship.name })}"
-									width="96"
-									height="96"
-									loading="lazy"
-									decoding="async"
-									class="hidden h-24 w-24 shrink-0 sm:block"
-								/>
 							</div>
 						</section>`
 					: null
 			}
 
-			<div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-				${rest.map((project) =>
-					projectCard(project, locale, messages, { headingLevel: 'h2' }),
+			<div class="${ROW_LIST} mt-20">
+				${rest.map((project, index) =>
+					projectCard(project, locale, messages, {
+						headingLevel: 'h2',
+						index,
+					}),
 				)}
 			</div>
 		</div>

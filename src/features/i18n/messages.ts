@@ -51,7 +51,6 @@ export interface AppMessages {
 		readonly description: string;
 		readonly heroHeading: string;
 		readonly heroIntro: string;
-		readonly flagshipChip: string;
 		readonly statsProjects: string;
 		readonly statsTech: string;
 		readonly statsPosts: string;

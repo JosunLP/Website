@@ -11,24 +11,17 @@ import {
 import { formatMessage } from '@/features/i18n';
 import type { RenderContext } from '@/render/layout';
 import {
+	arrowLink,
 	blogCard,
 	buttonLink,
 	externalLink,
-	motif,
 	projectCard,
+	ROW_LIST,
 	sectionHeading,
 	techTags,
 } from '@/render/ui';
-import { html, raw } from '@/utils/html';
+import { html } from '@/utils/html';
 import type { RenderedPage } from './types';
-
-/** Decorative hero artwork: a larger instance of the module motif. */
-function heroArt(): ReturnType<typeof motif> {
-	return motif(
-		7,
-		'jp-hero-art pointer-events-none absolute -top-6 right-0 hidden h-40 w-80 text-accent/50 dark:text-accent-dark/40 lg:block',
-	);
-}
 
 export function renderHomePage(
 	ctx: RenderContext,
@@ -41,37 +34,28 @@ export function renderHomePage(
 	);
 
 	const main = html`
-		<div class="mx-auto max-w-6xl px-4 sm:px-6">
-			<!-- Hero -->
-			<section class="relative py-14 sm:py-28" aria-labelledby="hero-heading">
-				${heroArt()}
-				${
-					flagship !== undefined
-						? html`<p>
-								<a
-									href="${pagePath(locale, 'projects')}#flagship-heading"
-									class="jp-chip border-line dark:border-night-line text-ink-muted dark:text-snow-muted hover:border-accent hover:text-accent dark:hover:border-accent-dark dark:hover:text-accent-dark inline-flex min-h-9 items-center gap-2 rounded-full border px-3.5 text-sm"
-									>${raw(
-										'<span class="jp-chip-dot bg-accent dark:bg-accent-dark h-1.5 w-1.5 rounded-full" aria-hidden="true"></span>',
-									)}${formatMessage(messages.home.flagshipChip, {
-										name: flagship.name,
-									})}<span aria-hidden="true">→</span></a
-								>
-							</p>`
-						: null
-				}
+		<div class="mx-auto max-w-5xl px-4 sm:px-6">
+			<!--
+				Hero. No stat cards, no floating artwork: a name, a claim, and
+				two ways forward. The counts still appear, but as one line of
+				metadata under a rule — they are context, not the headline.
+			-->
+			<section class="py-20 sm:py-32" aria-labelledby="hero-heading">
+				<p class="jp-meta text-ink-muted dark:text-snow-muted">
+					${messages.siteTagline}
+				</p>
 				<h1
 					id="hero-heading"
-					class="mt-6 max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl"
+					class="jp-display mt-8 max-w-3xl text-5xl sm:text-7xl"
 				>
 					${messages.home.heroHeading}
 				</h1>
 				<p
-					class="text-ink-muted dark:text-snow-muted mt-6 max-w-2xl text-lg leading-relaxed"
+					class="text-ink-muted dark:text-snow-muted mt-8 max-w-[52ch] text-lg leading-relaxed"
 				>
 					${messages.home.heroIntro}
 				</p>
-				<p class="mt-8 flex flex-wrap gap-3">
+				<p class="mt-10 flex flex-wrap gap-3">
 					${buttonLink(
 						pagePath(locale, 'projects'),
 						messages.home.ctaProjects,
@@ -84,7 +68,7 @@ export function renderHomePage(
 					)}
 				</p>
 				<dl
-					class="border-line dark:border-night-line mt-12 grid max-w-xl grid-cols-3 gap-6 border-t pt-8"
+					class="jp-meta border-line dark:border-night-line text-ink-muted dark:text-snow-muted mt-16 flex flex-wrap gap-x-8 gap-y-2 border-t pt-5"
 				>
 					${[
 						{ value: PROJECTS.length, label: messages.home.statsProjects },
@@ -92,48 +76,49 @@ export function renderHomePage(
 						{ value: latestPosts.length, label: messages.home.statsPosts },
 					].map(
 						(stat) =>
-							// Column-reverse so the figure reads first visually while
-							// the DOM keeps the term-before-definition order a <dl>
-							// requires.
-							html`<div class="flex flex-col-reverse">
-								<dt class="text-ink-muted dark:text-snow-muted mt-1 text-sm">
-									${formatMessage(stat.label, { count: stat.value })}
-								</dt>
-								<dd
-									class="text-ink dark:text-snow text-3xl font-semibold tracking-tight tabular-nums sm:text-4xl"
-								>
-									${stat.value}
-								</dd>
+							// Row-reverse so the figure reads first visually while the
+							// DOM keeps the term-before-definition order a <dl> requires.
+							html`<div class="flex flex-row-reverse items-baseline gap-2">
+								<dt>${formatMessage(stat.label, { count: stat.value })}</dt>
+								<dd class="text-ink dark:text-snow">${stat.value}</dd>
 							</div>`,
 					)}
 				</dl>
 			</section>
 
 			<!-- Selected work -->
-			<section class="py-16" aria-labelledby="selected-work">
+			<section class="pb-24" aria-labelledby="selected-work">
 				${sectionHeading(
+					0,
 					'selected-work',
 					'Open Source',
 					messages.home.selectedWorkHeading,
+					messages.home.selectedWorkIntro,
 				)}
-				<p class="text-ink-muted dark:text-snow-muted -mt-6 mb-10 max-w-2xl">
-					${messages.home.selectedWorkIntro}
-				</p>
 				${
 					flagship !== undefined
 						? html`<div
-								class="jp-card jp-card--feature rounded-card border-accent/40 bg-accent-soft/40 dark:border-accent-dark/40 dark:bg-accent-dark-soft/40 mb-8 border p-6 sm:p-8"
+								class="border-accent dark:border-accent-dark border-t-2 pt-8 pb-10"
 							>
-								<p
-									class="jp-kicker text-accent dark:text-accent-dark mb-3 text-sm font-semibold tracking-widest uppercase"
+								<div
+									class="grid gap-x-10 gap-y-6 md:grid-cols-12 md:items-start"
 								>
-									${messages.projects.flagshipHeading}
-								</p>
-								<div class="flex flex-wrap items-start justify-between gap-6">
-									<div class="max-w-2xl space-y-4">
-										<h3 class="text-2xl font-semibold tracking-tight">
-											${flagship.name}
-										</h3>
+									<div class="md:col-span-4">
+										<p class="jp-label text-accent dark:text-accent-dark">
+											${messages.projects.flagshipHeading}
+										</p>
+										<h3 class="jp-title mt-3 text-3xl">${flagship.name}</h3>
+										<img
+											src="/images/logo-bquery.svg"
+											alt="${formatMessage(messages.projects.logoAlt, { name: flagship.name })}"
+											width="64"
+											height="64"
+											loading="lazy"
+											decoding="async"
+											class="mt-6 hidden h-16 w-16 sm:block"
+										/>
+									</div>
+									<div class="md:col-span-7 md:col-start-6">
 										<p
 											class="text-ink-muted dark:text-snow-muted leading-relaxed"
 										>
@@ -143,7 +128,7 @@ export function renderHomePage(
 											flagship.technologies,
 											messages.projects.technologiesLabel,
 										)}
-										<p class="flex flex-wrap gap-4 text-sm font-medium">
+										<p class="jp-meta mt-5 flex flex-wrap gap-x-6 gap-y-1">
 											${
 												flagship.websiteUrl !== undefined
 													? externalLink(
@@ -160,81 +145,94 @@ export function renderHomePage(
 											)}
 										</p>
 									</div>
-									<img
-										src="/images/logo-bquery.svg"
-										alt="${formatMessage(messages.projects.logoAlt, { name: flagship.name })}"
-										width="96"
-										height="96"
-										loading="lazy"
-										decoding="async"
-										class="hidden h-24 w-24 shrink-0 sm:block"
-									/>
 								</div>
 							</div>`
 						: null
 				}
-				<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-					${projects.map((project) => projectCard(project, locale, messages))}
-				</div>
-				<p class="mt-8">
-					${buttonLink(
-						pagePath(locale, 'projects'),
-						messages.home.allProjects,
-						'secondary',
+				<div class="${ROW_LIST}">
+					${projects.map((project, index) =>
+						projectCard(project, locale, messages, { index }),
 					)}
+				</div>
+				<p class="mt-10">
+					${arrowLink(pagePath(locale, 'projects'), messages.home.allProjects)}
 				</p>
 			</section>
 
 			<!-- About snapshot -->
-			<section class="py-16" aria-labelledby="about-snapshot">
-				${sectionHeading('about-snapshot', messages.nav.about, messages.home.aboutHeading)}
+			<section class="pb-24" aria-labelledby="about-snapshot">
+				${sectionHeading(
+					1,
+					'about-snapshot',
+					messages.nav.about,
+					messages.home.aboutHeading,
+				)}
 				<p
-					class="text-ink-muted dark:text-snow-muted -mt-4 max-w-2xl leading-relaxed"
+					class="text-ink-muted dark:text-snow-muted max-w-[60ch] text-lg leading-relaxed"
 				>
 					${messages.home.aboutText}
 				</p>
-				<p class="mt-6">
-					<a
-						href="${pagePath(locale, 'about')}"
-						class="text-accent dark:text-accent-dark font-medium underline underline-offset-2 hover:no-underline"
-						>${messages.home.aboutMore}</a
-					>
+				<p class="mt-8">
+					${arrowLink(pagePath(locale, 'about'), messages.home.aboutMore)}
 				</p>
 			</section>
 
 			<!-- Technical focus -->
-			<section class="py-16" aria-labelledby="technical-focus">
-				${sectionHeading('technical-focus', messages.projects.technologiesLabel, messages.home.focusHeading)}
-				<p class="text-ink-muted dark:text-snow-muted -mt-6 mb-10 max-w-2xl">
-					${messages.home.focusIntro}
-				</p>
-				<div class="grid gap-6 sm:grid-cols-2">
+			<section class="pb-24" aria-labelledby="technical-focus">
+				${sectionHeading(
+					2,
+					'technical-focus',
+					messages.projects.technologiesLabel,
+					messages.home.focusHeading,
+					messages.home.focusIntro,
+				)}
+				<div class="${ROW_LIST}">
 					${FOCUS_AREAS.map(
-						(area) =>
-							html`<div
-								class="jp-card jp-card--feature rounded-card border-line dark:border-night-line border p-6"
+						(area, index) =>
+							html`<article
+								class="border-line dark:border-night-line border-t px-4 py-8 sm:px-6"
 							>
-								<h3 class="text-lg font-semibold">${area.heading[locale]}</h3>
-								<p
-									class="text-ink-muted dark:text-snow-muted mt-2 leading-relaxed"
-								>
-									${area.text[locale]}
-								</p>
-								${techTags(area.keywords, messages.projects.technologiesLabel)}
-							</div>`,
+								<div class="grid gap-x-10 gap-y-3 md:grid-cols-12">
+									<div class="md:col-span-4">
+										<p
+											class="jp-label text-ink-muted dark:text-snow-muted"
+											aria-hidden="true"
+										>
+											${String(index + 1).padStart(2, '0')}
+										</p>
+										<h3 class="jp-title mt-3 text-xl">
+											${area.heading[locale]}
+										</h3>
+									</div>
+									<div class="md:col-span-7 md:col-start-6">
+										<p
+											class="text-ink-muted dark:text-snow-muted leading-relaxed"
+										>
+											${area.text[locale]}
+										</p>
+										${techTags(
+											area.keywords,
+											messages.projects.technologiesLabel,
+										)}
+									</div>
+								</div>
+							</article>`,
 					)}
 				</div>
 			</section>
 
 			<!-- Latest writing -->
-			<section class="py-16" aria-labelledby="latest-writing">
-				${sectionHeading('latest-writing', messages.nav.blog, messages.home.writingHeading)}
-				<p class="text-ink-muted dark:text-snow-muted -mt-6 mb-10 max-w-2xl">
-					${messages.home.writingIntro}
-				</p>
+			<section class="pb-24" aria-labelledby="latest-writing">
+				${sectionHeading(
+					3,
+					'latest-writing',
+					messages.nav.blog,
+					messages.home.writingHeading,
+					messages.home.writingIntro,
+				)}
 				${
 					latestPosts.length > 0
-						? html`<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+						? html`<div class="${ROW_LIST}">
 								${latestPosts
 									.slice(0, 3)
 									.map((post) => blogCard(post, locale, messages))}
@@ -243,30 +241,29 @@ export function renderHomePage(
 								${messages.blog.empty}
 							</p>`
 				}
-				<p class="mt-8">
-					${buttonLink(
-						pagePath(locale, 'blog'),
-						messages.home.allPosts,
-						'secondary',
-					)}
+				<p class="mt-10">
+					${arrowLink(pagePath(locale, 'blog'), messages.home.allPosts)}
 				</p>
 			</section>
 
-			<!-- Contact CTA -->
-			<section class="py-16" aria-labelledby="contact-cta">
-				${sectionHeading('contact-cta', messages.nav.contact, messages.home.contactHeading)}
+			<!-- Contact -->
+			<section class="pb-24" aria-labelledby="contact-cta">
+				${sectionHeading(
+					4,
+					'contact-cta',
+					messages.nav.contact,
+					messages.home.contactHeading,
+				)}
 				<p
-					class="text-ink-muted dark:text-snow-muted -mt-4 max-w-2xl leading-relaxed"
+					class="text-ink-muted dark:text-snow-muted max-w-[60ch] text-lg leading-relaxed"
 				>
 					${messages.home.contactText}
 				</p>
-				<p class="mt-8 flex flex-wrap items-center gap-4">
+				<p class="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
 					${buttonLink(`mailto:${OWNER.email}`, OWNER.email, 'primary')}
-					${raw('<span class="text-ink-muted dark:text-snow-muted text-sm">')}${externalLink(
-						OWNER.gitHubUrl,
-						'GitHub',
-						ctx.messages,
-					)}${raw('</span>')}
+					<span class="jp-meta"
+						>${externalLink(OWNER.gitHubUrl, 'GitHub', ctx.messages)}</span
+					>
 				</p>
 			</section>
 		</div>

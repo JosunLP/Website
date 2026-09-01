@@ -3,7 +3,6 @@ import { join } from 'node:path';
 import { OG_IMAGE } from '@/app/configuration';
 import {
 	Canvas,
-	circle,
 	oklch,
 	rgb,
 	roundedRect,
@@ -21,13 +20,16 @@ import { parseSvgShapes } from './lib/svg-shapes';
  * scaled into a small summary card. The card is drawn from the real logo
  * geometry and the design tokens in `src/styles/main.css`, with no image
  * toolchain involved (see `scripts/lib/raster.ts`).
+ *
+ * The composition follows the site: a plain ink field, the mark, and the
+ * accent as a single rule. Nothing textured sits behind it — a preview
+ * card is shown at thumbnail size, where any pattern turns to noise.
  */
 
 // Design tokens, mirrored from src/styles/main.css.
-const NIGHT = oklch(0.19, 0.02, 270);
-const NIGHT_RAISED = oklch(0.24, 0.02, 270);
-const ACCENT_DARK = oklch(0.78, 0.1, 250);
-const SNOW = oklch(0.93, 0.005, 95);
+const NIGHT = oklch(0.165, 0.003, 95);
+const SNOW = oklch(0.945, 0.002, 95);
+const NIGHT_LINE = oklch(0.31, 0.004, 95);
 
 const ROOT = process.cwd();
 
@@ -76,59 +78,34 @@ function colorOf(fill: string): Rgb {
 	throw new Error(`unsupported fill in logo: ${fill}`);
 }
 
-/**
- * The "modular systems" motif used across the site, scaled up as a faint
- * background texture. Deterministic, so the file only changes when this
- * code does.
- */
-function drawMotif(canvas: Canvas): void {
-	const cell = 60;
-	let state = 7 * 2654435761;
-	const random = (): number => {
-		state = (state * 1103515245 + 12345) & 0x7fffffff;
-		return state / 0x7fffffff;
-	};
-	for (let column = 0; column * cell < canvas.width; column += 1) {
-		for (let row = 0; row * cell < canvas.height; row += 1) {
-			const value = random();
-			const x = column * cell;
-			const y = row * cell;
-			if (value > 0.62) {
-				canvas.fill(
-					[roundedRect(x + 14, y + 14, cell - 28, cell - 28, 8)],
-					ACCENT_DARK,
-					value > 0.85 ? 0.16 : 0.08,
-				);
-			} else if (value > 0.45) {
-				canvas.fill([circle(x + cell / 2, y + cell / 2, 5)], ACCENT_DARK, 0.12);
-			}
-		}
-	}
-}
-
 const canvas = new Canvas(OG_IMAGE.width, OG_IMAGE.height, NIGHT);
 
-drawMotif(canvas);
+// A margin rule frames the card the way the site's hairlines frame a
+// section — the only structure the composition needs.
+const margin = 72;
+const hairline = 2;
+for (const rule of [
+	roundedRect(margin, margin, OG_IMAGE.width - margin * 2, hairline),
+	roundedRect(
+		margin,
+		OG_IMAGE.height - margin - hairline,
+		OG_IMAGE.width - margin * 2,
+		hairline,
+	),
+]) {
+	canvas.fill([rule], NIGHT_LINE);
+}
 
-// Raised plate behind the mark: keeps the logo legible wherever the
-// motif happens to sit, and gives the card a clear focal point.
-const plate = 400;
-const plateX = (OG_IMAGE.width - plate) / 2;
-const plateY = (OG_IMAGE.height - plate) / 2 - 14;
-canvas.fill([roundedRect(plateX, plateY, plate, plate, 40)], NIGHT_RAISED);
-
+// The mark, and nothing else. It already carries the accent red, so a
+// second red rule under it would put two near-identical reds side by
+// side at thumbnail size — which reads as a mistake rather than a system.
+const mark = 300;
 placeLogo(
 	canvas,
 	readFileSync(join(ROOT, 'public', 'images', 'logo-jonas-dark.svg'), 'utf8'),
-	plateX + 60,
-	plateY + 60,
-	plate - 120,
-);
-
-// Accent rule along the bottom edge, echoing the site's focus colour.
-canvas.fill(
-	[roundedRect(0, OG_IMAGE.height - 12, OG_IMAGE.width, 12)],
-	ACCENT_DARK,
+	(OG_IMAGE.width - mark) / 2,
+	(OG_IMAGE.height - mark) / 2,
+	mark,
 );
 
 const target = join(ROOT, 'public', OG_IMAGE.path.slice(1));

@@ -26,25 +26,24 @@ const CLOSED_MOBILE_CLASSES = ['hidden', 'md:flex'];
 // against the header's inner container (`relative`), so it spans the whole
 // width instead of the narrow controls cluster it lives in.
 const OPEN_CLASSES = [
-	// Entry animation (fade + slide) via @starting-style; see main.css.
+	// Entry fade via @starting-style; see main.css.
 	'jp-nav-panel',
 	'absolute',
 	'left-0',
 	'right-0',
 	'top-full',
 	'z-40',
-	'mt-px',
 	'flex',
 	'w-full',
 	'flex-col',
 	'items-stretch',
 	'border-line',
 	'dark:border-night-line',
-	'border-t',
+	'border-b',
 	'bg-paper',
 	'dark:bg-night',
-	'p-4',
-	'shadow-card',
+	'px-4',
+	'py-2',
 	'max-h-[calc(100vh_-_4rem)]',
 	'overflow-y-auto',
 ];

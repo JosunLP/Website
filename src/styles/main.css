@@ -1,9 +1,13 @@
 @import 'tailwindcss';
 
 /*
- * Design tokens. The visual identity is calm and editorial: a warm paper /
- * deep ink base, one restrained accent, generous spacing, and a geometric
- * "modular systems" motif used sparingly as decoration.
+ * Design tokens.
+ *
+ * The identity is a printed page rather than an interface: neutral paper
+ * and ink, hairline rules instead of boxes and shadows, a monospace voice
+ * for everything structural (indices, dates, technologies), and exactly
+ * one accent — the red the site mark already carries. Nothing glows,
+ * nothing floats, nothing is tinted with a gradient.
  */
 @theme {
 	--font-sans:
@@ -12,31 +16,53 @@
 	--font-mono:
 		ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
 
-	/* Color system (WCAG AA checked against their background pairings) */
-	--color-paper: oklch(0.985 0.004 95);
-	--color-paper-raised: oklch(1 0 0);
-	--color-ink: oklch(0.24 0.02 270);
-	--color-ink-muted: oklch(0.42 0.02 270);
-	--color-line: oklch(0.88 0.008 95);
+	/*
+	 * Neutrals are deliberately near-achromatic. The previous palette
+	 * carried a blue cast (hue 270) in every grey, which tinted the whole
+	 * page; paper and ink now read as paper and ink.
+	 */
+	--color-paper: oklch(0.986 0.002 95);
+	--color-ink: oklch(0.18 0.003 95);
+	--color-ink-muted: oklch(0.47 0.004 95);
+	--color-line: oklch(0.885 0.003 95);
+	--color-line-strong: oklch(0.74 0.004 95);
 
-	--color-night: oklch(0.19 0.02 270);
-	--color-night-raised: oklch(0.24 0.02 270);
-	--color-snow: oklch(0.93 0.005 95);
-	--color-snow-muted: oklch(0.75 0.01 270);
-	--color-night-line: oklch(0.34 0.02 270);
+	--color-night: oklch(0.165 0.003 95);
+	--color-night-raised: oklch(0.215 0.003 95);
+	--color-snow: oklch(0.945 0.002 95);
+	--color-snow-muted: oklch(0.68 0.004 95);
+	--color-night-line: oklch(0.31 0.004 95);
+	--color-night-line-strong: oklch(0.45 0.004 95);
 
-	--color-accent: oklch(0.5 0.13 250);
-	--color-accent-strong: oklch(0.42 0.13 250);
-	--color-accent-soft: oklch(0.93 0.03 250);
-	--color-accent-dark: oklch(0.78 0.1 250);
-	--color-accent-dark-soft: oklch(0.3 0.05 250);
+	/*
+	 * Accent = the mark's red, rgb(170,53,53). Taking the accent from the
+	 * logo instead of inventing a second brand colour is why the page and
+	 * the wordmark look like one thing. Both variants are ≥ 4.5:1 against
+	 * their own background.
+	 *
+	 * There is no soft/tinted variant on purpose: a wash of accent behind
+	 * a block is the shortcut this redesign exists to remove. The accent
+	 * is a line or a word, never a field.
+	 */
+	--color-accent: oklch(0.47 0.15 27);
+	--color-accent-dark: oklch(0.73 0.14 30);
 
-	--radius-card: 0.75rem;
-	--radius-tag: 0.375rem;
-
-	--shadow-card: 0 1px 3px oklch(0 0 0 / 0.08);
+	/* Corners are square. Only pressable controls get the 2px softening. */
+	--radius-ui: 2px;
 
 	--duration-swift: 150ms;
+
+	/*
+	 * Display sizes need tighter leading than body text. Tailwind's size
+	 * utilities set line-height along with font-size, so the only place a
+	 * heading's leading can be fixed once and for all is here.
+	 */
+	--text-2xl--line-height: 1.22;
+	--text-3xl--line-height: 1.16;
+	--text-4xl--line-height: 1.1;
+	--text-5xl--line-height: 1.05;
+	--text-6xl--line-height: 1.02;
+	--text-7xl--line-height: 1;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -45,8 +71,8 @@
  * Cross-document view transitions: full page navigations animate instead
  * of hard-cutting. Header and footer are pinned as their own transition
  * groups so they stay visually stable while the main content performs a
- * quick fade-and-rise. Browsers without support simply navigate normally,
- * and reduced-motion users keep instant swaps.
+ * short fade. Browsers without support simply navigate normally, and
+ * reduced-motion users keep instant swaps.
  */
 @view-transition {
 	navigation: auto;
@@ -74,76 +100,76 @@
 	}
 }
 
-@keyframes jp-vt-rise-in {
+@keyframes jp-vt-fade-in {
 	from {
 		opacity: 0;
-		transform: translateY(0.5rem);
 	}
 }
 
 ::view-transition-old(main-content) {
-	animation: jp-vt-fade-out 120ms ease-in both;
+	animation: jp-vt-fade-out 90ms ease-in both;
 }
 
 ::view-transition-new(main-content) {
-	animation: jp-vt-rise-in 240ms 60ms ease-out both;
+	animation: jp-vt-fade-in 180ms 40ms ease-out both;
 }
 
 /* Keep the root cross-fade snappy so navigation never feels delayed. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-	animation-duration: 200ms;
+	animation-duration: 160ms;
 }
 
 /*
  * Directional navigation: the inline head snippet (see
  * src/features/navigation/view-transition-types.ts) tags each transition
- * as "forwards" or "backwards" based on the header-nav page order, so
- * content slides in the direction the user is moving through the site.
+ * as "forwards" or "backwards" based on the header-nav page order. The
+ * shift is deliberately small — one line of text, not a carousel swipe —
+ * so it reads as page order rather than as an effect.
  */
-@keyframes jp-vt-slide-out-left {
+@keyframes jp-vt-shift-out-left {
 	to {
 		opacity: 0;
-		transform: translateX(-2rem);
+		transform: translateX(-0.75rem);
 	}
 }
 
-@keyframes jp-vt-slide-in-right {
+@keyframes jp-vt-shift-in-right {
 	from {
 		opacity: 0;
-		transform: translateX(2rem);
+		transform: translateX(0.75rem);
 	}
 }
 
-@keyframes jp-vt-slide-out-right {
+@keyframes jp-vt-shift-out-right {
 	to {
 		opacity: 0;
-		transform: translateX(2rem);
+		transform: translateX(0.75rem);
 	}
 }
 
-@keyframes jp-vt-slide-in-left {
+@keyframes jp-vt-shift-in-left {
 	from {
 		opacity: 0;
-		transform: translateX(-2rem);
+		transform: translateX(-0.75rem);
 	}
 }
 
 html:active-view-transition-type(forwards) {
 	&::view-transition-old(main-content) {
-		animation: jp-vt-slide-out-left 140ms ease-in both;
+		animation: jp-vt-shift-out-left 100ms ease-in both;
 	}
 	&::view-transition-new(main-content) {
-		animation: jp-vt-slide-in-right 260ms 50ms cubic-bezier(0.2, 0, 0, 1) both;
+		animation: jp-vt-shift-in-right 200ms 40ms cubic-bezier(0.2, 0, 0, 1) both;
 	}
 }
 
 html:active-view-transition-type(backwards) {
 	&::view-transition-old(main-content) {
-		animation: jp-vt-slide-out-right 140ms ease-in both;
+		animation: jp-vt-shift-out-right 100ms ease-in both;
 	}
 	&::view-transition-new(main-content) {
-		animation: jp-vt-slide-in-left 260ms 50ms cubic-bezier(0.2, 0, 0, 1) both;
+		animation: jp-vt-shift-in-left 200ms 40ms cubic-bezier(0.2, 0, 0, 1) both;
 	}
 }
 
@@ -190,7 +216,7 @@ html:active-view-transition-type(backwards) {
 	}
 
 	::selection {
-		@apply bg-accent-soft text-ink dark:bg-accent-dark-soft dark:text-snow;
+		@apply bg-accent text-paper dark:bg-accent-dark dark:text-night;
 	}
 
 	:focus-visible {
@@ -227,38 +253,239 @@ html:active-view-transition-type(backwards) {
 }
 
 /*
+ * ---------------------------------------------------------------------------
+ * Typography
+ * ---------------------------------------------------------------------------
+ * Three voices, and only three: a display voice for headings, the body
+ * voice, and a monospace voice for structure. Keeping them as classes
+ * rather than utility strings is what stops every heading in the codebase
+ * from drifting to its own tracking value.
+ */
+@layer components {
+	/* Page-opening statement. Leading comes from the size utility. */
+	.jp-display {
+		font-weight: 600;
+		letter-spacing: -0.035em;
+		text-wrap: balance;
+	}
+
+	/* Section and article headings. */
+	.jp-title {
+		font-weight: 600;
+		letter-spacing: -0.022em;
+		text-wrap: balance;
+	}
+
+	/* Structural micro-label: section indices, column headings, kickers. */
+	.jp-label {
+		font-family: var(--font-mono);
+		font-size: 0.6875rem;
+		line-height: 1.4;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	/* Structural metadata: dates, reading times, technologies. */
+	.jp-meta {
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		line-height: 1.5;
+		letter-spacing: 0.005em;
+		font-variant-numeric: tabular-nums;
+	}
+
+	/*
+	 * Inline list of technologies or tags. A real list for assistive
+	 * technology, separated visually by middots rather than by turning
+	 * every keyword into a bordered pill.
+	 */
+	.jp-taglist {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		column-gap: 0.5rem;
+	}
+	.jp-taglist > li + li::before {
+		content: '·';
+		margin-right: 0.5rem;
+		opacity: 0.45;
+	}
+}
+
+/*
+ * ---------------------------------------------------------------------------
+ * Structure
+ * ---------------------------------------------------------------------------
+ * Content is separated by hairlines, not by cards. A row is a band of the
+ * page that responds to the pointer; it bleeds slightly past the text
+ * column so the highlight reads as a full-width band rather than a box
+ * drawn around the words.
+ */
+@layer components {
+	.jp-row {
+		transition: background-color var(--duration-swift) ease-out;
+	}
+	.jp-row:hover,
+	.jp-row:focus-within {
+		background-color: oklch(0.18 0.003 95 / 0.035);
+	}
+	.dark .jp-row:hover,
+	.dark .jp-row:focus-within {
+		background-color: oklch(0.945 0.002 95 / 0.05);
+	}
+
+	/*
+	 * The row's title link. Underlined only on interaction, and the
+	 * whole row is the hover target — so the pointer never has to find
+	 * the exact glyphs.
+	 */
+	.jp-row-link {
+		text-decoration: none;
+		transition: color var(--duration-swift) ease-out;
+	}
+	.jp-row:hover .jp-row-link,
+	.jp-row-link:focus-visible {
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+		text-decoration-thickness: 1px;
+	}
+
+	/*
+	 * Buttons. Rectangular, ink-filled, red on hover — the same two
+	 * colours the mark uses, in the same relationship.
+	 */
+	.jp-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 2.75rem;
+		padding-inline: 1.25rem;
+		border-radius: var(--radius-ui);
+		font-size: 0.9375rem;
+		font-weight: 500;
+		border: 1px solid transparent;
+		transition:
+			background-color var(--duration-swift) ease-out,
+			border-color var(--duration-swift) ease-out,
+			color var(--duration-swift) ease-out;
+	}
+	.jp-btn--primary {
+		background-color: var(--color-ink);
+		color: var(--color-paper);
+	}
+	.jp-btn--primary:hover {
+		background-color: var(--color-accent);
+	}
+	.dark .jp-btn--primary {
+		background-color: var(--color-snow);
+		color: var(--color-night);
+	}
+	.dark .jp-btn--primary:hover {
+		background-color: var(--color-accent-dark);
+	}
+	/*
+	 * The secondary button's border is its only affordance, so it is drawn
+	 * in the muted ink rather than a hairline grey — a 2:1 outline reads
+	 * as a disabled control, and disappears entirely on a dim screen.
+	 */
+	.jp-btn--secondary {
+		border-color: var(--color-ink-muted);
+		color: var(--color-ink);
+	}
+	.jp-btn--secondary:hover {
+		border-color: var(--color-accent);
+		color: var(--color-accent);
+	}
+	.dark .jp-btn--secondary {
+		border-color: var(--color-snow-muted);
+		color: var(--color-snow);
+	}
+	.dark .jp-btn--secondary:hover {
+		border-color: var(--color-accent-dark);
+		color: var(--color-accent-dark);
+	}
+
+	/*
+	 * Links. The word stays ink-coloured and the accent lives in the
+	 * underline: a page of body copy then reads as text with marked
+	 * links rather than as text sprinkled with coloured words.
+	 */
+	.jp-link {
+		@apply text-ink dark:text-snow decoration-accent dark:decoration-accent-dark underline decoration-1 underline-offset-4;
+	}
+	.jp-link:hover {
+		@apply text-accent dark:text-accent-dark;
+	}
+
+	/* Secondary links (navigation, metadata): underlined on interaction. */
+	.jp-link-quiet {
+		@apply text-ink-muted dark:text-snow-muted no-underline;
+		transition: color var(--duration-swift) ease-out;
+	}
+	.jp-link-quiet:hover,
+	.jp-link-quiet:focus-visible {
+		@apply text-ink dark:text-snow;
+	}
+
+	/*
+	 * A link that ends in an arrow. The arrow steps forward on hover —
+	 * the one piece of movement kept anywhere in the interface, because
+	 * it says which direction the link goes.
+	 */
+	.jp-arrow {
+		display: inline-block;
+		transition: transform var(--duration-swift) ease-out;
+	}
+	a:hover > .jp-arrow {
+		transform: translateX(0.2em);
+	}
+}
+
+/*
  * Prose styling for sanitized Markdown output (blog articles) and legal
  * pages. Kept as a component class because the HTML is generated.
  */
 @layer components {
 	.jp-prose {
 		@apply text-ink dark:text-snow;
-		max-width: 70ch;
+		max-width: 68ch;
+		font-size: 1.0625rem;
+		line-height: 1.7;
 	}
 	.jp-prose > * + * {
-		margin-top: 1em;
+		margin-top: 1.15em;
 	}
 	.jp-prose h2 {
-		@apply mt-12 text-2xl font-semibold tracking-tight;
+		@apply mt-14 text-2xl font-semibold;
+		letter-spacing: -0.022em;
+		text-wrap: balance;
 	}
 	.jp-prose h3 {
-		@apply mt-8 text-xl font-semibold tracking-tight;
+		@apply mt-10 text-xl font-semibold;
+		letter-spacing: -0.015em;
+		text-wrap: balance;
 	}
 	.jp-prose h4 {
-		@apply mt-6 text-lg font-semibold;
+		@apply mt-8 text-lg font-semibold;
 	}
 	.jp-prose p,
 	.jp-prose li {
-		@apply text-ink-muted dark:text-snow-muted leading-relaxed;
+		@apply text-ink-muted dark:text-snow-muted;
 	}
 	.jp-prose a {
-		@apply text-accent dark:text-accent-dark underline underline-offset-2 hover:no-underline;
+		@apply text-ink dark:text-snow decoration-accent dark:decoration-accent-dark underline underline-offset-3 decoration-1;
+	}
+	.jp-prose a:hover {
+		@apply text-accent dark:text-accent-dark;
 	}
 	.jp-prose ul {
-		@apply list-disc pl-6;
+		@apply list-disc pl-5;
 	}
 	.jp-prose ol {
-		@apply list-decimal pl-6;
+		@apply list-decimal pl-5;
+	}
+	.jp-prose li::marker {
+		@apply text-ink-muted dark:text-snow-muted;
 	}
 	/*
 	 * GFM task lists. `renderMarkdown` tags each task `<li>` with
@@ -274,23 +501,31 @@ html:active-view-transition-type(backwards) {
 	.jp-prose li.jp-task-item input[type='checkbox'] {
 		@apply accent-accent dark:accent-accent-dark mt-1.5 shrink-0;
 	}
+	/*
+	 * Pull quote: an accent rule on the left, no italics. Italic body
+	 * copy at this size is harder to read and adds nothing the rule does
+	 * not already say.
+	 */
 	.jp-prose blockquote {
-		@apply border-accent dark:border-accent-dark border-l-4 pl-4 italic;
+		@apply border-accent dark:border-accent-dark text-ink dark:text-snow my-8 border-l-2 pl-5;
+	}
+	.jp-prose blockquote p {
+		@apply text-ink dark:text-snow;
 	}
 	.jp-prose code {
-		@apply bg-accent-soft/60 dark:bg-night-raised rounded px-1.5 py-0.5 font-mono text-[0.9em];
+		@apply bg-line/50 dark:bg-night-raised rounded-ui px-1.5 py-0.5 font-mono text-[0.875em];
 	}
 	.jp-prose pre {
-		@apply bg-night dark:bg-night-raised overflow-x-auto rounded-lg p-4;
+		@apply bg-night dark:bg-night-raised dark:border-night-line overflow-x-auto border border-transparent p-4;
 	}
 	.jp-prose pre code {
 		@apply text-snow bg-transparent p-0;
 	}
 	.jp-prose img {
-		@apply h-auto max-w-full rounded-lg;
+		@apply border-line dark:border-night-line h-auto max-w-full border;
 	}
 	.jp-prose hr {
-		@apply border-line dark:border-night-line my-10;
+		@apply border-line dark:border-night-line my-12;
 	}
 	.jp-prose .jp-table-wrap {
 		@apply overflow-x-auto;
@@ -303,7 +538,8 @@ html:active-view-transition-type(backwards) {
 		@apply border-line dark:border-night-line border-b px-3 py-2 align-top;
 	}
 	.jp-prose th {
-		@apply font-semibold;
+		@apply text-ink dark:text-snow pb-2 font-mono text-xs uppercase;
+		letter-spacing: 0.14em;
 	}
 }
 
@@ -315,18 +551,19 @@ html:active-view-transition-type(backwards) {
  * background/foreground pair that fights the design tokens. Code blocks
  * are dark in both color schemes (`.jp-prose pre`), so one palette is
  * enough. Every hue is chosen for ≥ 4.5:1 against `--color-night` and
- * `--color-night-raised`.
+ * `--color-night-raised`, and the palette is deliberately low-chroma:
+ * five muted hues rather than a rainbow.
  */
 @layer components {
 	.jp-prose pre code {
-		--jp-hl-comment: oklch(0.68 0.02 270);
-		--jp-hl-keyword: oklch(0.79 0.11 300);
-		--jp-hl-string: oklch(0.83 0.13 150);
-		--jp-hl-number: oklch(0.85 0.11 75);
-		--jp-hl-title: oklch(0.81 0.11 235);
-		--jp-hl-attr: oklch(0.84 0.08 200);
-		--jp-hl-type: oklch(0.85 0.09 175);
-		--jp-hl-muted: oklch(0.74 0.03 270);
+		--jp-hl-comment: oklch(0.62 0.01 95);
+		--jp-hl-keyword: oklch(0.78 0.09 30);
+		--jp-hl-string: oklch(0.82 0.07 140);
+		--jp-hl-number: oklch(0.84 0.07 80);
+		--jp-hl-title: oklch(0.85 0.05 230);
+		--jp-hl-attr: oklch(0.83 0.04 200);
+		--jp-hl-type: oklch(0.86 0.05 165);
+		--jp-hl-muted: oklch(0.72 0.008 95);
 	}
 
 	.jp-prose .hljs-comment,
@@ -392,92 +629,48 @@ html:active-view-transition-type(backwards) {
  * Theme toggle icon. The glyphs are CSS mask images colored via
  * currentColor: bQuery's component sanitizer strips inline <svg> from
  * render output, so the icon cannot live in the component's markup.
- * The swap animation makes the sun/moon/system change read as a
- * deliberate transition rather than a hard cut; motion is neutralised by
- * the global reduced-motion guard.
  */
-@keyframes jp-theme-swap {
-	from {
-		transform: rotate(-120deg) scale(0.5);
-		opacity: 0;
-	}
-	to {
-		transform: rotate(0) scale(1);
-		opacity: 1;
-	}
-}
-
 @layer components {
 	.jp-theme-icon {
-		width: 1.25rem;
-		height: 1.25rem;
+		width: 1.125rem;
+		height: 1.125rem;
 		background-color: currentColor;
 		-webkit-mask: var(--jp-theme-icon-mask) center / contain no-repeat;
 		mask: var(--jp-theme-icon-mask) center / contain no-repeat;
-		transform-origin: center;
-		animation: jp-theme-swap var(--duration-swift) ease-out;
 	}
 	.jp-theme-icon--system {
-		--jp-theme-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Crect x='4' y='5' width='16' height='11' rx='2'/%3E%3Cpath d='M9 20h6M12 16v4'/%3E%3C/svg%3E");
+		--jp-theme-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round'%3E%3Crect x='4' y='5' width='16' height='11'/%3E%3Cpath d='M9 20h6M12 16v4'/%3E%3C/svg%3E");
 	}
 	.jp-theme-icon--light {
-		--jp-theme-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4'/%3E%3C/svg%3E");
+		--jp-theme-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4'/%3E%3C/svg%3E");
 	}
 	.jp-theme-icon--dark {
-		--jp-theme-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z'/%3E%3C/svg%3E");
+		--jp-theme-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round'%3E%3Cpath d='M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z'/%3E%3C/svg%3E");
 	}
 }
 
 /*
- * ---------------------------------------------------------------------------
- * Editorial details
- * ---------------------------------------------------------------------------
- * Small, structural touches that carry the "modular systems" identity into
- * the page furniture. Each one is a single class so the markup stays free
- * of decorative utility soup.
+ * Article furniture.
  */
 @layer components {
-	/* Eyebrow kicker: a short accent rule anchors it to the section edge. */
-	.jp-kicker {
-		display: flex;
-		align-items: center;
-		gap: 0.625rem;
-	}
-	.jp-kicker::before {
-		content: '';
-		flex: none;
-		width: 1.5rem;
-		height: 2px;
-		border-radius: 1px;
-		background-color: currentColor;
-	}
-
-	/* Hero chip: a pill that points at the flagship project. */
-	.jp-chip {
-		transition:
-			border-color var(--duration-swift) ease-out,
-			color var(--duration-swift) ease-out;
-	}
-
 	/*
-	 * Article table of contents: the entry for the section currently in
-	 * view gets an accent rail. The rail is a border rather than a
-	 * background so the highlight survives forced-colors mode.
+	 * Table of contents: the entry for the section currently in view gets
+	 * an accent rail. The rail is a border rather than a background so the
+	 * highlight survives forced-colors mode.
 	 */
 	.jp-toc-link {
-		border-left: 2px solid transparent;
-		padding-left: 0.75rem;
-		margin-left: -0.75rem;
+		border-left: 1px solid transparent;
+		padding-left: 0.875rem;
 		transition:
 			color var(--duration-swift) ease-out,
 			border-color var(--duration-swift) ease-out;
 	}
 	/* H3 entries, indented against the rail rather than the text. */
 	.jp-toc-link--sub {
-		padding-left: 1.75rem;
+		padding-left: 1.875rem;
 	}
 	.jp-toc-link--active {
-		@apply text-ink dark:text-snow font-medium;
+		@apply text-ink dark:text-snow;
 		border-left-color: var(--color-accent);
 	}
 	.dark .jp-toc-link--active {
@@ -491,13 +684,16 @@ html:active-view-transition-type(backwards) {
 	 * keyboard users (the island also emits a visually hidden link).
 	 */
 	.jp-heading-anchor {
-		@apply text-accent dark:text-accent-dark no-underline;
+		@apply text-ink-muted dark:text-snow-muted no-underline;
 		opacity: 0;
 		transition: opacity var(--duration-swift) ease-out;
 	}
 	.jp-prose :is(h2, h3):hover .jp-heading-anchor,
 	.jp-prose :is(h2, h3):focus-within .jp-heading-anchor {
 		opacity: 1;
+	}
+	.jp-heading-anchor:hover {
+		@apply text-accent dark:text-accent-dark;
 	}
 }
 
@@ -520,14 +716,10 @@ html:active-view-transition-type(backwards) {
 	pointer-events: none;
 	transform: scaleX(var(--jp-progress, 0));
 	transform-origin: left;
-	background: linear-gradient(90deg, var(--color-accent), oklch(0.62 0.11 200));
+	background-color: var(--color-accent);
 }
 .dark .jp-reading-progress {
-	background: linear-gradient(
-		90deg,
-		var(--color-accent-dark),
-		oklch(0.7 0.09 210)
-	);
+	background-color: var(--color-accent-dark);
 }
 
 /*
@@ -557,277 +749,31 @@ html.jp-navigating::before {
 	top: 0;
 	left: 0;
 	right: 0;
-	height: 3px;
+	height: 2px;
 	z-index: 60;
 	pointer-events: none;
 	transform-origin: left;
-	background: linear-gradient(90deg, var(--color-accent), oklch(0.62 0.11 200));
+	background-color: var(--color-accent);
 	animation: jp-nav-progress 6s 150ms cubic-bezier(0.1, 0.6, 0.2, 1) both;
 }
 
 html.dark.jp-navigating::before {
-	background: linear-gradient(
-		90deg,
-		var(--color-accent-dark),
-		oklch(0.7 0.09 210)
-	);
+	background-color: var(--color-accent-dark);
 }
 
 /*
- * Mobile navigation panel: fades and slides in when it first renders.
+ * Mobile navigation panel: fades in when it first renders.
  * `@starting-style` provides the pre-render state, so the transition runs
  * on the display:none → visible switch without any JavaScript timing
  * tricks. Motion is neutralised by the global reduced-motion guard.
  */
 @layer components {
 	.jp-nav-panel {
-		transition:
-			opacity var(--duration-swift) ease-out,
-			translate var(--duration-swift) ease-out;
+		transition: opacity var(--duration-swift) ease-out;
 
 		@starting-style {
 			opacity: 0;
-			translate: 0 -0.5rem;
 		}
-	}
-}
-
-/*
- * ---------------------------------------------------------------------------
- * Ambient & element motion
- * ---------------------------------------------------------------------------
- * A restrained motion layer that reinforces the "modular systems" identity
- * without ever competing with the content:
- *   - a fixed, slowly drifting accent glow plus a faint static grid behind
- *     everything;
- *   - scroll-driven section reveals (progressive enhancement — content is
- *     never hidden on browsers without `animation-timeline`);
- *   - a gentle staggered hero entrance and a floating hero motif;
- *   - hover lift on cards and buttons.
- *
- * All durations/transforms are neutralised by the global reduced-motion
- * guard in the base layer, and every transform-based effect is additionally
- * gated behind `prefers-reduced-motion: no-preference` so nothing moves for
- * users who opt out. These rules sit outside @layer on purpose: they must win
- * over Tailwind utilities such as `shadow-card` and `transition-colors`.
- */
-
-/* Background: drifting accent glow + faint modular grid. */
-:root {
-	--jp-glow-a: oklch(0.5 0.13 250 / 0.07);
-	--jp-glow-b: oklch(0.62 0.11 200 / 0.05);
-	--jp-grid-line: oklch(0.24 0.02 270 / 0.025);
-}
-:root.dark {
-	--jp-glow-a: oklch(0.78 0.1 250 / 0.09);
-	--jp-glow-b: oklch(0.7 0.09 210 / 0.06);
-	--jp-grid-line: oklch(0.93 0.005 95 / 0.022);
-}
-
-body::before,
-body::after {
-	content: '';
-	position: fixed;
-	inset: -25%;
-	z-index: -1;
-	pointer-events: none;
-}
-
-/* Layer 1: two soft accent blooms that slowly drift and breathe. */
-body::before {
-	background-image:
-		radial-gradient(38rem 38rem at 18% 12%, var(--jp-glow-a), transparent 60%),
-		radial-gradient(34rem 34rem at 84% 30%, var(--jp-glow-b), transparent 58%);
-	animation: jp-ambient-drift 34s ease-in-out infinite alternate;
-}
-
-/* Layer 2: a faint 40px grid, static, tying back to the module motif. */
-body::after {
-	background-image:
-		linear-gradient(var(--jp-grid-line) 1px, transparent 1px),
-		linear-gradient(90deg, var(--jp-grid-line) 1px, transparent 1px);
-	background-size: 2.5rem 2.5rem;
-	/* Fade the grid out toward the edges so it reads as texture, not a table. */
-	-webkit-mask-image: radial-gradient(
-		120% 90% at 50% 0%,
-		black,
-		transparent 78%
-	);
-	mask-image: radial-gradient(120% 90% at 50% 0%, black, transparent 78%);
-}
-
-@keyframes jp-ambient-drift {
-	from {
-		transform: translate3d(-1.5%, -1%, 0) scale(1.02);
-	}
-	to {
-		transform: translate3d(1.5%, 1%, 0) scale(1.08);
-	}
-}
-
-/* Card hover: a small lift, deeper shadow, and accent border. */
-.jp-card {
-	position: relative;
-	transition:
-		transform var(--duration-swift) ease-out,
-		box-shadow var(--duration-swift) ease-out,
-		border-color var(--duration-swift) ease-out;
-}
-.jp-card:hover {
-	border-color: var(--color-accent);
-}
-.dark .jp-card:hover {
-	border-color: var(--color-accent-dark);
-}
-
-/*
- * A hairline of accent along the card's top edge on hover. The gradient
- * fades out at both ends so it never collides with the rounded corners,
- * which a solid rule would cut across.
- */
-.jp-card::after {
-	content: '';
-	position: absolute;
-	inset-inline: 1rem;
-	top: -1px;
-	height: 2px;
-	border-radius: 1px;
-	opacity: 0;
-	pointer-events: none;
-	background: linear-gradient(
-		90deg,
-		transparent,
-		var(--color-accent),
-		transparent
-	);
-	transition: opacity var(--duration-swift) ease-out;
-}
-.dark .jp-card::after {
-	background: linear-gradient(
-		90deg,
-		transparent,
-		var(--color-accent-dark),
-		transparent
-	);
-}
-.jp-card:hover::after,
-.jp-card:focus-within::after {
-	opacity: 1;
-}
-
-/* Button hover: subtle lift + shadow, layered on the existing colour swap. */
-.jp-btn {
-	transition:
-		background-color var(--duration-swift) ease-out,
-		border-color var(--duration-swift) ease-out,
-		color var(--duration-swift) ease-out,
-		transform var(--duration-swift) ease-out,
-		box-shadow var(--duration-swift) ease-out;
-}
-
-@keyframes jp-reveal-in {
-	from {
-		opacity: 0;
-		transform: translateY(1.75rem);
-	}
-	to {
-		opacity: 1;
-		transform: none;
-	}
-}
-
-@keyframes jp-hero-in {
-	from {
-		opacity: 0;
-		transform: translateY(1.25rem);
-	}
-	to {
-		opacity: 1;
-		transform: none;
-	}
-}
-
-@keyframes jp-hero-float {
-	from {
-		transform: translateY(-0.4rem);
-		opacity: 0.8;
-	}
-	to {
-		transform: translateY(0.4rem);
-		opacity: 1;
-	}
-}
-
-@media (prefers-reduced-motion: no-preference) {
-	.jp-card:hover {
-		transform: translateY(-4px);
-		box-shadow: 0 14px 30px -10px oklch(0 0 0 / 0.18);
-	}
-	.dark .jp-card:hover {
-		box-shadow: 0 14px 30px -10px oklch(0 0 0 / 0.55);
-	}
-	/* The card's motif nudges to life with the hover. */
-	.jp-card-motif {
-		transition: transform var(--duration-swift) ease-out;
-	}
-	.jp-card:hover .jp-card-motif {
-		transform: scale(1.1);
-	}
-
-	.jp-btn:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 8px 18px -8px oklch(0.5 0.13 250 / 0.5);
-	}
-	.jp-btn:active {
-		transform: translateY(0);
-	}
-
-	/*
-	 * Staggered hero entrance. Delays key off `nth-child` rather than
-	 * element type so the cascade holds regardless of what each row is;
-	 * the decorative motif is child 1 and animates separately below.
-	 */
-	section[aria-labelledby='hero-heading'] > *:not(.jp-hero-art) {
-		animation: jp-hero-in 700ms cubic-bezier(0.2, 0, 0, 1) both;
-	}
-	section[aria-labelledby='hero-heading'] > *:nth-child(2) {
-		animation-delay: 60ms;
-	}
-	section[aria-labelledby='hero-heading'] > *:nth-child(3) {
-		animation-delay: 150ms;
-	}
-	section[aria-labelledby='hero-heading'] > *:nth-child(4) {
-		animation-delay: 250ms;
-	}
-	section[aria-labelledby='hero-heading'] > *:nth-child(5) {
-		animation-delay: 350ms;
-	}
-	section[aria-labelledby='hero-heading'] > *:nth-child(6) {
-		animation-delay: 450ms;
-	}
-
-	/* The hero motif fades in, then floats indefinitely. */
-	.jp-hero-art {
-		animation:
-			jp-hero-in 900ms ease-out both,
-			jp-hero-float 9s ease-in-out 900ms infinite alternate;
-	}
-
-	/* The flagship chip's dot breathes, marking it as a live pointer. */
-	.jp-chip-dot {
-		animation: jp-chip-pulse 2.4s ease-in-out infinite;
-	}
-}
-
-@keyframes jp-chip-pulse {
-	0%,
-	100% {
-		opacity: 1;
-		transform: scale(1);
-	}
-	50% {
-		opacity: 0.45;
-		transform: scale(0.75);
 	}
 }
 
@@ -837,18 +783,16 @@ body::after {
  * ---------------------------------------------------------------------------
  * The UA replaces every author colour with a system one, which silently
  * erases anything built out of colour alone: mask-image icons lose the
- * `background-color` that fills them, and the ambient/decorative layers
- * become opaque blocks over the content. Restore the icons from system
- * colours and drop the decoration entirely.
+ * `background-color` that fills them, and a hover band becomes an opaque
+ * block over its own text.
  */
 @media (forced-colors: active) {
 	.jp-theme-icon {
 		background-color: CanvasText;
 	}
-	body::before,
-	body::after,
-	.jp-card::after {
-		display: none;
+	.jp-row:hover,
+	.jp-row:focus-within {
+		background-color: Canvas;
 	}
 	.jp-reading-progress,
 	html.jp-navigating::before {
@@ -857,9 +801,7 @@ body::after {
 	.jp-toc-link--active {
 		border-left-color: Highlight;
 	}
-	/* Borders are the only reliable separator left; make them visible. */
-	.jp-card,
-	.jp-chip {
+	.jp-btn {
 		border-color: CanvasText;
 	}
 }
@@ -877,8 +819,6 @@ body::after {
 		background: #fff;
 		color: #000;
 	}
-	body::before,
-	body::after,
 	body > header,
 	body > footer,
 	.jp-reading-progress,
@@ -921,21 +861,5 @@ body::after {
 	.jp-prose blockquote,
 	.jp-prose table {
 		break-inside: avoid;
-	}
-}
-
-/*
- * Scroll-driven section reveals. Guarded by @supports so browsers without
- * scroll-linked animations render the content in its final, visible state —
- * the initial opacity:0 only exists inside this block. The hero animates on
- * load (above), so it is excluded here.
- */
-@supports (animation-timeline: view()) {
-	@media (prefers-reduced-motion: no-preference) {
-		main#main-content section:not([aria-labelledby='hero-heading']) {
-			animation: jp-reveal-in linear both;
-			animation-timeline: view();
-			animation-range: entry 0% entry 45%;
-		}
 	}
 }
