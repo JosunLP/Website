@@ -162,6 +162,9 @@ export const en: AppMessages = {
 		moreReading: 'Keep reading',
 		newerPost: 'Newer post',
 		olderPost: 'Older post',
+		filterLabel: 'Filter by topic',
+		filterAll: 'All',
+		filterResult: '{count} post | {count} posts',
 	},
 	contact: {
 		title: 'Contact — Jonas Pfalzgraf',

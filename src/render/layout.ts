@@ -163,7 +163,6 @@ function siteHeader(ctx: RenderContext): SafeHtml {
 						aria-expanded="false"
 						aria-controls="main-nav"
 						class="border-line dark:border-night-line rounded-ui inline-flex min-h-11 min-w-11 items-center justify-center border md:hidden"
-						hidden
 					>
 						<span
 							class="sr-only"
@@ -186,9 +185,16 @@ function siteHeader(ctx: RenderContext): SafeHtml {
 						</svg>
 					</button>
 					<nav aria-label="${messages.nav.mainNavLabel}">
+						${
+							// Rendered collapsed, which is the state jp-site-nav would
+							// otherwise have to put it in after the first paint. See the
+							// `.no-js` rules in main.css for how this stays usable
+							// without scripting.
+							null
+						}
 						<ul
 							id="main-nav"
-							class="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm"
+							class="hidden flex-wrap items-center gap-x-6 gap-y-1 text-sm md:flex"
 						>
 							${HEADER_NAV.map((page) => {
 								const current = isCurrentPage(ctx, page);
@@ -351,7 +357,12 @@ export function renderDocument(
 	options: DocumentOptions = {},
 ): string {
 	const { messages, assets } = ctx;
-	const scripts = ['bootstrap', ...(options.extraScripts ?? [])];
+	// The bare root page has no header, footer, theme toggle or nav — the
+	// three things the global bundle exists for. It only decides a locale
+	// and leaves, so it loads only what does that.
+	const scripts = options.bare
+		? [...(options.extraScripts ?? [])]
+		: ['bootstrap', ...(options.extraScripts ?? [])];
 	const styleLinks = assets
 		.styles()
 		.map((href) => `<link rel="stylesheet" href="${escape(href)}">`)
@@ -376,7 +387,7 @@ export function renderDocument(
 				<main id="main-content" tabindex="-1">${main}</main>
 				${siteFooter(ctx)}`;
 	return `<!doctype html>
-<html lang="${escape(options.langOverride ?? ctx.locale)}">
+<html lang="${escape(options.langOverride ?? ctx.locale)}" class="no-js">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">

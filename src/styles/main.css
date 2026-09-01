@@ -428,6 +428,29 @@ html:active-view-transition-type(backwards) {
 	}
 
 	/*
+	 * Islands that render themselves must not resize the page when they
+	 * upgrade. The theme toggle is an empty element in the server markup
+	 * (switching schemes needs JavaScript), and the button it builds is
+	 * 2.75rem square — so the element reserves exactly that box up front.
+	 * Without it the header's controls jumped sideways on every load.
+	 */
+	jp-theme-toggle {
+		display: inline-flex;
+		width: 2.75rem;
+		height: 2.75rem;
+	}
+
+	/*
+	 * Blog topic filter. Styled like the header navigation on purpose —
+	 * the active topic is the current view of the list, and the site
+	 * already says "you are here" with an accent underline.
+	 */
+	.jp-filter {
+		cursor: pointer;
+		background: none;
+	}
+
+	/*
 	 * A link that ends in an arrow. The arrow steps forward on hover —
 	 * the one piece of movement kept anywhere in the interface, because
 	 * it says which direction the link goes.
@@ -759,6 +782,29 @@ html.jp-navigating::before {
 
 html.dark.jp-navigating::before {
 	background-color: var(--color-accent-dark);
+}
+
+/*
+ * No-JavaScript navigation.
+ *
+ * The header renders the state JavaScript ends up in: the link list
+ * collapsed behind a toggle on small screens. Rendering the expanded list
+ * instead and letting `jp-site-nav` hide it on upgrade cost a large
+ * layout shift on every mobile load — the whole nav painted, wrapped over
+ * three lines, then vanished.
+ *
+ * `no-js` is set on <html> by the server and removed by the inline head
+ * snippet before the first paint, so these rules only ever apply when
+ * scripting is off — where the toggle button does nothing and the list
+ * must therefore stay open. The rules live here rather than in a
+ * `<noscript><style>` block because the Content-Security-Policy allows no
+ * inline styles.
+ */
+.no-js #main-nav {
+	display: flex;
+}
+.no-js [data-nav-toggle] {
+	display: none;
 }
 
 /*

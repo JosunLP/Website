@@ -15,6 +15,10 @@ export {
 	storeLocale,
 } from './locale-preference';
 
+// Formatting helpers are dictionary-free and live in their own module so
+// client islands can format without importing every locale's messages.
+export { formatIsoDate, formatMessage } from './format';
+
 /** All dictionaries, keyed by locale. */
 export const DICTIONARIES: Readonly<Record<Locale, AppMessages>> = { de, en };
 
@@ -36,37 +40,4 @@ export function createAppI18n(locale: Locale): I18nInstance {
 /** Returns the typed dictionary for a locale. */
 export function messagesFor(locale: Locale): AppMessages {
 	return DICTIONARIES[locale];
-}
-
-/**
- * Interpolates `{param}` placeholders and `one | many` plurals the same
- * way bQuery's `t()` does, but on a typed message string. Keeps the
- * build-time renderer fully typed without dot-path string keys.
- */
-export function formatMessage(
-	message: string,
-	params: Record<string, string | number> = {},
-): string {
-	let template = message;
-	const count = params.count;
-	if (typeof count === 'number' && template.includes('|')) {
-		const forms = template.split('|').map((form) => form.trim());
-		template = (count === 1 ? forms[0] : (forms[1] ?? forms[0])) ?? '';
-	}
-	return template.replace(/\{(\w+)\}/g, (match, key: string) => {
-		const value = params[key];
-		return value === undefined ? match : String(value);
-	});
-}
-
-/** Formats an ISO date for display in the given locale. */
-export function formatIsoDate(isoDate: string, locale: Locale): string {
-	const date = new Date(`${isoDate}T00:00:00Z`);
-	if (Number.isNaN(date.getTime())) {
-		return isoDate;
-	}
-	return new Intl.DateTimeFormat(locale, {
-		dateStyle: 'long',
-		timeZone: 'UTC',
-	}).format(date);
 }

@@ -8,7 +8,7 @@ and [`examples/hosting/nginx.conf`](../examples/hosting/nginx.conf).
 
 ```
 default-src 'none';
-script-src 'self' 'sha256-nTPhegqmvrjZuRuiDtWRYUA0nsamNqLzG7buGcTJGsk=' 'sha256-7sGlICR1u1ehkP45UGXitl7/ffJ1IWxU3psQ/HzGX+M=';
+script-src 'self' 'sha256-JgoTUGaD8rXGn7DIZfXYgLwGcgPN5F60IRGMIip6nc8=' 'sha256-mGGHE9s9bRwdg8h2oVhqn4nE52LU1aIIURx673g1Ib0=';
 style-src 'self';
 img-src 'self' data:;
 font-src 'self';

@@ -68,10 +68,22 @@ export function renderBlogIndexPage(
 					>${raw(FEED_ICON)}${messages.blog.feedLink}</a
 				>
 			</p>
-			<jp-blog-list locale="${locale}">
+			<jp-blog-list
+				locale="${locale}"
+				data-reading-time="${messages.blog.readingTime}"
+				data-tags-label="${messages.blog.tagsLabel}"
+				data-count-label="${messages.blog.postCount}"
+				data-error-label="${messages.blog.loadError}"
+			>
 				<div data-blog-status aria-live="polite" class="sr-only"></div>
+				<jp-tag-filter
+					class="block"
+					data-label="${messages.blog.filterLabel}"
+					data-all="${messages.blog.filterAll}"
+					data-result="${messages.blog.filterResult}"
+				></jp-tag-filter>
 				<p
-					class="jp-label text-ink-muted dark:text-snow-muted mt-20"
+					class="jp-label text-ink-muted dark:text-snow-muted mt-6"
 					data-post-count
 				>
 					${formatMessage(messages.blog.postCount, { count: posts.length })}

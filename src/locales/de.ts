@@ -169,6 +169,9 @@ export const de: AppMessages = {
 		moreReading: 'Weiterlesen',
 		newerPost: 'Neuerer Artikel',
 		olderPost: 'Älterer Artikel',
+		filterLabel: 'Nach Thema filtern',
+		filterAll: 'Alle',
+		filterResult: '{count} Artikel | {count} Artikel',
 	},
 	contact: {
 		title: 'Kontakt — Jonas Pfalzgraf',

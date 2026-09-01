@@ -4,6 +4,7 @@ import type { Project } from '@/domain/models/project';
 import { blogPostPath } from '@/app/configuration';
 import { formatIsoDate, formatMessage } from '@/features/i18n';
 import type { AppMessages } from '@/features/i18n/messages';
+import * as css from '@/render/classes';
 import { html, raw, type SafeHtml } from '@/utils/html';
 
 /**
@@ -18,13 +19,24 @@ import { html, raw, type SafeHtml } from '@/utils/html';
  * belongs in neither this file nor the pages.
  */
 
+export { ROW_LIST } from '@/render/classes';
+
 /** Inline metadata separator; decorative, so it stays out of the a11y tree. */
 const SEPARATOR = raw(
-	'<span aria-hidden="true" class="text-line-strong dark:text-night-line-strong">·</span>',
+	`<span aria-hidden="true" class="${css.SEPARATOR}">·</span>`,
 );
 
 /** Trailing arrow for "go here" links; steps forward on hover via CSS. */
 const ARROW = raw('<span class="jp-arrow" aria-hidden="true">→</span>');
+
+/**
+ * Serialises tags into a `data-tags` attribute the client filter can
+ * match against. Both ends are padded with the delimiter so a substring
+ * test never matches a partial tag ("Vite" inside "Vitest").
+ */
+export function tagAttribute(tags: readonly string[]): string {
+	return tags.length === 0 ? '' : `|${tags.join('|')}|`;
+}
 
 /** Two-digit ordinal used to index rows and sections. Decorative. */
 function ordinal(index: number): string {
@@ -157,10 +169,7 @@ export function techTags(
 	technologies: readonly string[],
 	label: string,
 ): SafeHtml {
-	return html`<ul
-		class="jp-taglist jp-meta text-ink-muted dark:text-snow-muted mt-4"
-		aria-label="${label}"
-	>
+	return html`<ul class="${css.TAGLIST}" aria-label="${label}">
 		${technologies.map((tech) => html`<li>${tech}</li>`)}
 	</ul>`;
 }
@@ -186,26 +195,6 @@ export function statusBadge(
 }
 
 /**
- * Shared row chrome. A row carries the page gutter as its own padding;
- * the list around it carries the matching negative margin (ROW_LIST), so
- * the pointer highlight and the rules read as full-width bands while the
- * text still lines up with everything above them.
- */
-const ROW_CLASS =
-	'jp-row border-line dark:border-night-line border-t px-4 py-8 sm:px-6 sm:py-10';
-
-/**
- * Container for a run of rows: the full-bleed offset plus the rule that
- * closes the list. `:not(:empty)` keeps the closing rule from drawing a
- * stray hairline when the jp-blog-list island finds no posts.
- */
-export const ROW_LIST =
-	'border-line dark:border-night-line -mx-4 sm:-mx-6 [&:not(:empty)]:border-b';
-
-/** Two-column row body: label column left, content column right. */
-const ROW_GRID = 'grid gap-x-10 gap-y-5 md:grid-cols-12';
-
-/**
  * Project row. Fully keyboard accessible; no hover-only content — the
  * pointer highlight is an affordance, never the only way to read
  * something.
@@ -218,8 +207,8 @@ export function projectCard(
 ): SafeHtml {
 	const heading = options.headingLevel ?? 'h3';
 	const index = options.index ?? 0;
-	return html`<article class="${ROW_CLASS}">
-		<div class="${ROW_GRID}">
+	return html`<article class="${css.ROW}">
+		<div class="${css.ROW_GRID}">
 			<div class="md:col-span-4">
 				<p
 					class="jp-label text-ink-muted dark:text-snow-muted"
@@ -291,26 +280,27 @@ export function blogCard(
 	const heading = options.headingLevel ?? 'h3';
 	const path = blogPostPath(locale, post.slug);
 	const minutes = readingTime(post.readingMinutes, messages);
-	return html`<article data-slug="${post.slug}" class="${ROW_CLASS}">
-		<div class="${ROW_GRID}">
-			<div class="md:col-span-3">
-				<p
-					class="jp-meta text-ink-muted dark:text-snow-muted flex flex-wrap items-baseline gap-x-2"
-				>
+	// `data-tags` lets the tag filter match without re-reading the rendered
+	// tag list, and keeps matching on the raw tag rather than its displayed
+	// form.
+	return html`<article
+		data-slug="${post.slug}"
+		data-tags="${tagAttribute(post.tags)}"
+		class="${css.ROW}"
+	>
+		<div class="${css.ROW_GRID}">
+			<div class="${css.ROW_ASIDE}">
+				<p class="${css.META}">
 					<time datetime="${post.publishedAt}"
 						>${formatIsoDate(post.publishedAt, locale)}</time
 					>${minutes !== null ? html`${SEPARATOR}${minutes}` : null}
 				</p>
 			</div>
-			<div class="md:col-span-8 md:col-start-5">
-				<${raw(heading)} class="jp-title text-2xl">
-					<a href="${path}" class="jp-row-link text-ink dark:text-snow"
-						>${post.title}</a
-					>
+			<div class="${css.ROW_MAIN}">
+				<${raw(heading)} class="${css.ROW_TITLE}">
+					<a href="${path}" class="${css.ROW_LINK}">${post.title}</a>
 				</${raw(heading)}>
-				<p class="text-ink-muted dark:text-snow-muted mt-4 leading-relaxed">
-					${post.description}
-				</p>
+				<p class="${css.ROW_TEXT}">${post.description}</p>
 				${post.tags.length > 0 ? techTags(post.tags, messages.blog.tagsLabel) : null}
 			</div>
 		</div>

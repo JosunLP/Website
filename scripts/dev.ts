@@ -63,7 +63,22 @@ const vite = await createViteServer({
 
 const DEV_ASSETS = {
 	script: (entry: string): string => `/src/app/${entry}.ts`,
-	styles: (): readonly string[] => ['/src/styles/main.css'],
+	/*
+	 * `?direct` is load-bearing. Asked for a bare `.css` path, Vite serves
+	 * a JavaScript module that injects the styles when executed — which is
+	 * right for `import './x.css'` and wrong for `<link rel="stylesheet">`:
+	 * the response arrives as `text/javascript`, a stylesheet link cannot
+	 * apply it, and the page paints unstyled before the design appears.
+	 * `?direct` returns the compiled CSS as `text/css`, so the stylesheet
+	 * blocks the first paint in development exactly as the built one does
+	 * in production.
+	 *
+	 * The cost is CSS hot-replacement: styles arrive outside the module
+	 * graph, so a change to main.css needs a reload rather than a hot
+	 * patch. Correct first paint is worth more than that — the flash was
+	 * misreporting the design on every single load.
+	 */
+	styles: (): readonly string[] => ['/src/styles/main.css?direct'],
 	extraHead: (): string => '',
 };
 

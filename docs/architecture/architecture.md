@@ -35,17 +35,30 @@ Build order:
 
 ## 2. bQuery.js module usage
 
-| Module                     | Used for                                                             |
-| -------------------------- | -------------------------------------------------------------------- |
-| `@bquery/bquery/component` | `jp-theme-toggle`, `jp-blog-article` (typed props/state islands)     |
-| `@bquery/bquery/reactive`  | signals backing component re-renders (via `signals` option)          |
-| `@bquery/bquery/i18n`      | `negotiateLocale` for the root locale decision; `createI18n` factory |
-| `@bquery/bquery/a11y`      | `trapFocus` (mobile menu), `announceToScreenReader` (async updates)  |
-| `@bquery/bquery/security`  | `sanitizeHtml` allow-list for all Markdown output                    |
-| `@bquery/bquery/media`     | `usePreferredColorScheme` signal for the theme system                |
+| Module                     | Used for                                                                                                 |
+| -------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `@bquery/bquery/component` | `jp-theme-toggle`, `jp-blog-article` (typed props/state islands)                                         |
+| `@bquery/bquery/reactive`  | signals backing component re-renders; `signal`/`effect` as the single source of truth in `jp-tag-filter` |
+| `@bquery/bquery/i18n`      | `negotiateLocale` for the root locale decision; `createI18n` factory                                     |
+| `@bquery/bquery/a11y`      | `trapFocus` (mobile menu, dynamically imported on first open), `announceToScreenReader` (async updates)  |
+| `@bquery/bquery/security`  | `sanitizeHtml` allow-list for all Markdown output                                                        |
+| `@bquery/bquery/media`     | `usePreferredColorScheme` signal for the theme system                                                    |
 
 Not used: `router`, `store`, `forms`, `view`, `motion`, `server`, `ssr`
-runtime — no SPA, no forms, no backend, and motion is CSS-only.
+runtime — no SPA, no forms, no backend, and motion is CSS-only. The
+router in particular is a deliberate no: these pages are prerendered
+static files that navigate in 60–190 ms, and cross-document view
+transitions already animate the change. Client-side routing would add a
+bundle, a history implementation and a whole class of failure modes in
+exchange for nothing.
+
+**Where bQuery is deliberately _not_ used.** `platform.storage` (735 B
+gzip) would replace ten lines of `try/catch` around `localStorage`, and
+`media.useIntersectionObserver` (975 B) would replace a hand-written
+observer in `jp-article-tools` that also avoids a layout read per scroll
+frame. Both would cost more bytes than they remove. A framework helper
+earns its place when it is smaller than the code it deletes or removes a
+real correctness risk — not because it exists.
 
 **Component conventions.** Two island styles, both light-DOM
 (`shadow: false`) so the Tailwind design system applies:
@@ -190,12 +203,38 @@ construction rather than by optimization passes:
   document as an SVG `<symbol>` and referenced with `<use>`. The previous
   light/dark `<img>` pair cost two requests per placement — browsers
   fetch both files even though CSS hides one.
-- **Chunks follow routes, not convenience.** `bootstrap` (~3 kB gzip) is
-  the only script on most pages. The blog index loads `blog-index`, which
-  deliberately excludes the client-side article renderer; the article
-  shell loads `article`; prerendered posts load only `article-tools`.
-  `marked` and highlight.js stay behind dynamic imports and never reach a
-  page that does not render Markdown in the browser.
+- **Chunks follow routes, not convenience.** `bootstrap` (~3.4 kB gzip)
+  is the only script on most pages. The blog index loads `blog-index`,
+  which deliberately excludes the client-side article renderer; the
+  article shell loads `article`; prerendered posts load only
+  `article-tools`. `marked` and highlight.js stay behind dynamic imports
+  and never reach a page that does not render Markdown in the browser.
+- **Islands never import the server renderer.** `jp-blog-list` used to
+  import `blogCard` so the build-time and runtime renderings could not
+  drift. The guarantee was real but cost 26 kB — the whole render layer
+  plus both locale dictionaries — on every visit to the blog index, for a
+  case that only occurs between a content upload and the next build. The
+  island now shares only the class names (`src/render/classes.ts`) and
+  the formatters (`src/features/i18n/format.ts`), takes its strings from
+  `data-*` attributes, and builds rows with DOM calls — which also
+  removed its dependency on the sanitizer, since text nodes cannot inject
+  markup. A parity test in `tests/components.test.ts` compares the two
+  renderings and is what keeps them honest.
+- **Formatting helpers are dictionary-free.** `@/features/i18n` imports
+  every locale's messages, so anything importing `formatMessage` from it
+  used to pull all of them. The helpers live in `@/features/i18n/format`
+  and the barrel re-exports them.
+- **Third-party code gets explicit chunk boundaries.** Left to itself,
+  Rollup grouped shared framework modules into the highlight.js chunk, so
+  importing a signal statically pulled in 59 kB of syntax highlighting.
+  `manualChunks` pins highlight.js and `marked` to their own chunks;
+  bQuery is left alone, because forcing its dist files into named chunks
+  defeated its own tree-shaking and made things worse (measured both
+  ways).
+- **Deferred work waits for idle.** The blog manifest fetch and the tag
+  filter's DOM both run in `requestIdleCallback` (`@/utils/schedule`):
+  neither is needed to read a page the server already rendered
+  correctly.
 - **Shared chunks are preloaded, not discovered.** The prerenderer reads
   Vite's manifest and emits `<link rel="modulepreload">` for the
   transitive imports of a page's entries.
