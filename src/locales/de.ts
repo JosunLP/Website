@@ -50,7 +50,6 @@ export const de: AppMessages = {
 		heroHeading: 'Software, die verständlich bleibt.',
 		heroIntro:
 			'Ich bin Jonas Pfalzgraf — Full-Stack-Entwickler aus Norddeutschland. Ich baue Webanwendungen und Open-Source-Werkzeuge mit TypeScript, mit Fokus auf Wartbarkeit, Barrierefreiheit und ehrliches Engineering.',
-		flagshipChip: 'Flaggschiff-Projekt: {name}',
 		statsProjects: 'Open-Source-Projekt | Open-Source-Projekte',
 		statsTech: 'Technologie | Technologien',
 		statsPosts: 'Artikel | Artikel',
@@ -170,6 +169,9 @@ export const de: AppMessages = {
 		moreReading: 'Weiterlesen',
 		newerPost: 'Neuerer Artikel',
 		olderPost: 'Älterer Artikel',
+		filterLabel: 'Nach Thema filtern',
+		filterAll: 'Alle',
+		filterResult: '{count} Artikel | {count} Artikel',
 	},
 	contact: {
 		title: 'Kontakt — Jonas Pfalzgraf',

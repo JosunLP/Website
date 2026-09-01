@@ -28,6 +28,33 @@ export default defineConfig({
 				'locale-redirect': 'src/app/locale-redirect.ts',
 				styles: 'src/styles/main.css',
 			},
+			output: {
+				/**
+				 * Third-party code gets explicit chunk boundaries.
+				 *
+				 * Left to itself, Rollup grouped shared framework modules into
+				 * the same chunk as highlight.js — so the blog index, which
+				 * only wanted a signal and an announcer, statically imported
+				 * 59 kB of syntax highlighting it never runs. Pinning each
+				 * dependency to its own chunk makes that class of accident
+				 * impossible: a heavy library can only ever be pulled in by
+				 * something that actually imports it.
+				 *
+				 * bQuery is split along its own entry points rather than
+				 * bundled as one vendor chunk, so a page that needs
+				 * `announceToScreenReader` does not also download the
+				 * component runtime and the sanitizer.
+				 */
+				manualChunks(id: string): string | undefined {
+					if (id.includes('node_modules/highlight.js')) {
+						return 'vendor-highlight';
+					}
+					if (id.includes('node_modules/marked')) {
+						return 'vendor-marked';
+					}
+					return undefined;
+				},
+			},
 		},
 	},
 	test: {

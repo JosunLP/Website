@@ -79,14 +79,14 @@ function languageSwitcher(ctx: RenderContext, idSuffix: string): SafeHtml {
 	const isLandmark = idSuffix === 'header';
 	return html`<jp-language-switcher>
 		<${raw(isLandmark ? 'nav' : 'div role="group"')} aria-label="${messages.language.switcherLabel}">
-			<ul class="flex items-center gap-1 text-sm">
+			<ul class="jp-meta flex items-center">
 				${LOCALES.map((locale, index) => {
 					const current = locale === ctx.locale;
 					const label = messages.language[locale];
 					return html`${
 							index > 0
 								? raw(
-										'<li aria-hidden="true" class="text-line dark:text-night-line">/</li>',
+										'<li aria-hidden="true" class="text-line-strong dark:text-night-line-strong">/</li>',
 									)
 								: null
 						}
@@ -100,8 +100,8 @@ function languageSwitcher(ctx: RenderContext, idSuffix: string): SafeHtml {
 								${current ? raw('aria-current="true"') : null}
 								class="${
 									current
-										? 'inline-flex min-h-9 items-center rounded-full px-2.5 font-semibold text-ink dark:text-snow'
-										: 'inline-flex min-h-9 items-center rounded-full px-2.5 text-ink-muted hover:text-accent dark:text-snow-muted dark:hover:text-accent-dark'
+										? 'text-ink dark:text-snow inline-flex min-h-9 items-center px-1.5'
+										: 'jp-link-quiet inline-flex min-h-9 items-center px-1.5'
 								}"
 								>${locale.toUpperCase()}<span class="sr-only">
 									—
@@ -129,37 +129,45 @@ function themeToggle(messages: AppMessages): SafeHtml {
 	></jp-theme-toggle>`;
 }
 
+/**
+ * Site header: the mark, the navigation, the two preference controls.
+ *
+ * Opaque rather than translucent-and-blurred. A blurred bar smears
+ * whatever scrolls under it, which is exactly the kind of effect that
+ * looks impressive in a screenshot and makes running text harder to read
+ * in use. A single hairline does the same job of separating the bar from
+ * the page.
+ *
+ * The navigation list is rendered collapsed (`hidden … md:flex`) — the
+ * state jp-site-nav would otherwise have to put it in after the first
+ * paint, at the cost of a large layout shift on every mobile load. The
+ * `.no-js` rules in main.css invert it for readers without scripting.
+ */
 function siteHeader(ctx: RenderContext): SafeHtml {
 	const { messages, locale } = ctx;
 	return html`<header
-		class="border-line dark:border-night-line bg-paper/85 dark:bg-night/85 sticky top-0 z-40 border-b backdrop-blur-md"
+		class="border-line dark:border-night-line bg-paper dark:bg-night sticky top-0 z-40 border-b"
 	>
 		<div
-			class="relative mx-auto flex max-w-6xl items-center justify-between gap-x-4 gap-y-3 px-4 py-3 sm:px-6 sm:py-4"
+			class="relative mx-auto flex max-w-5xl items-center justify-between gap-x-4 px-4 py-4 sm:px-6"
 		>
 			<a
 				href="${pagePath(locale, 'home')}"
-				class="flex min-w-0 items-center gap-2.5 text-lg font-semibold tracking-tight sm:gap-3"
+				class="flex min-w-0 items-center gap-3"
 			>
-				${siteLogo(40, 'h-9 w-9 shrink-0 sm:h-10 sm:w-10')}
-				<span class="min-w-0 truncate">
-					${messages.siteName}
-					<span
-						class="text-ink-muted dark:text-snow-muted block truncate text-xs font-normal"
-						>${messages.siteTagline}</span
-					>
-				</span>
+				${siteLogo(32, 'h-7 w-7 shrink-0')}
+				<span class="min-w-0 truncate font-medium tracking-tight"
+					>${messages.siteName}</span
+				>
 			</a>
-			<div class="flex shrink-0 items-center gap-1 sm:gap-4">
-				${languageSwitcher(ctx, 'header')} ${themeToggle(messages)}
+			<div class="flex shrink-0 items-center gap-2 sm:gap-6">
 				<jp-site-nav>
 					<button
 						type="button"
 						data-nav-toggle
 						aria-expanded="false"
 						aria-controls="main-nav"
-						class="border-line dark:border-night-line inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border md:hidden"
-						hidden
+						class="border-line dark:border-night-line rounded-ui inline-flex min-h-11 min-w-11 items-center justify-center border md:hidden"
 					>
 						<span
 							class="sr-only"
@@ -169,14 +177,14 @@ function siteHeader(ctx: RenderContext): SafeHtml {
 						>
 						<svg
 							viewBox="0 0 24 24"
-							class="h-5 w-5"
+							class="h-4 w-4"
 							aria-hidden="true"
 							focusable="false"
 						>
 							<path
-								d="M4 7h16M4 12h16M4 17h16"
+								d="M4 8h16M4 16h16"
 								stroke="currentColor"
-								stroke-width="2"
+								stroke-width="1.75"
 								stroke-linecap="round"
 							/>
 						</svg>
@@ -184,22 +192,25 @@ function siteHeader(ctx: RenderContext): SafeHtml {
 					<nav aria-label="${messages.nav.mainNavLabel}">
 						<ul
 							id="main-nav"
-							class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium"
+							class="hidden flex-wrap items-center gap-x-6 gap-y-1 text-sm md:flex"
 						>
 							${HEADER_NAV.map((page) => {
 								const current = isCurrentPage(ctx, page);
 								// Full-width, 44px tap targets inside the mobile panel;
 								// plain inline links from `md` up.
 								const base =
-									'flex min-h-11 w-full items-center rounded-lg px-3 md:min-h-9 md:w-auto md:rounded-none md:px-0';
+									'flex min-h-11 w-full items-center md:min-h-9 md:w-auto';
 								return html`<li class="w-full md:w-auto">
 									<a
 										href="${pagePath(locale, page)}"
 										${current ? raw('aria-current="page"') : null}
 										class="${
 											current
-												? `${base} text-accent dark:text-accent-dark bg-accent-soft/50 dark:bg-accent-dark-soft/40 md:bg-transparent md:dark:bg-transparent`
-												: `${base} hover:text-accent dark:hover:text-accent-dark hover:bg-line/40 dark:hover:bg-night-line/30 md:hover:bg-transparent md:dark:hover:bg-transparent`
+												? // The current page is marked with the accent
+													// underline rather than a filled tab: one rule
+													// of colour, no extra shape.
+													`${base} text-ink dark:text-snow decoration-accent dark:decoration-accent-dark underline decoration-1 underline-offset-[0.4rem]`
+												: `${base} jp-link-quiet`
 										}"
 										>${navLabel(messages, page)}</a
 									>
@@ -208,13 +219,17 @@ function siteHeader(ctx: RenderContext): SafeHtml {
 						</ul>
 					</nav>
 				</jp-site-nav>
+				<div
+					class="border-line dark:border-night-line flex items-center gap-1 border-l pl-2 sm:pl-4"
+				>
+					${languageSwitcher(ctx, 'header')} ${themeToggle(messages)}
+				</div>
 			</div>
 		</div>
 	</header>`;
 }
 
-const FOOTER_LINK_CLASS =
-	'hover:text-accent dark:hover:text-accent-dark inline-flex min-h-9 items-center';
+const FOOTER_LINK_CLASS = 'jp-link-quiet inline-flex min-h-8 items-center';
 
 /**
  * Footer column heading. Each one names its group through
@@ -224,7 +239,7 @@ const FOOTER_LINK_CLASS =
 function footerColumnHeading(id: string, label: string): SafeHtml {
 	return html`<h2
 		id="${id}"
-		class="text-ink dark:text-snow mb-2 text-xs font-semibold tracking-widest uppercase"
+		class="jp-label text-ink-muted dark:text-snow-muted mb-4"
 	>
 		${label}
 	</h2>`;
@@ -232,18 +247,18 @@ function footerColumnHeading(id: string, label: string): SafeHtml {
 
 function siteFooter(ctx: RenderContext): SafeHtml {
 	const { messages, locale } = ctx;
-	return html`<footer class="border-line dark:border-night-line mt-24 border-t">
+	return html`<footer class="border-line dark:border-night-line mt-32 border-t">
 		<div
-			class="text-ink-muted dark:text-snow-muted mx-auto grid max-w-6xl gap-10 px-4 py-14 text-sm sm:px-6 md:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,1fr))]"
+			class="jp-meta text-ink-muted dark:text-snow-muted mx-auto grid max-w-5xl gap-12 px-4 py-16 sm:px-6 md:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))]"
 		>
-			<div class="space-y-3">
-				<div class="flex items-center gap-2.5">
-					${siteLogo(32, 'h-8 w-8')}
-					<p class="text-ink dark:text-snow font-semibold">
+			<div>
+				<div class="flex items-center gap-3">
+					${siteLogo(28, 'h-7 w-7')}
+					<p class="text-ink dark:text-snow font-sans font-medium">
 						${messages.siteName}
 					</p>
 				</div>
-				<p class="max-w-xs leading-relaxed">${messages.siteTagline}</p>
+				<p class="mt-4 max-w-[26ch] leading-relaxed">${messages.siteTagline}</p>
 			</div>
 
 			<nav aria-labelledby="footer-explore">
@@ -289,13 +304,23 @@ function siteFooter(ctx: RenderContext): SafeHtml {
 			<div>
 				${footerColumnHeading('footer-social', messages.footer.socialLabel)}
 				<ul aria-labelledby="footer-social">
-					<li>${externalLink(OWNER.gitHubUrl, 'GitHub', messages)}</li>
-					<li>${externalLink(OWNER.koFiUrl, 'Ko-fi', messages)}</li>
+					<li>
+						${externalLink(
+							OWNER.gitHubUrl,
+							'GitHub',
+							messages,
+							FOOTER_LINK_CLASS,
+						)}
+					</li>
+					<li>
+						${externalLink(OWNER.koFiUrl, 'Ko-fi', messages, FOOTER_LINK_CLASS)}
+					</li>
 					<li>
 						${externalLink(
 							'https://github.com/JosunLP/Website',
 							messages.footer.sourceNote,
 							messages,
+							FOOTER_LINK_CLASS,
 						)}
 					</li>
 				</ul>
@@ -303,7 +328,7 @@ function siteFooter(ctx: RenderContext): SafeHtml {
 		</div>
 
 		<div
-			class="border-line dark:border-night-line text-ink-muted dark:text-snow-muted mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 border-t px-4 py-6 text-sm sm:px-6"
+			class="border-line dark:border-night-line jp-meta text-ink-muted dark:text-snow-muted mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 border-t px-4 py-6 sm:px-6"
 		>
 			${languageSwitcher(ctx, 'footer')}
 			<a href="#main-content" class="${FOOTER_LINK_CLASS}"
@@ -330,7 +355,12 @@ export function renderDocument(
 	options: DocumentOptions = {},
 ): string {
 	const { messages, assets } = ctx;
-	const scripts = ['bootstrap', ...(options.extraScripts ?? [])];
+	// The bare root page has no header, footer, theme toggle or nav — the
+	// three things the global bundle exists for. It only decides a locale
+	// and leaves, so it loads only what does that.
+	const scripts = options.bare
+		? [...(options.extraScripts ?? [])]
+		: ['bootstrap', ...(options.extraScripts ?? [])];
 	const styleLinks = assets
 		.styles()
 		.map((href) => `<link rel="stylesheet" href="${escape(href)}">`)
@@ -348,14 +378,14 @@ export function renderDocument(
 		? html`${LOGO_SPRITE}${main}`
 		: html`${LOGO_SPRITE}<a
 					href="#main-content"
-					class="focus:bg-accent sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-full focus:px-4 focus:py-2 focus:text-white"
+					class="focus:bg-ink focus:text-paper focus:rounded-ui dark:focus:bg-snow dark:focus:text-night sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2"
 					>${messages.skipToContent}</a
 				>
 				${siteHeader(ctx)}
 				<main id="main-content" tabindex="-1">${main}</main>
 				${siteFooter(ctx)}`;
 	return `<!doctype html>
-<html lang="${escape(options.langOverride ?? ctx.locale)}">
+<html lang="${escape(options.langOverride ?? ctx.locale)}" class="no-js">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -375,8 +405,8 @@ export function renderDocument(
 			//    so speculation only added risk.
 			''
 		}${renderHeadMeta(meta).value}
-		<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbfaf7">
-		<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#20242f">
+		<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbfaf8">
+		<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#141413">
 		<link rel="icon" href="/favicon.ico" sizes="32x32">
 		<link rel="icon" href="/favicon-32x32.png" type="image/png">
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png">

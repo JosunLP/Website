@@ -1,28 +1,54 @@
-import type { BlogManifestEntry } from '@/domain/models/blog';
+import { blogRowRevision, type BlogManifestEntry } from '@/domain/models/blog';
 import type { Locale } from '@/domain/models/locale';
 import type { Project } from '@/domain/models/project';
 import { blogPostPath } from '@/app/configuration';
 import { formatIsoDate, formatMessage } from '@/features/i18n';
 import type { AppMessages } from '@/features/i18n/messages';
+import * as css from '@/render/classes';
 import { html, raw, type SafeHtml } from '@/utils/html';
 
 /**
  * Reusable presentational partials. Pure functions: typed data in,
  * escaped HTML out. Interactive behavior lives in the `jp-*` Web
  * Components that enhance this markup client-side.
+ *
+ * The visual system is deliberately narrow. Content sits in ruled rows
+ * instead of cards, structural information (indices, dates, licences,
+ * technologies) speaks in the monospace voice, and the accent appears
+ * only where it means something. Anything that would be decoration
+ * belongs in neither this file nor the pages.
  */
+
+export { ROW_LIST } from '@/render/classes';
 
 /** Inline metadata separator; decorative, so it stays out of the a11y tree. */
 const SEPARATOR = raw(
-	'<span aria-hidden="true" class="text-line dark:text-night-line">·</span>',
+	`<span aria-hidden="true" class="${css.SEPARATOR}">·</span>`,
 );
+
+/** Trailing arrow for "go here" links; steps forward on hover via CSS. */
+const ARROW = raw('<span class="jp-arrow" aria-hidden="true">→</span>');
+
+/**
+ * Serialises tags into a `data-tags` attribute the client filter can
+ * match against. Both ends are padded with the delimiter so a substring
+ * test never matches a partial tag ("Vite" inside "Vitest").
+ */
+export function tagAttribute(tags: readonly string[]): string {
+	return tags.length === 0 ? '' : `|${tags.join('|')}|`;
+}
+
+/** Two-digit ordinal used to index rows and sections. Decorative. */
+function ordinal(index: number): string {
+	return String(index + 1).padStart(2, '0');
+}
 
 /** External links: new tab + safe rel + visually hidden hint. */
 export function externalLink(
 	href: string,
 	label: string,
 	messages: AppMessages,
-	classes = 'text-accent dark:text-accent-dark underline underline-offset-2 hover:no-underline',
+	classes = 'jp-link',
 ): SafeHtml {
 	return html`<a
 		href="${href}"
@@ -35,19 +61,12 @@ export function externalLink(
 
 export type ButtonVariant = 'primary' | 'secondary';
 
-const BUTTON_CLASSES: Record<ButtonVariant, string> = {
-	primary:
-		'jp-btn inline-flex min-h-11 items-center justify-center rounded-full bg-accent px-6 py-2.5 font-medium text-white transition-colors duration-swift hover:bg-accent-strong dark:bg-accent-dark dark:text-night dark:hover:bg-accent-soft',
-	secondary:
-		'jp-btn inline-flex min-h-11 items-center justify-center rounded-full border border-line px-6 py-2.5 font-medium text-ink transition-colors duration-swift hover:border-accent hover:text-accent dark:border-night-line dark:text-snow dark:hover:border-accent-dark dark:hover:text-accent-dark',
-};
-
 export function buttonLink(
 	href: string,
 	label: string,
 	variant: ButtonVariant = 'primary',
 ): SafeHtml {
-	return html`<a href="${href}" class="${BUTTON_CLASSES[variant]}"
+	return html`<a href="${href}" class="${`jp-btn jp-btn--${variant}`}"
 		>${label}</a
 	>`;
 }
@@ -70,9 +89,9 @@ export function breadcrumbs(
 	items: readonly BreadcrumbItem[],
 	messages: AppMessages,
 ): SafeHtml {
-	return html`<nav aria-label="${messages.breadcrumbLabel}" class="mb-6">
+	return html`<nav aria-label="${messages.breadcrumbLabel}" class="mb-10">
 		<ol
-			class="text-ink-muted dark:text-snow-muted flex flex-wrap items-center gap-x-2 text-sm"
+			class="jp-meta text-ink-muted dark:text-snow-muted flex flex-wrap items-center gap-x-2"
 		>
 			${items.map((item, index) => {
 				const isLast = index === items.length - 1;
@@ -80,7 +99,7 @@ export function breadcrumbs(
 					${
 						index > 0
 							? raw(
-									'<span aria-hidden="true" class="text-line dark:text-night-line">/</span>',
+									'<span aria-hidden="true" class="text-line-strong dark:text-night-line-strong">/</span>',
 								)
 							: null
 					}${
@@ -93,9 +112,7 @@ export function breadcrumbs(
 									class="text-ink dark:text-snow max-w-[min(100%,42ch)] truncate"
 									>${item.name}</span
 								>`
-							: html`<a
-									href="${item.path}"
-									class="hover:text-accent dark:hover:text-accent-dark underline-offset-2 hover:underline"
+							: html`<a href="${item.path}" class="jp-link-quiet"
 									>${item.name}</a
 								>`
 					}
@@ -105,147 +122,155 @@ export function breadcrumbs(
 	</nav>`;
 }
 
-/** Section heading with an eyebrow-style kicker. */
+/**
+ * Section opener: a hairline, a numbered monospace kicker, the heading,
+ * and an optional standfirst. Sections carry their own index so the page
+ * reads as a numbered document instead of a stack of unrelated blocks —
+ * and so no page has to invent its own spacing for the same three parts.
+ */
 export function sectionHeading(
+	index: number,
 	id: string,
 	kicker: string,
 	title: string,
+	intro?: string,
 ): SafeHtml {
-	return html`<div class="mb-10">
+	return html`<header
+		class="border-line dark:border-night-line mb-12 border-t pt-6"
+	>
 		<p
-			class="jp-kicker text-accent dark:text-accent-dark mb-3 text-sm font-semibold tracking-widest uppercase"
+			class="jp-label text-ink-muted dark:text-snow-muted flex items-baseline gap-2.5"
 			aria-hidden="true"
 		>
-			${kicker}
+			<span>${ordinal(index)}</span>
+			<span class="text-line-strong dark:text-night-line-strong">/</span>
+			<span>${kicker}</span>
 		</p>
-		<h2 id="${id}" class="text-3xl font-semibold tracking-tight sm:text-4xl">
-			${title}
-		</h2>
-	</div>`;
+		<h2 id="${id}" class="jp-title mt-5 text-3xl sm:text-4xl">${title}</h2>
+		${
+			intro !== undefined
+				? html`<p
+						class="text-ink-muted dark:text-snow-muted mt-5 max-w-2xl leading-relaxed"
+					>
+						${intro}
+					</p>`
+				: null
+		}
+	</header>`;
 }
 
-/** Technology tag list. */
+/**
+ * Technology / tag list. A real list for assistive technology, set in the
+ * monospace voice and separated by middots — every keyword used to be a
+ * bordered pill, which turned three words of metadata into the loudest
+ * element in the row.
+ */
 export function techTags(
 	technologies: readonly string[],
 	label: string,
 ): SafeHtml {
-	return html`<ul class="flex flex-wrap gap-2" aria-label="${label}">
-		${technologies.map(
-			(tech) =>
-				html`<li
-					class="rounded-tag border-line text-ink-muted dark:border-night-line dark:text-snow-muted border px-2.5 py-1 text-xs font-medium"
-				>
-					${tech}
-				</li>`,
-		)}
+	return html`<ul class="${css.TAGLIST}" aria-label="${label}">
+		${technologies.map((tech) => html`<li>${tech}</li>`)}
 	</ul>`;
 }
 
-/** Status badge; conveys state through text, not color alone. */
+/** Status marker; conveys state through text, not color alone. */
 export function statusBadge(
 	status: Project['status'],
 	messages: AppMessages,
 ): SafeHtml {
 	const label = messages.projects.status[status];
 	return html`<span
-		class="border-line dark:border-night-line text-ink-muted dark:text-snow-muted inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium"
+		class="jp-label text-ink-muted dark:text-snow-muted inline-flex items-center gap-2"
 		>${
 			status === 'active'
 				? raw(
-						'<span class="h-1.5 w-1.5 rounded-full bg-accent dark:bg-accent-dark" aria-hidden="true"></span>',
+						'<span class="bg-accent dark:bg-accent-dark h-1.5 w-1.5" aria-hidden="true"></span>',
 					)
-				: null
+				: raw(
+						'<span class="bg-line-strong dark:bg-night-line-strong h-1.5 w-1.5" aria-hidden="true"></span>',
+					)
 		}${label}</span
 	>`;
 }
 
 /**
- * Decorative geometric motif: a small module/connection diagram.
- * Deterministic per seed so each project gets a distinct but stable
- * pattern. Purely decorative (aria-hidden).
+ * Project row. Fully keyboard accessible; no hover-only content — the
+ * pointer highlight is an affordance, never the only way to read
+ * something.
  */
-export function motif(seed: number, classes: string): SafeHtml {
-	const cells: string[] = [];
-	let state = seed * 2654435761;
-	const rand = (): number => {
-		state = (state * 1103515245 + 12345) & 0x7fffffff;
-		return state / 0x7fffffff;
-	};
-	for (let x = 0; x < 6; x += 1) {
-		for (let y = 0; y < 3; y += 1) {
-			const value = rand();
-			if (value > 0.62) {
-				cells.push(
-					`<rect x="${String(x * 16 + 3)}" y="${String(y * 16 + 3)}" width="10" height="10" rx="2" fill="currentColor" opacity="${value > 0.85 ? '0.9' : '0.35'}"/>`,
-				);
-			} else if (value > 0.45) {
-				cells.push(
-					`<circle cx="${String(x * 16 + 8)}" cy="${String(y * 16 + 8)}" r="2.5" fill="currentColor" opacity="0.5"/>`,
-				);
-			}
-		}
-	}
-	return raw(
-		`<svg viewBox="0 0 96 48" class="${classes}" aria-hidden="true" focusable="false">${cells.join('')}</svg>`,
-	);
-}
-
-/** Project card. Fully keyboard accessible; no hover-only content. */
 export function projectCard(
 	project: Project,
 	locale: Locale,
 	messages: AppMessages,
-	options: { headingLevel?: 'h3' | 'h2' } = {},
+	options: { headingLevel?: 'h3' | 'h2'; index?: number } = {},
 ): SafeHtml {
 	const heading = options.headingLevel ?? 'h3';
-	const seed = project.slug
-		.split('')
-		.reduce((sum, char) => sum + char.charCodeAt(0), 0);
-	return html`<article
-		class="jp-card rounded-card border-line bg-paper-raised shadow-card dark:border-night-line dark:bg-night-raised flex h-full flex-col gap-4 border p-6"
-	>
-		<div class="flex items-start justify-between gap-4">
-			${motif(seed, 'jp-card-motif h-8 w-16 text-accent dark:text-accent-dark shrink-0')}
-			${statusBadge(project.status, messages)}
+	const index = options.index ?? 0;
+	return html`<article class="${css.ROW}">
+		<div class="${css.ROW_GRID}">
+			<div class="md:col-span-4">
+				<p
+					class="jp-label text-ink-muted dark:text-snow-muted"
+					aria-hidden="true"
+				>
+					${ordinal(index)}
+				</p>
+				<${raw(heading)} class="jp-title mt-3 text-2xl">
+					${externalLink(
+						project.repositoryUrl,
+						project.name,
+						messages,
+						'jp-row-link text-ink dark:text-snow',
+					)}
+				</${raw(heading)}>
+				<p class="mt-4">${statusBadge(project.status, messages)}</p>
+			</div>
+			<div class="md:col-span-7 md:col-start-6">
+				<p class="text-ink-muted dark:text-snow-muted leading-relaxed">
+					${project.description[locale]}
+				</p>
+				${techTags(project.technologies, messages.projects.technologiesLabel)}
+				<dl
+					class="jp-meta text-ink-muted dark:text-snow-muted mt-4 flex flex-wrap gap-x-6 gap-y-1"
+				>
+					<div class="flex gap-1.5">
+						<dt>${messages.projects.categoryLabel}</dt>
+						<dd class="text-ink-muted dark:text-snow-muted">
+							${messages.projects.category[project.category]}
+						</dd>
+					</div>
+					<div class="flex gap-1.5">
+						<dt>${messages.projects.licenseLabel}</dt>
+						<dd class="text-ink-muted dark:text-snow-muted">
+							${project.license}
+						</dd>
+					</div>
+				</dl>
+				<p class="jp-meta mt-5 flex flex-wrap gap-x-6 gap-y-1">
+					${externalLink(project.repositoryUrl, messages.projects.repository, messages)}
+					${
+						project.websiteUrl !== undefined
+							? externalLink(
+									project.websiteUrl,
+									messages.projects.website,
+									messages,
+								)
+							: null
+					}
+				</p>
+			</div>
 		</div>
-		<${raw(heading)} class="text-xl font-semibold tracking-tight">
-			${externalLink(
-				project.repositoryUrl,
-				project.name,
-				messages,
-				'text-ink dark:text-snow hover:text-accent dark:hover:text-accent-dark no-underline',
-			)}
-		</${raw(heading)}>
-		<p class="text-ink-muted dark:text-snow-muted grow leading-relaxed">
-			${project.description[locale]}
-		</p>
-		${techTags(project.technologies, messages.projects.technologiesLabel)}
-		<dl class="text-ink-muted dark:text-snow-muted flex flex-wrap gap-x-6 gap-y-1 text-sm">
-			<div class="flex gap-1.5">
-				<dt>${messages.projects.categoryLabel}:</dt>
-				<dd>${messages.projects.category[project.category]}</dd>
-			</div>
-			<div class="flex gap-1.5">
-				<dt>${messages.projects.licenseLabel}:</dt>
-				<dd>${project.license}</dd>
-			</div>
-		</dl>
-		<p class="flex flex-wrap gap-x-5 gap-y-1 text-sm font-medium">
-			${externalLink(project.repositoryUrl, messages.projects.repository, messages)}
-			${
-				project.websiteUrl !== undefined
-					? externalLink(
-							project.websiteUrl,
-							messages.projects.website,
-							messages,
-						)
-					: null
-			}
-		</p>
 	</article>`;
 }
 
-/** Blog card used on the blog index and the home page. */
+/**
+ * Blog row used on the blog index and the home page.
+ *
+ * `data-slug` is load-bearing: the jp-blog-list island compares the
+ * rendered slugs against the runtime manifest and re-renders this exact
+ * markup for posts published after the build.
+ */
 export function blogCard(
 	post: BlogManifestEntry,
 	locale: Locale,
@@ -255,35 +280,31 @@ export function blogCard(
 	const heading = options.headingLevel ?? 'h3';
 	const path = blogPostPath(locale, post.slug);
 	const minutes = readingTime(post.readingMinutes, messages);
+	// `data-tags` lets the tag filter match without re-reading the rendered
+	// tag list, and keeps matching on the raw tag rather than its displayed
+	// form.
 	return html`<article
 		data-slug="${post.slug}"
-		class="jp-card rounded-card border-line bg-paper-raised shadow-card dark:border-night-line dark:bg-night-raised flex h-full flex-col gap-3 border p-6"
+		data-rev="${blogRowRevision(post)}"
+		data-tags="${tagAttribute(post.tags)}"
+		class="${css.ROW}"
 	>
-		<p
-			class="text-ink-muted dark:text-snow-muted flex flex-wrap items-center gap-x-2 text-sm"
-		>
-			<time datetime="${post.publishedAt}"
-				>${formatIsoDate(post.publishedAt, locale)}</time
-			>${minutes !== null ? html`${SEPARATOR}${minutes}` : null}
-		</p>
-		<${raw(heading)} class="text-xl font-semibold tracking-tight">
-			<a href="${path}" class="hover:text-accent dark:hover:text-accent-dark"
-				>${post.title}</a
-			>
-		</${raw(heading)}>
-		<p class="text-ink-muted dark:text-snow-muted grow leading-relaxed">
-			${post.description}
-		</p>
-		${post.tags.length > 0 ? techTags(post.tags, messages.blog.tagsLabel) : null}
-		<p>
-			<a
-				href="${path}"
-				class="text-accent dark:text-accent-dark text-sm font-medium underline underline-offset-2 hover:no-underline"
-				>${messages.blog.readPost}<span class="sr-only"
-					>: ${post.title}</span
-				></a
-			>
-		</p>
+		<div class="${css.ROW_GRID}">
+			<div class="${css.ROW_ASIDE}">
+				<p class="${css.META}">
+					<time datetime="${post.publishedAt}"
+						>${formatIsoDate(post.publishedAt, locale)}</time
+					>${minutes !== null ? html`${SEPARATOR}${minutes}` : null}
+				</p>
+			</div>
+			<div class="${css.ROW_MAIN}">
+				<${raw(heading)} class="${css.ROW_TITLE}">
+					<a href="${path}" class="${css.ROW_LINK}">${post.title}</a>
+				</${raw(heading)}>
+				<p class="${css.ROW_TEXT}">${post.description}</p>
+				${post.tags.length > 0 ? techTags(post.tags, messages.blog.tagsLabel) : null}
+			</div>
+		</div>
 	</article>`;
 }
 
@@ -321,7 +342,7 @@ export function postDates(
 			: undefined;
 	const minutes = readingTime(post.readingMinutes, messages);
 	return html`<p
-		class="text-ink-muted dark:text-snow-muted flex flex-wrap items-center gap-x-2 text-sm"
+		class="jp-meta text-ink-muted dark:text-snow-muted flex flex-wrap items-baseline gap-x-2"
 	>
 		<time datetime="${post.publishedAt}">${published}</time>${
 			updated !== undefined
@@ -331,4 +352,13 @@ export function postDates(
 				: null
 		}${minutes !== null ? html`${SEPARATOR}${minutes}` : null}
 	</p>`;
+}
+
+/** Text link that points onward, with a trailing arrow. */
+export function arrowLink(href: string, label: string): SafeHtml {
+	return html`<a
+		href="${href}"
+		class="jp-link inline-flex min-h-11 items-center gap-2"
+		>${label}${ARROW}</a
+	>`;
 }

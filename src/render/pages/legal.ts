@@ -35,7 +35,7 @@ export function renderLegalPage(
 	const main = html`
 		<div class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
 			${breadcrumbs(trail, messages)}
-			<h1 class="text-4xl font-semibold tracking-tight">
+			<h1 class="jp-display text-4xl sm:text-5xl">
 				${content.heading[locale]}
 			</h1>
 			${content.sections.map((section, index) => {
@@ -48,21 +48,24 @@ export function renderLegalPage(
 				// Numbered ids stay tied to the section's position in the source
 				// so they do not shift when an unanswered section drops out.
 				const id = section.anchor ?? `section-${String(index + 1)}`;
-				return html`<section class="mt-10" aria-labelledby="${id}">
-					<h2 id="${id}" class="text-2xl font-semibold tracking-tight">
+				return html`<section
+					class="border-line dark:border-night-line mt-12 border-t pt-6"
+					aria-labelledby="${id}"
+				>
+					<h2 id="${id}" class="jp-title text-2xl">
 						${section.heading[locale]}
 					</h2>
 					${paragraphs.map(
 						(paragraph) =>
 							html`<p
-								class="text-ink-muted dark:text-snow-muted mt-4 leading-relaxed whitespace-pre-line"
+								class="text-ink-muted dark:text-snow-muted mt-4 max-w-[62ch] leading-relaxed whitespace-pre-line"
 							>
 								${paragraph}
 							</p>`,
 					)}
 				</section>`;
 			})}
-			<p class="text-ink-muted dark:text-snow-muted mt-12 text-sm">
+			<p class="jp-meta text-ink-muted dark:text-snow-muted mt-16">
 				${locale === 'de' ? 'Stand' : 'Last reviewed'}:
 				<time datetime="${content.reviewedAt}"
 					>${formatIsoDate(content.reviewedAt, locale)}</time

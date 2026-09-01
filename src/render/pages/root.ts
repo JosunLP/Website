@@ -37,10 +37,12 @@ export function renderRootPage(ctx: RenderContext): RenderedPage {
 				id="main-content"
 				class="flex min-h-screen items-center justify-center px-4"
 			>
-				<div class="max-w-md space-y-8 text-center">
-					${siteLogo(96, 'mx-auto h-24 w-24')}
-					<h1 class="text-3xl font-semibold tracking-tight">${OWNER.name}</h1>
-					<p class="text-ink-muted dark:text-snow-muted">
+				<div class="w-full max-w-md">
+					${siteLogo(64, 'h-16 w-16')}
+					<h1 class="jp-display mt-10 text-3xl">${OWNER.name}</h1>
+					<p
+						class="jp-meta text-ink-muted dark:text-snow-muted border-line dark:border-night-line mt-6 border-t pt-6 leading-relaxed"
+					>
 						<span lang="de"
 							>Diese Website ist auf Deutsch und Englisch verfügbar.</span
 						>
@@ -48,14 +50,14 @@ export function renderRootPage(ctx: RenderContext): RenderedPage {
 							>This website is available in German and English.</span
 						>
 					</p>
-					<nav aria-label="Sprache / Language">
-						<ul class="flex justify-center gap-4">
+					<nav aria-label="Sprache / Language" class="mt-8">
+						<ul class="flex gap-3">
 							<li>
 								<a
 									href="/de/"
 									hreflang="de"
 									lang="de"
-									class="bg-accent hover:bg-accent-strong dark:bg-accent-dark dark:text-night inline-flex min-h-11 items-center rounded-full px-6 py-2.5 font-medium text-white"
+									class="jp-btn jp-btn--primary"
 									>Deutsch</a
 								>
 							</li>
@@ -64,7 +66,7 @@ export function renderRootPage(ctx: RenderContext): RenderedPage {
 									href="/en/"
 									hreflang="en"
 									lang="en"
-									class="border-line dark:border-night-line hover:border-accent hover:text-accent dark:hover:border-accent-dark dark:hover:text-accent-dark inline-flex min-h-11 items-center rounded-full border px-6 py-2.5 font-medium"
+									class="jp-btn jp-btn--secondary"
 									>English</a
 								>
 							</li>

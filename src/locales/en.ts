@@ -47,7 +47,6 @@ export const en: AppMessages = {
 		heroHeading: 'Software that stays understandable.',
 		heroIntro:
 			'I am Jonas Pfalzgraf — full-stack developer from northern Germany. I build web applications and open-source tools with TypeScript, with a focus on maintainability, accessibility, and honest engineering.',
-		flagshipChip: 'Flagship project: {name}',
 		statsProjects: 'open-source project | open-source projects',
 		statsTech: 'technology | technologies',
 		statsPosts: 'article | articles',
@@ -163,6 +162,9 @@ export const en: AppMessages = {
 		moreReading: 'Keep reading',
 		newerPost: 'Newer post',
 		olderPost: 'Older post',
+		filterLabel: 'Filter by topic',
+		filterAll: 'All',
+		filterResult: '{count} post | {count} posts',
 	},
 	contact: {
 		title: 'Contact — Jonas Pfalzgraf',

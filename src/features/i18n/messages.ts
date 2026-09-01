@@ -51,7 +51,6 @@ export interface AppMessages {
 		readonly description: string;
 		readonly heroHeading: string;
 		readonly heroIntro: string;
-		readonly flagshipChip: string;
 		readonly statsProjects: string;
 		readonly statsTech: string;
 		readonly statsPosts: string;
@@ -138,6 +137,10 @@ export interface AppMessages {
 		readonly moreReading: string;
 		readonly newerPost: string;
 		readonly olderPost: string;
+		/** Tag filter on the blog index (rendered by the client island). */
+		readonly filterLabel: string;
+		readonly filterAll: string;
+		readonly filterResult: string;
 	};
 	readonly contact: {
 		readonly title: string;

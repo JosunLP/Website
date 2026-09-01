@@ -25,6 +25,46 @@ export interface BlogPost {
 	readonly markdown: string;
 }
 
+/**
+ * Fingerprint of everything a blog row displays.
+ *
+ * `jp-blog-list` skips re-rendering when the runtime manifest matches what
+ * the build already rendered. Comparing slugs alone answered a narrower
+ * question than the skip claims — "no post was added, removed or
+ * reordered" — so editing a published post's title, summary, date,
+ * reading time or tags and re-uploading `index.json` left the index
+ * showing the old values until the next build, which is exactly the case
+ * the no-rebuild workflow exists for.
+ *
+ * The server writes this on each row as `data-rev`; the island recomputes
+ * it from the manifest. Hashed rather than inlined because the raw fields
+ * are a few hundred bytes per row of duplicated title and summary text in
+ * the HTML.
+ */
+export function blogRowRevision(entry: {
+	readonly title: string;
+	readonly description: string;
+	readonly publishedAt: string;
+	readonly readingMinutes?: number | undefined;
+	readonly tags: readonly string[];
+}): string {
+	const source = [
+		entry.title,
+		entry.description,
+		entry.publishedAt,
+		String(entry.readingMinutes ?? ''),
+		entry.tags.join(','),
+	].join('\u0000');
+	// FNV-1a: a few lines, no dependency, and collisions here cost a
+	// skipped refresh rather than anything a reader could be harmed by.
+	let hash = 0x811c9dc5;
+	for (let index = 0; index < source.length; index += 1) {
+		hash ^= source.charCodeAt(index);
+		hash = Math.imul(hash, 0x01000193);
+	}
+	return (hash >>> 0).toString(36);
+}
+
 /** One entry of the public blog manifest (`/content/blog/index.json`). */
 export interface BlogManifestEntry {
 	readonly title: string;

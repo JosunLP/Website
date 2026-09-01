@@ -29,10 +29,10 @@ const COPIED_FEEDBACK_MS = 2000;
  * code while reading but is always reachable.
  */
 const COPY_BUTTON_CLASS = [
-	'jp-code-copy absolute top-2.5 right-2.5 inline-flex min-h-9 items-center',
-	'rounded-md border border-white/15 bg-white/10 px-2.5 py-1 text-xs',
-	'font-medium text-snow opacity-0 transition-opacity duration-swift',
-	'hover:bg-white/20 focus-visible:opacity-100 group-hover:opacity-100',
+	'jp-code-copy absolute top-2 right-2 inline-flex min-h-8 items-center',
+	'rounded-ui border border-white/15 px-2.5 py-1 font-mono text-xs',
+	'text-snow opacity-0 transition-opacity duration-swift',
+	'hover:bg-white/10 focus-visible:opacity-100 group-hover:opacity-100',
 ].join(' ');
 
 export function registerArticleTools(): void {

@@ -16,13 +16,16 @@ import { STORAGE_KEYS } from '@/app/configuration';
  * come from data attributes so the element stays locale-agnostic.
  *
  * The icon lives in CSS (`.jp-theme-icon--*` mask images): a masked
- * `<span>` colored via `currentColor` inherits the button's hover colors.
+ * `<span>` colored via `currentColor` inherits the button's hover color.
+ * The glyph swaps without an animation — a rotating sun/moon is a stock
+ * flourish, and the button already reads as pressed through the change
+ * of icon and of the whole page behind it.
  */
 
 type ThemeMode = 'system' | 'light' | 'dark';
 
 const BUTTON_CLASS =
-	'text-ink-muted hover:bg-accent-soft/60 hover:text-accent dark:text-snow-muted dark:hover:bg-accent-dark-soft/40 dark:hover:text-accent-dark duration-swift inline-flex min-h-11 min-w-11 items-center justify-center rounded-full transition-[color,background-color,transform] active:scale-95';
+	'text-ink-muted hover:text-ink dark:text-snow-muted dark:hover:text-snow duration-swift inline-flex min-h-11 min-w-11 items-center justify-center transition-colors';
 
 function readStoredTheme(): ThemeMode {
 	try {
@@ -141,10 +144,10 @@ export function registerThemeToggle(): void {
 
 			/**
 			 * Swaps the glyph by replacing the element rather than rewriting
-			 * its class list: `jp-theme-icon` carries the swap animation, and
-			 * a CSS animation does not restart while the same element keeps
-			 * the same animation-name — the icon would change without the
-			 * transition it is styled for.
+			 * its class list. The two icon classes differ only in their mask
+			 * image, and swapping a `mask-image` in place is the kind of
+			 * change engines repaint inconsistently; replacing the node is
+			 * the variant that always lands.
 			 */
 			private swapIcon(mode: ThemeMode): void {
 				const previous = this.icon;

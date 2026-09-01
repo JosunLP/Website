@@ -14,11 +14,7 @@ export function renderContactPage(ctx: RenderContext): RenderedPage {
 		description: messages.contact.description,
 	};
 	const mailLink = (address: string): ReturnType<typeof html> =>
-		html`<a
-			href="mailto:${address}"
-			class="text-accent dark:text-accent-dark font-medium underline underline-offset-2 hover:no-underline"
-			>${address}</a
-		>`;
+		html`<a href="mailto:${address}" class="jp-link">${address}</a>`;
 	const trail = [
 		{ name: messages.nav.home, path: pagePath(locale, 'home') },
 		{ name: messages.nav.contact, path: ctx.path },
@@ -26,50 +22,58 @@ export function renderContactPage(ctx: RenderContext): RenderedPage {
 	const main = html`
 		<div class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
 			${breadcrumbs(trail, messages)}
-			<h1 class="text-4xl font-semibold tracking-tight">
+			<h1 class="jp-display text-4xl sm:text-6xl">
 				${messages.contact.heading}
 			</h1>
 			<p
-				class="text-ink-muted dark:text-snow-muted mt-4 text-lg leading-relaxed"
+				class="text-ink-muted dark:text-snow-muted mt-8 max-w-[52ch] text-lg leading-relaxed"
 			>
 				${messages.contact.intro}
 			</p>
 
-			<div class="mt-12 grid gap-6 sm:grid-cols-2">
+			<div class="border-line dark:border-night-line mt-16 border-b">
 				<section
-					class="rounded-card border-line dark:border-night-line border p-6"
+					class="border-line dark:border-night-line grid gap-x-10 gap-y-2 border-t py-8 md:grid-cols-12"
 					aria-labelledby="contact-general"
 				>
-					<h2 id="contact-general" class="text-lg font-semibold">
+					<h2
+						id="contact-general"
+						class="jp-label text-ink-muted dark:text-snow-muted md:col-span-4"
+					>
 						${messages.contact.generalHeading}
 					</h2>
-					<p class="text-ink-muted dark:text-snow-muted mt-2 leading-relaxed">
+					<p
+						class="text-ink-muted dark:text-snow-muted leading-relaxed md:col-span-7 md:col-start-6"
+					>
 						${messages.contact.generalText} ${mailLink(OWNER.email)}.
 					</p>
 				</section>
 				<section
-					class="rounded-card border-line dark:border-night-line border p-6"
+					class="border-line dark:border-night-line grid gap-x-10 gap-y-2 border-t py-8 md:grid-cols-12"
 					aria-labelledby="contact-support"
 				>
-					<h2 id="contact-support" class="text-lg font-semibold">
+					<h2
+						id="contact-support"
+						class="jp-label text-ink-muted dark:text-snow-muted md:col-span-4"
+					>
 						${messages.contact.supportHeading}
 					</h2>
-					<p class="text-ink-muted dark:text-snow-muted mt-2 leading-relaxed">
-						${messages.contact.supportText} ${mailLink(OWNER.supportEmail)}.
-					</p>
-					<p class="mt-3 text-sm">
-						${externalLink(OWNER.gitHubUrl, `GitHub — ${OWNER.alias}`, messages)}
-					</p>
+					<div class="md:col-span-7 md:col-start-6">
+						<p class="text-ink-muted dark:text-snow-muted leading-relaxed">
+							${messages.contact.supportText} ${mailLink(OWNER.supportEmail)}.
+						</p>
+						<p class="jp-meta mt-4">
+							${externalLink(OWNER.gitHubUrl, `GitHub — ${OWNER.alias}`, messages)}
+						</p>
+					</div>
 				</section>
 			</div>
 
 			<p
-				class="text-ink-muted dark:text-snow-muted mt-10 text-sm leading-relaxed"
+				class="jp-meta text-ink-muted dark:text-snow-muted mt-10 leading-relaxed"
 			>
 				${messages.contact.privacyNote}
-				<a
-					href="${pagePath(locale, 'privacy')}"
-					class="underline underline-offset-2 hover:no-underline"
+				<a href="${pagePath(locale, 'privacy')}" class="jp-link"
 					>${messages.nav.privacy}</a
 				>
 			</p>
