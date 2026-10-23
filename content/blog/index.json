@@ -1,7 +1,45 @@
 {
 	"version": 1,
-	"generatedAt": "2026-08-10T10:04:22.139Z",
+	"generatedAt": "2026-10-23T12:59:20.256Z",
 	"posts": [
+		{
+			"title": "Die Zeiten für Entwickler ändern sich... ob wir wollen oder nicht",
+			"description": "Ein kleiner Blick auf die sich verändernde Landschaft der Softwareentwicklung und was das für uns bedeutet.",
+			"publishedAt": "2026-10-23",
+			"updatedAt": "2026-10-23",
+			"slug": "times-are-changing",
+			"locale": "de",
+			"translationKey": "times-are-changing",
+			"tags": [
+				"Softwareentwicklung",
+				"Technologietrends",
+				"Zukunft der Arbeit",
+				"Entwicklergemeinschaft",
+				"FOSS"
+			],
+			"featured": true,
+			"path": "/content/blog/de/times-are-changing.md",
+			"readingMinutes": 1
+		},
+		{
+			"title": "Times Are Changing for Developers... Whether We Like It or Not",
+			"description": "A brief look at the changing landscape of software development and what that means for us.",
+			"publishedAt": "2026-10-23",
+			"updatedAt": "2026-10-23",
+			"slug": "times-are-changing",
+			"locale": "en",
+			"translationKey": "times-are-changing",
+			"tags": [
+				"Software Development",
+				"Technology Trends",
+				"Future of Work",
+				"Developer Community",
+				"FOSS"
+			],
+			"featured": true,
+			"path": "/content/blog/en/times-are-changing.md",
+			"readingMinutes": 1
+		},
 		{
 			"title": "josunlp.de neu gebaut: eine statische Website mit bQuery.js",
 			"description": "Wie diese Website funktioniert: vorgerendertes HTML, bQuery.js-Islands, eine strikte CSP und ein Markdown-Blog auf gewöhnlichem Static Hosting.",
@@ -15,7 +53,7 @@
 				"bQuery.js",
 				"Open Source"
 			],
-			"featured": true,
+			"featured": false,
 			"path": "/content/blog/de/rebuilding-josunlp-de.md",
 			"readingMinutes": 2
 		},
@@ -32,7 +70,7 @@
 				"bQuery.js",
 				"Open Source"
 			],
-			"featured": true,
+			"featured": false,
 			"path": "/content/blog/en/rebuilding-josunlp-de.md",
 			"readingMinutes": 2
 		}

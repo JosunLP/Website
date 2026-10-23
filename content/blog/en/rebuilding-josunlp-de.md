@@ -11,7 +11,7 @@ tags:
   - 'bQuery.js'
   - 'Open Source'
 draft: false
-featured: true
+featured: false
 ---
 
 This site is a complete rebuild. The previous version was a SvelteKit

@@ -19,7 +19,7 @@ export default defineConfig({
 	build: {
 		outDir: 'dist',
 		manifest: true,
-		rollupOptions: {
+		rolldownOptions: {
 			input: {
 				bootstrap: 'src/app/bootstrap.ts',
 				article: 'src/app/article.ts',
@@ -32,7 +32,7 @@ export default defineConfig({
 				/**
 				 * Third-party code gets explicit chunk boundaries.
 				 *
-				 * Left to itself, Rollup grouped shared framework modules into
+				 * Left to itself, the bundler grouped shared framework modules into
 				 * the same chunk as highlight.js — so the blog index, which
 				 * only wanted a signal and an announcer, statically imported
 				 * 59 kB of syntax highlighting it never runs. Pinning each
@@ -45,14 +45,14 @@ export default defineConfig({
 				 * `announceToScreenReader` does not also download the
 				 * component runtime and the sanitizer.
 				 */
-				manualChunks(id: string): string | undefined {
-					if (id.includes('node_modules/highlight.js')) {
-						return 'vendor-highlight';
-					}
-					if (id.includes('node_modules/marked')) {
-						return 'vendor-marked';
-					}
-					return undefined;
+				codeSplitting: {
+					groups: [
+						{
+							name: 'vendor-highlight',
+							test: /node_modules[\\/]highlight\.js/,
+						},
+						{ name: 'vendor-marked', test: /node_modules[\\/]marked/ },
+					],
 				},
 			},
 		},
