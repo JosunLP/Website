@@ -47,7 +47,10 @@ export default defineConfig({
 				 */
 				codeSplitting: {
 					groups: [
-						{ name: 'vendor-highlight', test: /node_modules[\\/]highlight\.js/ },
+						{
+							name: 'vendor-highlight',
+							test: /node_modules[\\/]highlight\.js/,
+						},
 						{ name: 'vendor-marked', test: /node_modules[\\/]marked/ },
 					],
 				},
