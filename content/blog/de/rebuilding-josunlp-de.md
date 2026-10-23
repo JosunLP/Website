@@ -11,7 +11,7 @@ tags:
   - 'bQuery.js'
   - 'Open Source'
 draft: false
-featured: true
+featured: false
 ---
 
 Diese Website ist ein kompletter Neubau. Die vorherige Version war ein
