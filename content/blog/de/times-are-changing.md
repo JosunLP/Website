@@ -1,5 +1,5 @@
 ---
-title: 'Die Zeiten für Entwickler ändern sich... ob wir wollen oder nicht'
+title: 'Die Zeiten für Entwickler ändern sich... so oder so'
 description: 'Ein kleiner Blick auf die sich verändernde Landschaft der Softwareentwicklung und was das für uns bedeutet.'
 publishedAt: '2026-10-23'
 updatedAt: '2026-10-23'
@@ -20,7 +20,7 @@ featured: true
 
 Das letzte Mal, dass ich tatsächlich einen Blogartikel geschrieben habe, war auf der alten WordPress-Website. Dementsprechend gebt mir ein bisschen Nachsicht.
 
-Nach den Eskalationen der letzten Tage mit PHP log2shell, der Reaktion der fucking WELT und der (sehr wahrscheinlichen) Zunahme solcher „apokalyptischen“ Events in den kommenden Jahren, wollte ich einfach mal Dampf ablassen.
+Nach den Eskalationen der letzten Tage mit PHP2Shell, der Reaktion der fucking WELT und der (sehr wahrscheinlichen) Zunahme solcher „apokalyptischen“ Events in den kommenden Jahren, wollte ich einfach mal Dampf ablassen.
 
 Ich durfte ja nun schon ein paar Ansätze an Softwareentwicklung verschiedener Firmen begutachten. So ziemlich alle, die sich an „individueller“ Softwareentwicklung orientieren, sind im Zuge der aktuellen Entwicklungen von AI‑Agents an der Grenze der Obsoleszenz. Und damit meine ich nicht, dass die Qualität der Agents so gut wäre... Aber CEOs, COOs und CTOs geben einen Fick auf die technische Einschätzung von Entwicklern und lassen sich von AI‑Agents beraten.
 
